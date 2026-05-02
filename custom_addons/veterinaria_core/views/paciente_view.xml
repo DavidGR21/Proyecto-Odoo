@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Vista de Formulario para Paciente MEJORADA -->
+        <record id="view_veterinaria_paciente_form" model="ir.ui.view">
+            <field name="name">veterinaria.paciente.form</field>
+            <field name="model">veterinaria.paciente</field>
+            <field name="arch" type="xml">
+                <form string="Paciente">
+                    <header>
+                        <field name="estado" widget="statusbar" statusbar_visible="activo,inactivo,fallecido"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_historia_clinica" type="object" 
+                                class="oe_stat_button" icon="fa-history">
+                                <field name="historia_clinica_count" widget="statinfo" string="Consultas"/>
+                            </button>
+                            <button name="action_view_citas" type="object" 
+                                class="oe_stat_button" icon="fa-calendar">
+                                <field name="cita_count" widget="statinfo" string="Citas"/>
+                            </button>
+                        </div>
+
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" placeholder="Ej: Luna, Max, Fluffy"/>
+                            </h1>
+                        </div>
+
+                        <group>
+                            <group string="Propietario">
+                                <field name="propietario_id" required="1" widget="res_partner_many2one"
+                                    domain="[('es_propietario', '=', True)]"
+                                    context="{'default_es_propietario': True}"/>
+                            </group>
+                            <group string="Estado">
+                                <field name="estado" widget="radio" nolabel="1"/>
+                            </group>
+                        </group>
+
+                        <group>
+                            <group string="Información Básica">
+                                <field name="especie" required="1" widget="selection"/>
+                                <field name="raza" placeholder="Ej: Labrador, Persa"/>
+                                <field name="fecha_nacimiento"/>
+                                <field name="peso" string="Peso (kg)"/>
+                            </group>
+                            <group string="Identificación">
+                                <field name="microchip" placeholder="Nº Microchip (opcional)"/>
+                                <field name="fecha_registro" readonly="1"/>
+                            </group>
+                        </group>
+
+                        <group>
+                            <group string="Salud">
+                                <field name="estado_vacunacion" widget="selection"/>
+                            </group>
+                            <group string="Alergias y Observaciones">
+                                <field name="alergias" placeholder="Liste alergias conocidas (opcional)"/>
+                            </group>
+                        </group>
+
+                        <group string="Foto">
+                            <field name="foto" widget="image" class="oe_avatar" nolabel="1"/>
+                        </group>
+
+                        <notebook>
+                            <page string="Expediente Clínico" name="historia">
+                                <field name="historia_clinica_ids" nolabel="1" readonly="1" mode="list">
+                                    <list>
+                                        <field name="fecha_apertura"/>
+                                        <field name="activa"/>
+                                        <field name="alergias"/>
+                                        <field name="tipo_sangre"/>
+                                        <field name="peso"/>
+                                    </list>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Vista de Lista para Paciente -->
+        <record id="view_veterinaria_paciente_list" model="ir.ui.view">
+            <field name="name">veterinaria.paciente.list</field>
+            <field name="model">veterinaria.paciente</field>
+            <field name="arch" type="xml">
+                <list>
+                    <field name="name"/>
+                    <field name="especie"/>
+                    <field name="raza"/>
+                    <field name="propietario_id"/>
+                    <field name="peso"/>
+                    <field name="estado_vacunacion"/>
+                    <field name="estado"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Acción para vista de Paciente -->
+        <record id="action_veterinaria_paciente" model="ir.actions.act_window">
+            <field name="name">Pacientes</field>
+            <field name="res_model">veterinaria.paciente</field>
+            <field name="view_mode">list,form</field>
+        </record>
+    </data>
+</odoo>

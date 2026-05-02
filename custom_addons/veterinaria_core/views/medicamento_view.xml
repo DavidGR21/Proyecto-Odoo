@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Vista de Formulario para Medicamento MEJORADA -->
+        <record id="view_veterinaria_medicamento_form" model="ir.ui.view">
+            <field name="name">veterinaria.medicamento.form</field>
+            <field name="model">veterinaria.medicamento</field>
+            <field name="arch" type="xml">
+                <form string="Medicamento">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" placeholder="Nombre del Medicamento"/>
+                            </h1>
+                        </div>
+
+                        <group>
+                            <group string="Información Básica">
+                                <field name="principio_activo" placeholder="Ej: Amoxicilina"/>
+                                <field name="tipo" required="1"/>
+                                <field name="activo" widget="boolean_toggle"/>
+                            </group>
+                            <group string="Administración">
+                                <field name="dosis_recomendada" placeholder="Ej: 250mg cada 8 horas"/>
+                                <field name="via_administracion"/>
+                                <field name="proveedor_id" 
+                                    domain="[('supplier_rank', '&gt;', 0)]" widget="res_partner_many2one"/>
+                            </group>
+                        </group>
+
+                        <group>
+                            <group string="Descripción">
+                                <field name="descripcion" placeholder="Descripción del medicamento..."/>
+                            </group>
+                        </group>
+
+                        <group>
+                            <group string="Precauciones">
+                                <field name="contraindicaciones" placeholder="Liste las contraindicaciones..."/>
+                            </group>
+                            <group string="Efectos Secundarios">
+                                <field name="efectos_secundarios" placeholder="Liste posibles efectos secundarios..."/>
+                            </group>
+                        </group>
+
+                        <group>
+                            <field name="fecha_registro" readonly="1" string="Fecha de Registro"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Vista de Lista para Medicamento -->
+        <record id="view_veterinaria_medicamento_list" model="ir.ui.view">
+            <field name="name">veterinaria.medicamento.list</field>
+            <field name="model">veterinaria.medicamento</field>
+            <field name="arch" type="xml">
+                <list>
+                    <field name="name"/>
+                    <field name="principio_activo"/>
+                    <field name="tipo"/>
+                    <field name="dosis_recomendada"/>
+                    <field name="via_administracion"/>
+                    <field name="activo" widget="boolean"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Vista de búsqueda para Medicamento -->
+        <record id="view_veterinaria_medicamento_search" model="ir.ui.view">
+            <field name="name">veterinaria.medicamento.search</field>
+            <field name="model">veterinaria.medicamento</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name" string="Medicamento"/>
+                    <field name="principio_activo" string="Principio Activo"/>
+                    <field name="proveedor_id" string="Proveedor"/>
+                    <filter name="activos" string="Activos" domain="[('activo', '=', True)]"/>
+                    <filter name="inactivos" string="Inactivos" domain="[('activo', '=', False)]"/>
+                    <group expand="0" string="Agrupar por">
+                        <filter string="Tipo" name="group_by_tipo" context="{'group_by': 'tipo'}"/>
+                        <filter string="Vía de Administración" name="group_by_via" context="{'group_by': 'via_administracion'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Acción para Medicamento -->
+        <record id="action_veterinaria_medicamento" model="ir.actions.act_window">
+            <field name="name">Medicamentos</field>
+            <field name="res_model">veterinaria.medicamento</field>
+            <field name="view_mode">list,form</field>
+        </record>
+    </data>
+</odoo>

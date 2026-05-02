@@ -1,11 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- Menu -->
-        <menuitem id="menu_veterinaria_root" name="Veterinaria" 
-            sequence="10" web_icon="veterinaria_core,static/description/icon.png"/>
+        <!-- Acciones -->
+        <record id="action_veterinaria_paciente" model="ir.actions.act_window">
+            <field name="name">Pacientes</field>
+            <field name="res_model">veterinaria.paciente</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+        <record id="action_veterinaria_historia_clinica" model="ir.actions.act_window">
+            <field name="name">Historia Clínica</field>
+            <field name="res_model">veterinaria.historia_clinica</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+        <record id="action_veterinaria_medicamento" model="ir.actions.act_window">
+            <field name="name">Medicamentos</field>
+            <field name="res_model">veterinaria.medicamento</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+        <record id="action_veterinaria_cita" model="ir.actions.act_window">
+            <field name="name">Citas</field>
+            <field name="res_model">veterinaria.cita</field>
+            <field name="view_mode">calendar,list,form</field>
+        </record>
+
+        <record id="action_veterinaria_producto" model="ir.actions.act_window">
+            <field name="name">Inventario</field>
+            <field name="res_model">veterinaria.producto</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+        <!-- Menú raíz -->
+        <menuitem id="menu_veterinaria_root" name="Veterinaria" sequence="50"/>
         
-        <menuitem id="menu_veterinaria_config" name="Configuración" 
-            parent="menu_veterinaria_root" sequence="100"/>
+        <!-- 1. GESTIÓN DE MASCOTAS Y CONSULTAS -->
+        <menuitem id="menu_veterinaria_gestion" name="Gestión Clínica" 
+            parent="menu_veterinaria_root" sequence="10"/>
+        
+        <menuitem id="menu_veterinaria_pacientes" name="Pacientes" 
+            parent="menu_veterinaria_gestion" sequence="10" action="action_veterinaria_paciente"/>
+
+        <menuitem id="menu_veterinaria_propietarios" name="Dueños" 
+            parent="menu_veterinaria_gestion" sequence="15" action="action_veterinaria_propietario"/>
+
+        <menuitem id="menu_veterinaria_veterinarios" name="Veterinarios" 
+            parent="menu_veterinaria_gestion" sequence="18" action="action_veterinaria_veterinario"/>
+        
+        <menuitem id="menu_veterinaria_historia" name="Historia Clínica" 
+            parent="menu_veterinaria_gestion" sequence="20" action="action_veterinaria_historia_clinica"/>
+        
+        <!-- 2. CITAS Y CALENDARIO -->
+        <menuitem id="menu_veterinaria_citas" name="Citas" 
+            parent="menu_veterinaria_root" sequence="20" action="action_veterinaria_cita"/>
+        
+        <!-- 3. INVENTARIO Y PRODUCTOS -->
+        <menuitem id="menu_veterinaria_inventario" name="Inventario" 
+            parent="menu_veterinaria_root" sequence="30"/>
+        
+        <menuitem id="menu_veterinaria_productos" name="Productos" 
+            parent="menu_veterinaria_inventario" sequence="10" action="action_veterinaria_producto"/>
+        
+        <menuitem id="menu_veterinaria_medicamentos" name="Medicamentos" 
+            parent="menu_veterinaria_inventario" sequence="20" action="action_veterinaria_medicamento"/>
+        
+        <!-- 4. VENTAS -->
+        <menuitem id="menu_veterinaria_ventas" name="Ventas" 
+            parent="menu_veterinaria_root" sequence="40" action="sale.action_quotations"/>
+        
+        <!-- 5. FACTURACIÓN Y CONTABILIDAD -->
+        <menuitem id="menu_veterinaria_facturacion" name="Facturación" 
+            parent="menu_veterinaria_root" sequence="50" action="account.action_move_out_invoice_type"/>
+        
+        <!-- 6. CRM Y CLIENTES -->
+        <menuitem id="menu_veterinaria_crm" name="CRM" 
+            parent="menu_veterinaria_root" sequence="60" action="crm.crm_lead_action_pipeline"/>
+        
+        <!-- 7. REPORTES Y CONFIGURACIÓN -->
+        <menuitem id="menu_veterinaria_configuracion" name="Configuración" 
+            parent="menu_veterinaria_root" sequence="200"/>
     </data>
 </odoo>

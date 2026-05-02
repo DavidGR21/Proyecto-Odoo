@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Vista de Formulario para Producto Veterinario MEJORADA -->
+        <record id="view_veterinaria_producto_form" model="ir.ui.view">
+            <field name="name">veterinaria.producto.form</field>
+            <field name="model">veterinaria.producto</field>
+            <field name="arch" type="xml">
+                <form string="Producto Veterinario">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" placeholder="Nombre del Producto"/>
+                            </h1>
+                        </div>
+
+                        <group>
+                            <group string="Clasificación">
+                                <field name="categoria" required="1"/>
+                                <field name="unidad_medida"/>
+                                <field name="activo" widget="boolean_toggle"/>
+                            </group>
+                            <group string="Disponibilidad">
+                                <field name="cantidad_stock" string="Stock Actual"/>
+                                <field name="cantidad_minima" string="Stock Mínimo"/>
+                            </group>
+                        </group>
+
+                        <group>
+                            <group string="Precios y Rentabilidad">
+                                <field name="precio_costo" string="Precio de Costo"/>
+                                <field name="precio_venta" required="1" string="Precio de Venta"/>
+                                <field name="margen_ganancia" readonly="1" string="Margen (%)"/>
+                            </group>
+                            <group string="Proveedores e Impuestos">
+                                <field name="proveedor_id" 
+                                    domain="[('supplier_rank', '&gt;', 0)]" widget="res_partner_many2one"/>
+                                <field name="impuesto_id" widget="many2many_tags" string="Impuestos"/>
+                            </group>
+                        </group>
+
+                        <group>
+                            <group string="Descripción">
+                                <field name="descripcion" placeholder="Descripción del producto..."/>
+                            </group>
+                        </group>
+
+                        <group invisible="categoria != 'medicamento'" string="Información Farmacéutica">
+                            <group>
+                                <field name="principio_activo" placeholder="Ej: Amoxicilina"/>
+                                <field name="dosis" placeholder="Ej: 250mg"/>
+                                <field name="via_administracion" widget="selection"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Vista de Lista para Producto -->
+        <record id="view_veterinaria_producto_list" model="ir.ui.view">
+            <field name="name">veterinaria.producto.list</field>
+            <field name="model">veterinaria.producto</field>
+            <field name="arch" type="xml">
+                <list>
+                    <field name="name"/>
+                    <field name="categoria"/>
+                    <field name="precio_venta" string="Precio"/>
+                    <field name="cantidad_stock" string="Stock"/>
+                    <field name="margen_ganancia" string="Margen %"/>
+                    <field name="activo" widget="boolean"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Vista de búsqueda para Producto -->
+        <record id="view_veterinaria_producto_search" model="ir.ui.view">
+            <field name="name">veterinaria.producto.search</field>
+            <field name="model">veterinaria.producto</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <field name="categoria"/>
+                    <field name="proveedor_id"/>
+                    <filter name="activos" string="Activos" domain="[('activo', '=', True)]"/>
+                    <filter name="inactivos" string="Inactivos" domain="[('activo', '=', False)]"/>
+                    <group expand="0" string="Agrupar por">
+                        <filter string="Categoría" name="group_by_categoria" context="{'group_by': 'categoria'}"/>
+                        <filter string="Proveedor" name="group_by_proveedor" context="{'group_by': 'proveedor_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Acción para Producto -->
+        <record id="action_veterinaria_producto" model="ir.actions.act_window">
+            <field name="name">Inventario</field>
+            <field name="res_model">veterinaria.producto</field>
+            <field name="view_mode">list,form</field>
+        </record>
+    </data>
+</odoo>

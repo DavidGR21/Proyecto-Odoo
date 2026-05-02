@@ -1,2 +1,8 @@
 # -*- coding: utf-8 -*-
-# Models package for veterinaria_core module
+from . import paciente
+from . import propietario
+from . import veterinario
+from . import historia_clinica
+from . import medicamento
+from . import cita
+from . import producto

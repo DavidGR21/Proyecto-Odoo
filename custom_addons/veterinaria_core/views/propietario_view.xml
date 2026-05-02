@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_veterinaria_propietario_tree" model="ir.ui.view">
+            <field name="name">veterinaria.propietario.tree</field>
+            <field name="model">res.partner</field>
+            <field name="arch" type="xml">
+                <list string="Dueños de Mascotas">
+                    <field name="name"/>
+                    <field name="mobile"/>
+                    <field name="phone"/>
+                    <field name="email"/>
+                    <field name="cantidad_mascotas" string="Mascotas"/>
+                    <field name="es_propietario" invisible="1"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_veterinaria_propietario_search" model="ir.ui.view">
+            <field name="name">veterinaria.propietario.search</field>
+            <field name="model">res.partner</field>
+            <field name="arch" type="xml">
+                <search string="Dueños de Mascotas">
+                    <field name="name"/>
+                    <field name="mobile"/>
+                    <field name="phone"/>
+                    <field name="email"/>
+                    <filter name="solo_propietarios" string="Solo dueños" domain="[('es_propietario', '=', True)]"/>
+                    <group expand="0" string="Agrupar por">
+                        <filter string="Dueño" name="group_by_propietario" context="{'group_by': 'es_propietario'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="view_veterinaria_propietario_form_inherit" model="ir.ui.view">
+            <field name="name">veterinaria.propietario.form.inherit</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook" position="inside">
+                    <page string="Veterinaria">
+                        <group>
+                            <group string="Perfil de Dueño">
+                                <field name="es_propietario"/>
+                                <field name="cantidad_mascotas" readonly="1"/>
+                            </group>
+                            <group string="Observaciones">
+                                <field name="observaciones_veterinaria" placeholder="Notas clínicas o administrativas..."/>
+                            </group>
+                        </group>
+                        <group string="Mascotas Asociadas">
+                            <field name="paciente_ids" nolabel="1" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="especie"/>
+                                    <field name="raza"/>
+                                    <field name="estado"/>
+                                    <field name="fecha_nacimiento"/>
+                                </list>
+                            </field>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="action_veterinaria_propietario" model="ir.actions.act_window">
+            <field name="name">Dueños</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_mode">list,form</field>
+            <field name="view_id" ref="view_veterinaria_propietario_tree"/>
+            <field name="domain">[('es_propietario', '=', True)]</field>
+            <field name="context">{'default_es_propietario': True}</field>
+        </record>
+    </data>
+</odoo>

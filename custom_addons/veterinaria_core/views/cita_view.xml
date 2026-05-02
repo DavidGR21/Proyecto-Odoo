@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Vista de Formulario para Cita MEJORADA -->
+        <record id="view_veterinaria_cita_form" model="ir.ui.view">
+            <field name="name">veterinaria.cita.form</field>
+            <field name="model">veterinaria.cita</field>
+            <field name="arch" type="xml">
+                <form string="Cita">
+                    <header>
+                        <button name="action_completar_cita" type="object" string="✓ Completar" 
+                            class="btn btn-success"
+                            invisible="estado != 'programada'"/>
+                        <button name="action_cancelar_cita" type="object" string="✗ Cancelar" 
+                            class="btn btn-danger"
+                            invisible="estado not in ('programada', 'completada')"/>
+                        <field name="estado" widget="statusbar" statusbar_visible="programada,completada,cancelada,no_asistio"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+
+                        <group>
+                            <group string="Datos de la Mascota">
+                                <field name="paciente_id" required="1"/>
+                                <field name="propietario_id" readonly="1" string="Propietario"/>
+                            </group>
+                            <group string="Datos del Veterinario">
+                                <field name="veterinario_id" required="1" 
+                                    domain="[('es_veterinario', '=', True)]"
+                                    context="{'default_es_veterinario': True}"/>
+                            </group>
+                        </group>
+
+                        <group>
+                            <group string="Fecha y Hora">
+                                <field name="fecha_hora" required="1" widget="datetime"/>
+                                <field name="duracion" string="Duración (horas)"/>
+                            </group>
+                            <group string="Confirmación">
+                                <field name="recordatorio_enviado" readonly="1"/>
+                                <field name="estado" readonly="1"/>
+                            </group>
+                        </group>
+
+                        <group string="Motivo de la Cita">
+                            <field name="motivo" placeholder="Describa brevemente el motivo de la cita..." required="1"/>
+                        </group>
+
+                        <group>
+                            <group string="Datos Generales de la Mascota">
+                                <field name="alergias" placeholder="Alergias conocidas..."/>
+                                <field name="tipo_sangre"/>
+                                <field name="peso"/>
+                            </group>
+                            <group string="Condiciones Crónicas">
+                                <field name="condiciones_cronicas" placeholder="Condiciones crónicas..."/>
+                            </group>
+                        </group>
+
+                        <group string="Observaciones">
+                            <field name="observaciones" placeholder="Notas adicionales (opcional)"/>
+                        </group>
+
+                        <group>
+                            <group string="Historia Clínica Relacionada">
+                                <field name="historia_clinica_id" readonly="1"/>
+                            </group>
+                        </group>
+                    </sheet>
+
+                </form>
+            </field>
+        </record>
+
+        <!-- Vista de Lista para Cita -->
+        <record id="view_veterinaria_cita_list" model="ir.ui.view">
+            <field name="name">veterinaria.cita.list</field>
+            <field name="model">veterinaria.cita</field>
+            <field name="arch" type="xml">
+                <list>
+                    <field name="fecha_hora"/>
+                    <field name="paciente_id"/>
+                    <field name="propietario_id"/>
+                    <field name="veterinario_id"/>
+                    <field name="motivo"/>
+                    <field name="estado" decoration-success="estado == 'completada'" 
+                        decoration-danger="estado == 'cancelada'"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Vista de Calendario para Cita -->
+        <record id="view_veterinaria_cita_calendar" model="ir.ui.view">
+            <field name="name">veterinaria.cita.calendar</field>
+            <field name="model">veterinaria.cita</field>
+            <field name="arch" type="xml">
+                <calendar
+                    date_start="fecha_hora"
+                    date_delay="duracion"
+                    string="Citas"
+                    mode="month"
+                    color="veterinario_id"
+                    quick_create="false"
+                >
+                    <field name="paciente_id"/>
+                    <field name="propietario_id"/>
+                    <field name="veterinario_id"/>
+                    <field name="motivo"/>
+                    <field name="estado"/>
+                    <field name="name"/>
+                </calendar>
+            </field>
+        </record>
+
+        <!-- Vista de búsqueda para Cita -->
+        <record id="view_veterinaria_cita_search" model="ir.ui.view">
+            <field name="name">veterinaria.cita.search</field>
+            <field name="model">veterinaria.cita</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="paciente_id"/>
+                    <field name="veterinario_id"/>
+                    <field name="propietario_id"/>
+                    <field name="motivo"/>
+                    <filter name="programadas" string="Programadas" domain="[('estado', '=', 'programada')]"/>
+                    <filter name="completadas" string="Completadas" domain="[('estado', '=', 'completada')]"/>
+                    <filter name="canceladas" string="Canceladas" domain="[('estado', '=', 'cancelada')]"/>
+                    <group expand="0" string="Agrupar por">
+                        <filter string="Veterinario" name="group_by_vet" context="{'group_by': 'veterinario_id'}"/>
+                        <filter string="Estado" name="group_by_estado" context="{'group_by': 'estado'}"/>
+                        <filter string="Fecha" name="group_by_fecha" context="{'group_by': 'fecha_hora'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Acción para Cita -->
+        <record id="action_veterinaria_cita" model="ir.actions.act_window">
+            <field name="name">Citas</field>
+            <field name="res_model">veterinaria.cita</field>
+            <field name="view_mode">calendar,list,form</field>
+            <field name="context">{'default_veterinario_id': uid, 'default_estado': 'programada', 'default_duracion': 1.0}</field>
+        </record>
+    </data>
+</odoo>

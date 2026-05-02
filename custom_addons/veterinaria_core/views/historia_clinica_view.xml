@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Vista de Formulario para Historia Clínica MEJORADA -->
+        <record id="view_veterinaria_historia_clinica_form" model="ir.ui.view">
+            <field name="name">veterinaria.historia_clinica.form</field>
+            <field name="model">veterinaria.historia_clinica</field>
+            <field name="arch" type="xml">
+                <form create="false" delete="false">
+                    <header>
+                        <field name="activa" widget="boolean_toggle"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="paciente_id" readonly="1"/>
+                            </h1>
+                        </div>
+
+                        <group>
+                            <group string="Información del Expediente">
+                                <field name="paciente_id" required="1" readonly="1"/>
+                                <field name="fecha_apertura" readonly="1"/>
+                                <field name="cita_count" readonly="1"/>
+                            </group>
+                        </group>
+
+                        <group>
+                            <group string="Datos Generales">
+                                <field name="alergias" placeholder="Alergias conocidas..."/>
+                                <field name="tipo_sangre"/>
+                                <field name="peso"/>
+                                <field name="condiciones_cronicas" placeholder="Condiciones crónicas..."/>
+                            </group>
+                        </group>
+
+                        <group>
+                            <group string="Observaciones">
+                                <field name="observaciones" placeholder="Notas adicionales..."/>
+                            </group>
+                        </group>
+
+                        <notebook>
+                            <page string="Historial de Citas" name="citas">
+                                <field name="cita_ids" nolabel="1" readonly="1">
+                                    <list>
+                                        <field name="fecha_hora"/>
+                                        <field name="name" string="Cita"/>
+                                        <field name="veterinario_id"/>
+                                        <field name="propietario_id"/>
+                                        <field name="motivo"/>
+                                        <field name="estado"/>
+                                    </list>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Vista de Lista para Historia Clínica -->
+        <record id="view_veterinaria_historia_clinica_list" model="ir.ui.view">
+            <field name="name">veterinaria.historia_clinica.list</field>
+            <field name="model">veterinaria.historia_clinica</field>
+            <field name="arch" type="xml">
+                <list create="false" edit="false" delete="false">
+                    <field name="paciente_id"/>
+                    <field name="fecha_apertura"/>
+                    <field name="activa" widget="boolean"/>
+                    <field name="cita_count"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Vista de búsqueda para Historia Clínica -->
+        <record id="view_veterinaria_historia_clinica_search" model="ir.ui.view">
+            <field name="name">veterinaria.historia_clinica.search</field>
+            <field name="model">veterinaria.historia_clinica</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="paciente_id" string="Paciente"/>
+                    <filter name="activas" string="Activas" domain="[('activa', '=', True)]"/>
+                    <filter name="inactivas" string="Inactivas" domain="[('activa', '=', False)]"/>
+                    <group expand="0" string="Agrupar por">
+                        <filter string="Paciente" name="group_by_paciente" context="{'group_by': 'paciente_id'}"/>
+                        <filter string="Activa" name="group_by_activa" context="{'group_by': 'activa'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Acción para vista de Historia Clínica -->
+        <record id="action_veterinaria_historia_clinica" model="ir.actions.act_window">
+            <field name="name">Historia Clínica</field>
+            <field name="res_model">veterinaria.historia_clinica</field>
+            <field name="view_mode">list,form</field>
+            <field name="context">{'create': False, 'delete': False}</field>
+        </record>
+    </data>
+</odoo>
