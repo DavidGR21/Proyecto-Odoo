@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Form View para Facturación -->
+        <record id="facturacion_form_view" model="ir.ui.view">
+            <field name="name">veterinaria.facturacion.form</field>
+            <field name="model">veterinaria.facturacion</field>
+            <field name="arch" type="xml">
+                <form string="Facturación por Servicios">
+                    <header>
+                        <button name="action_validar_factura" string="Validar y Generar Factura" 
+                                type="object" class="btn-primary" 
+                                invisible="estado != 'borrador'"/>
+                        <button name="action_cancelar_factura" string="Cancelar" 
+                                type="object" 
+                                invisible="estado != 'validado'"/>
+                        <field name="estado" widget="statusbar" 
+                               statusbar_visible="borrador,validado,cancelado"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="cita_id" required="1"/>
+                                <field name="propietario_id" readonly="1"/>
+                                <field name="paciente_id" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="veterinario_id" readonly="1"/>
+                                <field name="fecha_cita" readonly="1"/>
+                                <field name="fecha_factura"/>
+                            </group>
+                        </group>
+
+                        <notebook>
+                            <page string="Detalles de la Cita">
+                                <group>
+                                    <field name="motivo_cita" readonly="1" colspan="2"/>
+                                </group>
+                            </page>
+
+                            <page string="Precios e Impuestos">
+                                <group>
+                                    <field name="precio_unitario" required="1"/>
+                                    <field name="impuesto_id" widget="many2many_tags"/>
+                                </group>
+                            </page>
+
+                            <page string="Factura Contable">
+                                <group>
+                                    <field name="move_id" readonly="1"/>
+                                </group>
+                            </page>
+
+                            <page string="Observaciones">
+                                <field name="observaciones" colspan="2"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- List View para Facturación -->
+        <record id="facturacion_list_view" model="ir.ui.view">
+            <field name="name">veterinaria.facturacion.list</field>
+            <field name="model">veterinaria.facturacion</field>
+            <field name="arch" type="xml">
+                <list string="Facturación por Servicios" default_order="fecha_factura DESC">
+                    <field name="name"/>
+                    <field name="paciente_id"/>
+                    <field name="propietario_id"/>
+                    <field name="fecha_cita"/>
+                    <field name="precio_unitario" sum="Total"/>
+                    <field name="move_id"/>
+                    <field name="estado" decoration-info="estado=='borrador'" 
+                           decoration-success="estado=='validado'" 
+                           decoration-danger="estado=='cancelado'"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Search View para Facturación -->
+        <record id="facturacion_search_view" model="ir.ui.view">
+            <field name="name">veterinaria.facturacion.search</field>
+            <field name="model">veterinaria.facturacion</field>
+            <field name="arch" type="xml">
+                <search string="Facturación por Servicios">
+                    <field name="name" string="Número de Factura"/>
+                    <field name="paciente_id" string="Mascota"/>
+                    <field name="propietario_id" string="Propietario"/>
+                    <field name="veterinario_id" string="Veterinario"/>
+                    <separator/>
+                    <filter name="filter_borrador" string="Borradores" domain="[('estado', '=', 'borrador')]"/>
+                    <filter name="filter_validado" string="Validadas" domain="[('estado', '=', 'validado')]"/>
+                    <filter name="filter_cancelado" string="Canceladas" domain="[('estado', '=', 'cancelado')]"/>
+                    <separator/>
+                    <filter name="filter_propietario" string="Por Propietario" 
+                            context="{'group_by': 'propietario_id'}"/>
+                    <filter name="filter_paciente" string="Por Mascota" 
+                            context="{'group_by': 'paciente_id'}"/>
+                    <filter name="filter_fecha" string="Por Fecha" 
+                            context="{'group_by': 'fecha_factura'}"/>
+                </search>
+            </field>
+        </record>
+
+        <!-- Action para Facturación -->
+        <record id="facturacion_action" model="ir.actions.act_window">
+            <field name="name">Facturación por Servicios</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">veterinaria.facturacion</field>
+            <field name="view_mode">list,form</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Crear una nueva factura por servicios (citas completadas)
+                </p>
+            </field>
+        </record>
+    </data>
+</odoo>

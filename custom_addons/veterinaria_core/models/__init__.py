@@ -6,3 +6,5 @@ from . import historia_clinica
 from . import medicamento
 from . import cita
 from . import producto
+from . import venta
+from . import facturacion

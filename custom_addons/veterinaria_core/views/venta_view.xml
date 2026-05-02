@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Form View para Líneas de Venta -->
+        <record id="venta_linea_form_view" model="ir.ui.view">
+            <field name="name">veterinaria.venta.linea.form</field>
+            <field name="model">veterinaria.venta.linea</field>
+            <field name="arch" type="xml">
+                <form string="Línea de Venta">
+                    <group>
+                        <group>
+                            <field name="producto_id"/>
+                            <field name="cantidad"/>
+                        </group>
+                        <group>
+                            <field name="precio_unitario"/>
+                            <field name="subtotal" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="impuesto_id" widget="many2many_tags"/>
+                        <field name="impuesto" readonly="1"/>
+                        <field name="total_linea" readonly="1"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <!-- Tree View para Líneas de Venta -->
+        <record id="venta_linea_tree_view" model="ir.ui.view">
+            <field name="name">veterinaria.venta.linea.tree</field>
+            <field name="model">veterinaria.venta.linea</field>
+            <field name="arch" type="xml">
+                <list string="Líneas de Venta" editable="bottom">
+                    <field name="producto_id"/>
+                    <field name="cantidad"/>
+                    <field name="precio_unitario"/>
+                    <field name="subtotal" readonly="1"/>
+                    <field name="impuesto_id" widget="many2many_tags"/>
+                    <field name="impuesto" readonly="1"/>
+                    <field name="total_linea" readonly="1" sum="Total"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Form View para Ventas -->
+        <record id="venta_form_view" model="ir.ui.view">
+            <field name="name">veterinaria.venta.form</field>
+            <field name="model">veterinaria.venta</field>
+            <field name="arch" type="xml">
+                <form string="Venta de Productos">
+                    <header>
+                        <button name="action_validar_venta" string="Validar y Crear Orden" 
+                                type="object" class="btn-primary" 
+                                invisible="estado != 'borrador'"/>
+                        <button name="action_cancelar_venta" string="Cancelar" 
+                                type="object" 
+                                invisible="estado != 'validado'"/>
+                        <field name="estado" widget="statusbar" 
+                               statusbar_visible="borrador,validado,cancelado"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="propietario_id" required="1" widget="res_partner_many2one"
+                                       context="{'default_es_propietario': True}"/>
+                                <field name="paciente_id"/>
+                                <field name="fecha_venta"/>
+                            </group>
+                            <group>
+                                <field name="sale_order_id" readonly="1"/>
+                            </group>
+                        </group>
+
+                        <notebook>
+                            <page string="Productos y Medicamentos">
+                                <field name="linea_venta_ids">
+                                    <form string="Línea de Venta">
+                                        <group>
+                                            <group>
+                                                <field name="producto_id"/>
+                                                <field name="cantidad"/>
+                                            </group>
+                                            <group>
+                                                <field name="precio_unitario"/>
+                                                <field name="subtotal" readonly="1"/>
+                                            </group>
+                                        </group>
+                                        <group>
+                                            <field name="impuesto_id" widget="many2many_tags"/>
+                                            <field name="impuesto" readonly="1"/>
+                                            <field name="total_linea" readonly="1"/>
+                                        </group>
+                                    </form>
+                                    <list editable="bottom">
+                                        <field name="producto_id"/>
+                                        <field name="cantidad"/>
+                                        <field name="precio_unitario"/>
+                                        <field name="subtotal" readonly="1"/>
+                                        <field name="impuesto" readonly="1"/>
+                                        <field name="total_linea" readonly="1" sum="Total"/>
+                                    </list>
+                                </field>
+                                <group class="oe_subtotal_footer">
+                                    <field name="total_sin_impuesto" readonly="1"/>
+                                    <field name="impuesto_total" readonly="1"/>
+                                    <field name="total" readonly="1" class="oe_subtotal_footer_separator"/>
+                                </group>
+                            </page>
+
+                            <page string="Observaciones">
+                                <field name="observaciones" colspan="2"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- List View para Ventas -->
+        <record id="venta_list_view" model="ir.ui.view">
+            <field name="name">veterinaria.venta.list</field>
+            <field name="model">veterinaria.venta</field>
+            <field name="arch" type="xml">
+                <list string="Ventas de Productos" default_order="fecha_venta DESC">
+                    <field name="name"/>
+                    <field name="propietario_id"/>
+                    <field name="paciente_id"/>
+                    <field name="fecha_venta"/>
+                    <field name="total_sin_impuesto"/>
+                    <field name="impuesto_total"/>
+                    <field name="total" sum="Total"/>
+                    <field name="estado" decoration-info="estado=='borrador'" 
+                           decoration-success="estado=='validado'" 
+                           decoration-danger="estado=='cancelado'"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Search View para Ventas -->
+        <record id="venta_search_view" model="ir.ui.view">
+            <field name="name">veterinaria.venta.search</field>
+            <field name="model">veterinaria.venta</field>
+            <field name="arch" type="xml">
+                <search string="Ventas de Productos">
+                    <field name="name" string="Venta"/>
+                    <field name="propietario_id" string="Propietario"/>
+                    <field name="paciente_id" string="Mascota"/>
+                    <separator/>
+                    <filter name="filter_borrador" string="Borradores" domain="[('estado', '=', 'borrador')]"/>
+                    <filter name="filter_validado" string="Validadas" domain="[('estado', '=', 'validado')]"/>
+                    <filter name="filter_cancelado" string="Canceladas" domain="[('estado', '=', 'cancelado')]"/>
+                    <separator/>
+                    <filter name="filter_propietario" string="Por Propietario" 
+                            context="{'group_by': 'propietario_id'}"/>
+                    <filter name="filter_fecha" string="Por Fecha" 
+                            context="{'group_by': 'fecha_venta'}"/>
+                </search>
+            </field>
+        </record>
+
+        <!-- Action para Ventas -->
+        <record id="venta_action" model="ir.actions.act_window">
+            <field name="name">Ventas de Productos</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">veterinaria.venta</field>
+            <field name="view_mode">list,form</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Crear una nueva venta de productos y medicamentos
+                </p>
+            </field>
+        </record>
+    </data>
+</odoo>

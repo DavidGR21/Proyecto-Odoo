@@ -4,5 +4,7 @@ access_veterinaria_historia_clinica_all,Acceso a Historia Clínica,model_veterin
 access_veterinaria_medicamento_all,Acceso a Medicamentos,model_veterinaria_medicamento,,1,1,1,1
 access_veterinaria_cita_all,Acceso a Citas,model_veterinaria_cita,,1,1,1,1
 access_veterinaria_producto_all,Acceso a Productos,model_veterinaria_producto,,1,1,1,1
-
+access_veterinaria_venta_all,Acceso a Ventas,model_veterinaria_venta,,1,1,1,1
+access_veterinaria_venta_linea_all,Acceso a Líneas de Venta,model_veterinaria_venta_linea,,1,1,1,1
+access_veterinaria_facturacion_all,Acceso a Facturación,model_veterinaria_facturacion,,1,1,1,1
 

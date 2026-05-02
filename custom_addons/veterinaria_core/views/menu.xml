@@ -32,6 +32,18 @@
             <field name="view_mode">list,form</field>
         </record>
 
+        <record id="action_veterinaria_venta" model="ir.actions.act_window">
+            <field name="name">Ventas de Productos</field>
+            <field name="res_model">veterinaria.venta</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+        <record id="action_veterinaria_facturacion" model="ir.actions.act_window">
+            <field name="name">Facturación por Servicios</field>
+            <field name="res_model">veterinaria.facturacion</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
         <!-- Menú raíz -->
         <menuitem id="menu_veterinaria_root" name="Veterinaria" sequence="50"/>
         
@@ -67,11 +79,11 @@
         
         <!-- 4. VENTAS -->
         <menuitem id="menu_veterinaria_ventas" name="Ventas" 
-            parent="menu_veterinaria_root" sequence="40" action="sale.action_quotations"/>
+            parent="menu_veterinaria_root" sequence="40" action="action_veterinaria_venta"/>
         
         <!-- 5. FACTURACIÓN Y CONTABILIDAD -->
         <menuitem id="menu_veterinaria_facturacion" name="Facturación" 
-            parent="menu_veterinaria_root" sequence="50" action="account.action_move_out_invoice_type"/>
+            parent="menu_veterinaria_root" sequence="50" action="action_veterinaria_facturacion"/>
         
         <!-- 6. CRM Y CLIENTES -->
         <menuitem id="menu_veterinaria_crm" name="CRM" 
