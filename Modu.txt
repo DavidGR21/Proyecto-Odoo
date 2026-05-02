@@ -1,0 +1,10 @@
+Mostrar Citas primer flujo a crear.
+
+Modelos:
+Pacientes
+Historia Clinica
+Modelo Nuestro (Tratamientos y Recetas)
+
+Contabilidad y Citas es pagado.
+
+Podemos simular las citas con el Calendario.

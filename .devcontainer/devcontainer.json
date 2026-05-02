@@ -1,0 +1,30 @@
+{
+    "name": "Odoo Veterinaria Development",
+    "dockerComposeFile": "../docker-compose.yml",
+    "service": "odoo",
+    "workspaceFolder": "/workspace",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "eamodio.gitlens",
+                "ms-vscode-remote.remote-containers",
+                "charliermarsh.ruff",
+                "ms-python.debugpy"
+            ],
+            "settings": {
+                "python.linting.enabled": true,
+                "python.linting.pylintEnabled": true,
+                "python.formatting.provider": "black",
+                "[python]": {
+                    "editor.formatOnSave": true,
+                    "editor.defaultFormatter": "ms-python.python"
+                }
+            }
+        }
+    },
+    "forwardPorts": [8070],
+    "postCreateCommand": "pip install --upgrade pip && pip install debugpy",
+    "remoteUser": "root"
+}

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Menu -->
+        <menuitem id="menu_veterinaria_root" name="Veterinaria" 
+            sequence="10" web_icon="veterinaria_core,static/description/icon.png"/>
+        
+        <menuitem id="menu_veterinaria_config" name="Configuración" 
+            parent="menu_veterinaria_root" sequence="100"/>
+    </data>
+</odoo>
