@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_veterinaria_especialidad_list" model="ir.ui.view">
+            <field name="name">veterinaria.especialidad.list</field>
+            <field name="model">veterinaria.especialidad</field>
+            <field name="arch" type="xml">
+                <list string="Especialidades">
+                    <field name="name"/>
+                    <field name="descripcion"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_veterinaria_especialidad_form" model="ir.ui.view">
+            <field name="name">veterinaria.especialidad.form</field>
+            <field name="model">veterinaria.especialidad</field>
+            <field name="arch" type="xml">
+                <form string="Especialidad">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="descripcion"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_veterinaria_especialidad" model="ir.actions.act_window">
+            <field name="name">Especialidades</field>
+            <field name="res_model">veterinaria.especialidad</field>
+            <field name="view_mode">list,form</field>
+        </record>
+    </data>
+</odoo>

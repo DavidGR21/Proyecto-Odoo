@@ -1,55 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+        <!-- Vista de Formulario para Veterinario -->
+        <record id="view_veterinaria_veterinario_form" model="ir.ui.view">
+            <field name="name">veterinaria.veterinario.form</field>
+            <field name="model">veterinaria.veterinario</field>
+            <field name="arch" type="xml">
+                <form string="Veterinario">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" placeholder="Ej: Dr. Juan Pérez"/>
+                            </h1>
+                        </div>
+
+                        <group>
+                            <group string="Información Profesional">
+                                <field name="especialidad_id" required="1"/>
+                                <field name="matricula_profesional"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Vista de Lista para Veterinario -->
         <record id="view_veterinaria_veterinario_list" model="ir.ui.view">
             <field name="name">veterinaria.veterinario.list</field>
-            <field name="model">res.users</field>
+            <field name="model">veterinaria.veterinario</field>
             <field name="arch" type="xml">
-                <list string="Veterinarios">
+                <list>
                     <field name="name"/>
-                    <field name="login"/>
-                    <field name="especialidad"/>
+                    <field name="especialidad_id"/>
                     <field name="matricula_profesional"/>
-                    <field name="cantidad_citas"/>
-                    <field name="active"/>
                 </list>
             </field>
         </record>
 
+        <!-- Vista de Búsqueda para Veterinario -->
         <record id="view_veterinaria_veterinario_search" model="ir.ui.view">
             <field name="name">veterinaria.veterinario.search</field>
-            <field name="model">res.users</field>
+            <field name="model">veterinaria.veterinario</field>
             <field name="arch" type="xml">
                 <search string="Veterinarios">
                     <field name="name"/>
-                    <field name="login"/>
-                    <field name="especialidad"/>
-                    <filter name="solo_veterinarios" string="Solo veterinarios" domain="[('es_veterinario', '=', True)]"/>
+                    <field name="especialidad_id"/>
                 </search>
             </field>
-        </record>
-
-        <record id="view_veterinaria_veterinario_form_inherit" model="ir.ui.view">
-            <field name="name">veterinaria.veterinario.form.inherit</field>
-            <field name="model">res.users</field>
-            <field name="inherit_id" ref="base.view_users_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="//field[@name='login']" position="after">
-                    <field name="es_veterinario"/>
-                    <field name="especialidad" invisible="not es_veterinario"/>
-                    <field name="matricula_profesional" invisible="not es_veterinario"/>
-                    <field name="cantidad_citas" readonly="1" invisible="not es_veterinario"/>
-                </xpath>
-            </field>
-        </record>
-
-        <record id="action_veterinaria_veterinario" model="ir.actions.act_window">
-            <field name="name">Veterinarios</field>
-            <field name="res_model">res.users</field>
-            <field name="view_mode">list,form</field>
-            <field name="view_id" ref="view_veterinaria_veterinario_list"/>
-            <field name="domain">[('es_veterinario', '=', True)]</field>
-            <field name="context">{'default_es_veterinario': True}</field>
         </record>
     </data>
 </odoo>

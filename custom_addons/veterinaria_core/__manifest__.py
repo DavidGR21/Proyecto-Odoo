@@ -27,6 +27,7 @@
         'security/ir.model.access.csv',
         # Views
         'views/propietario_view.xml',
+        'views/especialidad_view.xml',
         'views/veterinario_view.xml',
         'views/paciente_view.xml',
         'views/historia_clinica_view.xml',

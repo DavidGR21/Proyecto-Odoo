@@ -13,9 +13,7 @@ class Cita(models.Model):
                                    ondelete='cascade', tracking=True)
     propietario_id = fields.Many2one('res.partner', string='Propietario',
                                       related='paciente_id.propietario_id', readonly=True, store=True)
-    veterinario_id = fields.Many2one('res.users', string='Veterinario', 
-                                      domain=[('es_veterinario', '=', True)],
-                                      default=lambda self: self.env.user, tracking=True)
+    veterinario_id = fields.Many2one('veterinaria.veterinario', string='Veterinario', required=True, tracking=True)
     fecha_hora = fields.Datetime('Fecha y Hora', required=True, tracking=True)
     duracion = fields.Float('Duración (horas)', default=1.0)
     

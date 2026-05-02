@@ -29,9 +29,7 @@
                                 <field name="propietario_id" readonly="1" string="Propietario"/>
                             </group>
                             <group string="Datos del Veterinario">
-                                <field name="veterinario_id" required="1" 
-                                    domain="[('es_veterinario', '=', True)]"
-                                    context="{'default_es_veterinario': True}"/>
+                                <field name="veterinario_id" required="1"/>
                             </group>
                         </group>
 

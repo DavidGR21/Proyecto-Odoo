@@ -8,3 +8,4 @@ from . import cita
 from . import producto
 from . import venta
 from . import facturacion
+from . import especialidad

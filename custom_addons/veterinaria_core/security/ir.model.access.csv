@@ -1,4 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_veterinaria_especialidad_all,Acceso a Especialidades,model_veterinaria_especialidad,,1,1,1,1
+access_veterinaria_veterinario_all,Acceso a Veterinarios,model_veterinaria_veterinario,,1,1,1,1
 access_veterinaria_paciente_all,Acceso a Pacientes,model_veterinaria_paciente,,1,1,1,1
 access_veterinaria_historia_clinica_all,Acceso a Historia Clínica,model_veterinaria_historia_clinica,,1,1,1,1
 access_veterinaria_medicamento_all,Acceso a Medicamentos,model_veterinaria_medicamento,,1,1,1,1
