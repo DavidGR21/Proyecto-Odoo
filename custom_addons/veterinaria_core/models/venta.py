@@ -82,10 +82,18 @@ class VentaProductos(models.Model):
                 product_id = line.producto_id.product_id or self.env['product.product'].search([('name', '=', line.producto_id.name)], limit=1)
                 if not product_id:
                     # Crear producto en Odoo si no existe
-                    product_id = self.env['product.product'].create({
+                    # Obtener o crear categoría de producto por defecto
+                    categ_id = self.env['product.category'].search([], limit=1)
+                    if not categ_id:
+                        categ_id = self.env['product.category'].create({'name': 'General'})
+                    
+                    # Crear el product.template primero
+                    template = self.env['product.template'].create({
                         'name': line.producto_id.name,
-                        'type': 'product',
+                        'categ_id': categ_id.id,
                     })
+                    # El product.product se crea automáticamente
+                    product_id = template.product_variant_ids[0]
                 
                 order_lines.append((0, 0, {
                     'product_id': product_id.id,
