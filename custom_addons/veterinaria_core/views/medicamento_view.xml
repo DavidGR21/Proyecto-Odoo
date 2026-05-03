@@ -29,6 +29,14 @@
                         </group>
 
                         <group>
+                            <group string="Precio e Inventario">
+                                <field name="precio_venta" required="1"/>
+                                <field name="precio_costo"/>
+                                <field name="cantidad_stock"/>
+                            </group>
+                        </group>
+
+                        <group>
                             <group string="Descripción">
                                 <field name="descripcion" placeholder="Descripción del medicamento..."/>
                             </group>
@@ -60,7 +68,8 @@
                     <field name="name"/>
                     <field name="principio_activo"/>
                     <field name="tipo"/>
-                    <field name="dosis_recomendada"/>
+                    <field name="precio_venta"/>
+                    <field name="cantidad_stock"/>
                     <field name="via_administracion"/>
                     <field name="activo" widget="boolean"/>
                 </list>
@@ -76,11 +85,14 @@
                     <field name="name" string="Medicamento"/>
                     <field name="principio_activo" string="Principio Activo"/>
                     <field name="proveedor_id" string="Proveedor"/>
+                    <separator/>
                     <filter name="activos" string="Activos" domain="[('activo', '=', True)]"/>
                     <filter name="inactivos" string="Inactivos" domain="[('activo', '=', False)]"/>
+                    <filter name="bajo_stock" string="Stock Bajo" domain="[('cantidad_stock', '&lt;', 5)]"/>
                     <group expand="0" string="Agrupar por">
                         <filter string="Tipo" name="group_by_tipo" context="{'group_by': 'tipo'}"/>
                         <filter string="Vía de Administración" name="group_by_via" context="{'group_by': 'via_administracion'}"/>
+                        <filter string="Proveedor" name="group_by_proveedor" context="{'group_by': 'proveedor_id'}"/>
                     </group>
                 </search>
             </field>

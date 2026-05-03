@@ -30,6 +30,11 @@ class Medicamento(models.Model):
     contraindicaciones = fields.Text('Contraindicaciones')
     efectos_secundarios = fields.Text('Efectos Secundarios')
     
+    # Precio y stock
+    precio_venta = fields.Float('Precio de Venta', required=True)
+    precio_costo = fields.Float('Precio de Costo')
+    cantidad_stock = fields.Float('Stock Disponible', default=0.0)
+    
     # Proveedor
     proveedor_id = fields.Many2one('res.partner', string='Proveedor',
                                     domain=[('supplier_rank', '>', 0)])

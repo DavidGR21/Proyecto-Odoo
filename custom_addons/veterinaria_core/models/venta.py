@@ -79,9 +79,20 @@ class VentaProductos(models.Model):
             # Crear líneas para sale.order
             order_lines = []
             for line in record.linea_venta_ids:
-                product_id = line.producto_id.product_id or self.env['product.product'].search([('name', '=', line.producto_id.name)], limit=1)
+                product_id = None
+                item_name = None
+                
+                # Determinar qué tipo de item es
+                if line.producto_id:
+                    item = line.producto_id
+                    item_name = item.name
+                    product_id = item.product_id
+                elif line.medicamento_id:
+                    item = line.medicamento_id
+                    item_name = item.name
+                
+                # Si no tiene producto Odoo asociado, crear uno
                 if not product_id:
-                    # Crear producto en Odoo si no existe
                     # Obtener o crear categoría de producto por defecto
                     categ_id = self.env['product.category'].search([], limit=1)
                     if not categ_id:
@@ -89,7 +100,7 @@ class VentaProductos(models.Model):
                     
                     # Crear el product.template primero
                     template = self.env['product.template'].create({
-                        'name': line.producto_id.name,
+                        'name': item_name,
                         'categ_id': categ_id.id,
                     })
                     # El product.product se crea automáticamente
@@ -126,10 +137,16 @@ class VentaLinea(models.Model):
 
     venta_id = fields.Many2one('veterinaria.venta', string='Venta', ondelete='cascade', required=True)
     
+    # Campos separados para producto y medicamento
     producto_id = fields.Many2one(
         'veterinaria.producto',
-        string='Producto/Medicamento',
-        required=True,
+        string='Producto',
+        ondelete='restrict'
+    )
+    
+    medicamento_id = fields.Many2one(
+        'veterinaria.medicamento',
+        string='Medicamento',
         ondelete='restrict'
     )
     
@@ -167,8 +184,21 @@ class VentaLinea(models.Model):
         for record in self:
             record.total_linea = record.subtotal + record.impuesto
     
-    @api.onchange('producto_id')
-    def _onchange_producto_id(self):
-        """Al seleccionar un producto, carga su precio"""
+    @api.constrains('producto_id', 'medicamento_id')
+    def _check_item_selected(self):
+        """Valida que solo uno de los dos campos esté seleccionado"""
+        for record in self:
+            if not record.producto_id and not record.medicamento_id:
+                raise ValueError('Debe seleccionar un producto o medicamento')
+            if record.producto_id and record.medicamento_id:
+                raise ValueError('Solo puede seleccionar uno: producto O medicamento')
+    
+    @api.onchange('producto_id', 'medicamento_id')
+    def _onchange_item(self):
+        """Al seleccionar un producto o medicamento, carga su precio"""
         if self.producto_id:
+            self.medicamento_id = False
             self.precio_unitario = self.producto_id.precio_venta
+        elif self.medicamento_id:
+            self.producto_id = False
+            self.precio_unitario = self.medicamento_id.precio_venta
