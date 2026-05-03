@@ -21,39 +21,34 @@ class Facturacion(models.Model):
     propietario_id = fields.Many2one(
         'res.partner',
         string='Cliente (Propietario)',
-        related='cita_id.propietario_id',
-        readonly=True,
-        store=True
+        compute='_compute_propietario_id',
+        store=False
     )
     
     paciente_id = fields.Many2one(
         'veterinaria.paciente',
         string='Paciente (Mascota)',
-        related='cita_id.paciente_id',
-        readonly=True,
-        store=True
+        compute='_compute_paciente_id',
+        store=False
     )
     
     veterinario_id = fields.Many2one(
-        'res.users',
+        'veterinaria.veterinario',
         string='Veterinario',
-        related='cita_id.veterinario_id',
-        readonly=True,
-        store=True
+        compute='_compute_veterinario_id',
+        store=False
     )
     
     fecha_cita = fields.Datetime(
         'Fecha de la Cita',
-        related='cita_id.fecha_hora',
-        readonly=True,
-        store=True
+        compute='_compute_fecha_cita',
+        store=False
     )
     
     motivo_cita = fields.Text(
         'Motivo de la Cita',
-        related='cita_id.motivo',
-        readonly=True,
-        store=True
+        compute='_compute_motivo_cita',
+        store=False
     )
     
     # Precio del servicio (modificable)
@@ -89,6 +84,31 @@ class Facturacion(models.Model):
                 record.name = f"FAC-{record.cita_id.id:05d}"
             else:
                 record.name = "Factura"
+    
+    @api.depends('cita_id')
+    def _compute_propietario_id(self):
+        for record in self:
+            record.propietario_id = record.cita_id.propietario_id if record.cita_id else False
+    
+    @api.depends('cita_id')
+    def _compute_paciente_id(self):
+        for record in self:
+            record.paciente_id = record.cita_id.paciente_id if record.cita_id else False
+    
+    @api.depends('cita_id')
+    def _compute_veterinario_id(self):
+        for record in self:
+            record.veterinario_id = record.cita_id.veterinario_id if record.cita_id else False
+    
+    @api.depends('cita_id')
+    def _compute_fecha_cita(self):
+        for record in self:
+            record.fecha_cita = record.cita_id.fecha_hora if record.cita_id else False
+    
+    @api.depends('cita_id')
+    def _compute_motivo_cita(self):
+        for record in self:
+            record.motivo_cita = record.cita_id.motivo if record.cita_id else False
     
     def action_validar_factura(self):
         """Genera la factura contable desde la facturación"""

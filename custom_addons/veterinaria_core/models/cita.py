@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models
+from odoo.exceptions import ValidationError
 
 
 class Cita(models.Model):
@@ -8,12 +9,11 @@ class Cita(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'fecha_hora DESC'
 
-    name = fields.Char('Referencia', compute='_compute_name', store=True)
+    name = fields.Char('Referencia', compute='_compute_name')
     paciente_id = fields.Many2one('veterinaria.paciente', string='Paciente', required=True, 
                                    ondelete='cascade', tracking=True)
-    propietario_id = fields.Many2one('res.partner', string='Propietario',
-                                      related='paciente_id.propietario_id', readonly=True, store=True)
-    veterinario_id = fields.Many2one('veterinaria.veterinario', string='Veterinario', required=True, tracking=True)
+    propietario_id = fields.Many2one('res.partner', string='Propietario', compute='_compute_propietario', store=False)
+    veterinario_id = fields.Many2one('veterinaria.veterinario', string='Veterinario', ondelete='set null')
     fecha_hora = fields.Datetime('Fecha y Hora', required=True, tracking=True)
     duracion = fields.Float('Duración (horas)', default=1.0)
     
@@ -52,6 +52,21 @@ class Cita(models.Model):
     def _compute_name(self):
         for record in self:
             record.name = f"Cita {record.paciente_id.name} - {record.fecha_hora.strftime('%d/%m/%Y %H:%M') if record.fecha_hora else ''}"
+
+    @api.depends('paciente_id')
+    def _compute_propietario(self):
+        for record in self:
+            record.propietario_id = record.paciente_id.propietario_id if record.paciente_id else False
+
+    @api.constrains('veterinario_id', 'motivo', 'fecha_hora')
+    def _check_required_fields(self):
+        for record in self:
+            if not record.veterinario_id:
+                raise ValidationError('Debe seleccionar un Veterinario para la cita')
+            if not record.motivo:
+                raise ValidationError('Debe ingresar el Motivo de la cita')
+            if not record.fecha_hora:
+                raise ValidationError('Debe seleccionar la Fecha y Hora de la cita')
 
     def _map_estado_historia(self):
         self.ensure_one()
