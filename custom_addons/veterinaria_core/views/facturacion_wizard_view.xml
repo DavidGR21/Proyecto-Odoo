@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Wizard para Agregar Línea Individual -->
+        <record id="facturacion_linea_wizard_form_view" model="ir.ui.view">
+            <field name="name">veterinaria.facturacion.linea.wizard.form</field>
+            <field name="model">veterinaria.facturacion.linea.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Agregar Línea de Facturación">
+                    <sheet>
+                        <h2>Agregar un documento a la facturación</h2>
+                        
+                        <group>
+                            <group>
+                                <field name="facturacion_id" readonly="1"/>
+                                <field name="tipo_linea" widget="radio" required="1"
+                                       options="{'horizontal': true}"/>
+                            </group>
+                        </group>
+
+                        <group>
+                            <group>
+                                <!-- Cita -->
+                                <field name="cita_id" 
+                                       attrs="{'invisible': [('tipo_linea', '!=', 'cita')],
+                                               'required': [('tipo_linea', '=', 'cita')]}"/>
+                                
+                                <!-- Medicamento -->
+                                <field name="medicamento_id" 
+                                       attrs="{'invisible': [('tipo_linea', '!=', 'medicamento')],
+                                               'required': [('tipo_linea', '=', 'medicamento')]}"/>
+                                
+                                <!-- Producto -->
+                                <field name="producto_id" 
+                                       attrs="{'invisible': [('tipo_linea', '!=', 'producto')],
+                                               'required': [('tipo_linea', '=', 'producto')]}"/>
+                                
+                                <!-- Servicio -->
+                                <field name="servicio_id" 
+                                       attrs="{'invisible': [('tipo_linea', '!=', 'servicio')],
+                                               'required': [('tipo_linea', '=', 'servicio')]}"/>
+                            </group>
+                            <group>
+                                <field name="cantidad"/>
+                                <field name="precio_unitario" readonly="1"/>
+                            </group>
+                        </group>
+
+                        <group>
+                            <field name="impuesto_id" widget="many2many_tags" 
+                                   options="{'no_create': True}"/>
+                        </group>
+
+                        <group>
+                            <field name="observaciones_linea" colspan="2"/>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="action_agregar_linea" string="Agregar" type="object" 
+                                class="btn-primary"/>
+                        <button string="Cancelar" special="cancel" class="btn-secondary"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- Action para Wizard de Línea Individual -->
+        <record id="facturacion_linea_wizard_action" model="ir.actions.act_window">
+            <field name="name">Agregar Línea de Facturación</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">veterinaria.facturacion.linea.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <!-- Wizard para Agregar Múltiples Líneas -->
+        <record id="facturacion_multilinea_wizard_form_view" model="ir.ui.view">
+            <field name="name">veterinaria.facturacion.multilinea.wizard.form</field>
+            <field name="model">veterinaria.facturacion.multilinea.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Agregar Múltiples Líneas">
+                    <sheet>
+                        <h2>Agregar múltiples documentos a la facturación</h2>
+                        
+                        <group>
+                            <group>
+                                <field name="facturacion_id" readonly="1"/>
+                                <field name="tipo_documento" required="1" widget="radio"
+                                       options="{'horizontal': true}"/>
+                                <field name="cantidad_default"/>
+                            </group>
+                        </group>
+
+                        <group>
+                            <!-- Citas -->
+                            <field name="cita_ids" nolabel="1" colspan="2"
+                                   attrs="{'invisible': [('tipo_documento', '!=', 'cita')]}">
+                                <tree editable="bottom" create="false" delete="false">
+                                    <field name="name"/>
+                                    <field name="fecha_hora"/>
+                                    <field name="paciente_id"/>
+                                    <field name="veterinario_id"/>
+                                    <field name="estado"/>
+                                </tree>
+                            </field>
+                            
+                            <!-- Medicamentos -->
+                            <field name="medicamento_ids" nolabel="1" colspan="2"
+                                   attrs="{'invisible': [('tipo_documento', '!=', 'medicamento')]}">
+                                <tree editable="bottom" create="false" delete="false">
+                                    <field name="name"/>
+                                    <field name="tipo"/>
+                                    <field name="precio_venta"/>
+                                    <field name="cantidad_stock"/>
+                                </tree>
+                            </field>
+                            
+                            <!-- Productos -->
+                            <field name="producto_ids" nolabel="1" colspan="2"
+                                   attrs="{'invisible': [('tipo_documento', '!=', 'producto')]}">
+                                <tree editable="bottom" create="false" delete="false">
+                                    <field name="name"/>
+                                    <field name="categoria"/>
+                                    <field name="precio_venta"/>
+                                    <field name="cantidad_stock"/>
+                                </tree>
+                            </field>
+                            
+                            <!-- Servicios -->
+                            <field name="servicio_ids" nolabel="1" colspan="2"
+                                   attrs="{'invisible': [('tipo_documento', '!=', 'servicio')]}">
+                                <tree editable="bottom" create="false" delete="false">
+                                    <field name="name"/>
+                                    <field name="descripcion"/>
+                                    <field name="precio"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="action_agregar_multiples_lineas" string="Agregar Seleccionados" 
+                                type="object" class="btn-primary"/>
+                        <button string="Cancelar" special="cancel" class="btn-secondary"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- Action para Wizard de Múltiples Líneas -->
+        <record id="facturacion_multilinea_wizard_action" model="ir.actions.act_window">
+            <field name="name">Agregar Múltiples Líneas</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">veterinaria.facturacion.multilinea.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+    </data>
+</odoo>

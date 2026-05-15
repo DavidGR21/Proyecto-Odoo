@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Vista de lista para Documentos de Venta -->
+        <record id="veterinaria_documento_venta_view_list" model="ir.ui.view">
+            <field name="name">veterinaria.documento_venta.view.list</field>
+            <field name="model">veterinaria.documento_venta</field>
+            <field name="arch" type="xml">
+                <list>
+                    <field name="name"/>
+                    <field name="tipo_documento"/>
+                    <field name="propietario_id"/>
+                    <field name="paciente_id"/>
+                    <field name="fecha_documento"/>
+                    <field name="total"/>
+                    <field name="estado" widget="badge" 
+                           decoration-info="estado == 'borrador'"
+                           decoration-success="estado == 'validado'"
+                           decoration-danger="estado == 'cancelado'"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Vista de formulario para Documentos de Venta -->
+        <record id="veterinaria_documento_venta_view_form" model="ir.ui.view">
+            <field name="name">veterinaria.documento_venta.view.form</field>
+            <field name="model">veterinaria.documento_venta</field>
+            <field name="arch" type="xml">
+                <form>
+                    <!-- TU NUEVO HEADER INTEGRADO AQUÍ -->
+                    <header>
+                        <button name="action_validar_factura" string="Validar y Generar Factura" 
+                                type="object" class="oe_highlight" 
+                                invisible="estado != 'borrador'"/>
+                        
+                        <button name="action_cancelar_factura" string="Cancelar" 
+                                type="object" 
+                                invisible="estado != 'validado'"/>
+                        
+                        <field name="estado" widget="statusbar" 
+                               statusbar_visible="borrador,validado,cancelado"/>
+                    </header>
+                    
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+
+                        <group>
+                            <group>
+                                <field name="tipo_documento" required="1"/>
+                                <field name="fecha_documento"/>
+                            </group>
+                            <group>
+                                <!-- Bloqueo dinámico y guardado forzado -->
+                                <field name="propietario_id" 
+                                       readonly="tipo_documento == 'cita'" 
+                                       force_save="1"/>
+                                <field name="paciente_id" 
+                                       readonly="tipo_documento == 'cita'" 
+                                       force_save="1"/>
+                            </group>
+                        </group>
+
+                        <notebook>
+                            <!-- Tab para Citas -->
+                            <page string="Detalles de Cita" invisible="tipo_documento != 'cita'">
+                                <group>
+                                    <group>
+                                        <field name="cita_id" required="tipo_documento == 'cita'"/>
+                                        <field name="servicio_id"/>
+                                        <field name="veterinario_id" readonly="1" force_save="1"/>
+                                        <field name="fecha_cita" readonly="1" force_save="1"/>
+                                    </group>
+                                    <group>
+                                        <field name="motivo_cita" readonly="1" colspan="2" force_save="1"/>
+                                    </group>
+                                </group>
+                            </page>
+
+                            <!-- Tab para Ventas -->
+                            <page string="Detalles de Venta" invisible="tipo_documento != 'venta'">
+                                <group>
+                                    <group>
+                                        <field name="tipo_venta" required="tipo_documento == 'venta'"/>
+                                    </group>
+                                </group>
+                                <separator string="Productos/Servicios/Medicamentos"/>
+                                <field name="linea_venta_ids" nolabel="1">
+                                    <list editable="bottom">
+                                        <field name="producto_id"/>
+                                        <field name="medicamento_id"/>
+                                        <field name="cantidad"/>
+                                        <field name="precio_unitario"/>
+                                        <field name="subtotal" readonly="1"/>
+                                        <field name="impuesto" readonly="1"/>
+                                    </list>
+                                </field>
+                            </page>
+
+                            <!-- Tab de Precios e Impuestos -->
+                            <page string="Precios e Impuestos">
+                                <group>
+                                    <group>
+                                        <field name="precio_unitario" invisible="tipo_documento != 'cita'"/>
+                                        <field name="total_sin_impuesto" readonly="1"/>
+                                        <field name="impuesto_total" readonly="1"/>
+                                        <field name="total" readonly="1" class="text-primary font-weight-bold"/>
+                                    </group>
+                                    <group>
+                                        <field name="impuesto_id" widget="many2many_tags" options="{'no_create': True}"/>
+                                    </group>
+                                </group>
+                            </page>
+
+                            <page string="Observaciones">
+                                <field name="observaciones" nolabel="1" placeholder="Notas internas..."/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <!-- Chatter para el historial de cambios -->
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- Acción para Documentos de Venta -->
+        <record id="action_veterinaria_documento_venta" model="ir.actions.act_window">
+            <field name="name">Facturación y Ventas</field>
+            <field name="res_model">veterinaria.documento_venta</field>
+            <field name="view_mode">list,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Crear un nuevo documento de venta
+                </p>
+                <p>
+                    Gestiona facturas por citas y ventas de productos en un mismo lugar.
+                </p>
+            </field>
+        </record>
+    </data>
+</odoo>

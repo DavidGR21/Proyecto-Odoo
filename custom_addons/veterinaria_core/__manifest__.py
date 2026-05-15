@@ -16,6 +16,7 @@
     'license': 'LGPL-3',
     'depends': [
         'base',
+        'mail',      # Agregado: Necesario para el chatter (mail.thread y mail.activity.mixin)
         'sale',
         'account',
         'calendar',
@@ -34,8 +35,12 @@
         'views/medicamento_view.xml',
         'views/cita_view.xml',
         'views/producto_view.xml',
+        'views/servicio_view.xml',
+        'views/inventario_view.xml',
         'views/venta_view.xml',
         'views/facturacion_view.xml',
+        'views/facturacion_linea_view.xml',
+        'views/documento_venta_view.xml',
         'views/menu.xml',
     ],
     'installable': True,

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Vista de lista para Servicios -->
+        <record id="veterinaria_servicio_view_list" model="ir.ui.view">
+            <field name="name">veterinaria.servicio.view.list</field>
+            <field name="model">veterinaria.servicio</field>
+            <field name="arch" type="xml">
+                <list>
+                    <field name="name"/>
+                    <field name="precio"/>
+                    <field name="activo"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Vista de formulario para Servicios -->
+        <record id="veterinaria_servicio_view_form" model="ir.ui.view">
+            <field name="name">veterinaria.servicio.view.form</field>
+            <field name="model">veterinaria.servicio</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" placeholder="Nombre del Servicio"/>
+                            </h1>
+                        </div>
+
+                        <notebook>
+                            <!-- Información General -->
+                            <page string="Información General">
+                                <group>
+                                    <group>
+                                        <field name="descripcion"/>
+                                        <field name="precio" widget="monetary"/>
+                                    </group>
+                                    <group>
+                                        <field name="activo"/>
+                                    </group>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Acción para Servicios -->
+        <record id="action_veterinaria_servicio" model="ir.actions.act_window">
+            <field name="name">Servicios</field>
+            <field name="res_model">veterinaria.servicio</field>
+            <field name="view_mode">list,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Crear un nuevo servicio
+                </p>
+                <p>
+                    Gestiona los servicios que ofrece tu clínica veterinaria.
+                </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

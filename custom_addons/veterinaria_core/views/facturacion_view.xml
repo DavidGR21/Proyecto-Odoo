@@ -6,58 +6,60 @@
             <field name="name">veterinaria.facturacion.form</field>
             <field name="model">veterinaria.facturacion</field>
             <field name="arch" type="xml">
-                <form string="Facturación por Servicios">
+                <form modifiers="{'readonly': [('estado', '!=', 'borrador')]}">
+                    <!-- HEADER  BOTONES VALIDAD Y GENERAR -->
                     <header>
                         <button name="action_validar_factura" string="Validar y Generar Factura" 
-                                type="object" class="btn-primary" 
+                                type="object" class="oe_highlight" 
                                 invisible="estado != 'borrador'"/>
+                        
                         <button name="action_cancelar_factura" string="Cancelar" 
                                 type="object" 
                                 invisible="estado != 'validado'"/>
+                        
                         <field name="estado" widget="statusbar" 
                                statusbar_visible="borrador,validado,cancelado"/>
                     </header>
-                    <sheet>
+
+                    <sheet modifiers="{'readonly': [('estado', '!=', 'borrador')]}">
                         <div class="oe_title">
-                            <h1>
-                                <field name="name" readonly="1"/>
-                            </h1>
+                            <h1><field name="name" readonly="1"/></h1>
                         </div>
+                        
                         <group>
-                            <group>
-                                <field name="cita_id" required="1"/>
-                                <field name="propietario_id" readonly="1"/>
-                                <field name="paciente_id" readonly="1"/>
-                            </group>
-                            <group>
-                                <field name="veterinario_id" readonly="1"/>
-                                <field name="fecha_cita" readonly="1"/>
-                                <field name="fecha_factura"/>
-                            </group>
+                            <field name="fecha_factura" modifiers="{'readonly': [('estado', '!=', 'borrador')]}"/>
+                            <field name="propietario_id" modifiers="{'readonly': [('estado', '!=', 'borrador')]}"/>
+                            <field name="paciente_id" modifiers="{'readonly': [('estado', '!=', 'borrador')]}"/>
                         </group>
-
+                        
                         <notebook>
-                            <page string="Detalles de la Cita">
-                                <group>
-                                    <field name="motivo_cita" readonly="1" colspan="2"/>
+                            <page string="Líneas">
+                                <field name="linea_ids" modifiers="{'readonly': [('estado', '!=', 'borrador')]}" >
+                                    <list editable="bottom">
+                                        <field name="tipo_linea" modifiers="{'readonly': [('parent.estado', '!=', 'borrador')]}"/>
+                                        <field name="cita_id" domain="[('paciente_id.propietario_id', '=', parent.propietario_id)]"
+                                            modifiers="{'readonly': ['|', ('parent.estado', '!=', 'borrador'), ('tipo_linea', '!=', 'cita')], 'required': [('tipo_linea', '=', 'cita')]}"/>
+                                        <field name="medicamento_id"
+                                            modifiers="{'readonly': ['|', ('parent.estado', '!=', 'borrador'), ('tipo_linea', '!=', 'medicamento')], 'required': [('tipo_linea', '=', 'medicamento')]}"/>
+                                        <field name="producto_id"
+                                            modifiers="{'readonly': ['|', ('parent.estado', '!=', 'borrador'), ('tipo_linea', '!=', 'producto')], 'required': [('tipo_linea', '=', 'producto')]}"/>
+                                        <field name="servicio_id"
+                                            modifiers="{'readonly': ['|', ('parent.estado', '!=', 'borrador'), ('tipo_linea', '!=', 'servicio')], 'required': [('tipo_linea', '=', 'servicio')]}"/>
+                                        <field name="cantidad" modifiers="{'readonly': [('parent.estado', '!=', 'borrador')]}"/>
+                                        <field name="precio_unitario" modifiers="{'readonly': [('parent.estado', '!=', 'borrador')]}"/>
+                                        <field name="subtotal" readonly="1"/>
+                                        <field name="total_linea" readonly="1"/>
+                                    </list>
+                                </field>
+                                
+                                <group class="oe_subtotal_footer oe_right">
+                                    <field name="subtotal" readonly="1"/>
+                                    <field name="impuesto_total" readonly="1"/>
+                                    <field name="total" class="oe_subtotal_footer_separator" readonly="1"/>
                                 </group>
                             </page>
-
-                            <page string="Precios e Impuestos">
-                                <group>
-                                    <field name="precio_unitario" required="1"/>
-                                    <field name="impuesto_id" widget="many2many_tags"/>
-                                </group>
-                            </page>
-
-                            <page string="Factura Contable">
-                                <group>
-                                    <field name="move_id" readonly="1"/>
-                                </group>
-                            </page>
-
                             <page string="Observaciones">
-                                <field name="observaciones" colspan="2"/>
+                                <field name="observaciones" modifiers="{'readonly': [('estado', '!=', 'borrador')]}"/>
                             </page>
                         </notebook>
                     </sheet>
@@ -65,51 +67,37 @@
             </field>
         </record>
 
-        <!-- List View para Facturación -->
+        <!-- List View (Principal) -->
         <record id="facturacion_list_view" model="ir.ui.view">
             <field name="name">veterinaria.facturacion.list</field>
             <field name="model">veterinaria.facturacion</field>
             <field name="arch" type="xml">
-                <list string="Facturación por Servicios" default_order="fecha_factura DESC">
+                <list>
                     <field name="name"/>
                     <field name="paciente_id"/>
                     <field name="propietario_id"/>
-                    <field name="fecha_cita"/>
-                    <field name="precio_unitario" sum="Total"/>
-                    <field name="move_id"/>
-                    <field name="estado" decoration-info="estado=='borrador'" 
-                           decoration-success="estado=='validado'" 
-                           decoration-danger="estado=='cancelado'"/>
+                    <field name="total"/>
+                    <field name="estado"/>
                 </list>
             </field>
         </record>
 
-        <!-- Search View para Facturación -->
+        <!-- Search View -->
         <record id="facturacion_search_view" model="ir.ui.view">
             <field name="name">veterinaria.facturacion.search</field>
             <field name="model">veterinaria.facturacion</field>
             <field name="arch" type="xml">
-                <search string="Facturación por Servicios">
-                    <field name="name" string="Número de Factura"/>
-                    <field name="paciente_id" string="Mascota"/>
-                    <field name="propietario_id" string="Propietario"/>
-                    <field name="veterinario_id" string="Veterinario"/>
-                    <separator/>
-                    <filter name="filter_borrador" string="Borradores" domain="[('estado', '=', 'borrador')]"/>
-                    <filter name="filter_validado" string="Validadas" domain="[('estado', '=', 'validado')]"/>
-                    <filter name="filter_cancelado" string="Canceladas" domain="[('estado', '=', 'cancelado')]"/>
-                    <separator/>
-                    <filter name="filter_propietario" string="Por Propietario" 
-                            context="{'group_by': 'propietario_id'}"/>
-                    <filter name="filter_paciente" string="Por Mascota" 
-                            context="{'group_by': 'paciente_id'}"/>
-                    <filter name="filter_fecha" string="Por Fecha" 
-                            context="{'group_by': 'fecha_factura'}"/>
+                <search>
+                    <field name="name"/>
+                    <field name="paciente_id"/>
+                    <field name="propietario_id"/>
+                    <filter name="borrador" domain="[('estado', '=', 'borrador')]" string="Borrador"/>
+                    <filter name="validado" domain="[('estado', '=', 'validado')]" string="Validado"/>
                 </search>
             </field>
         </record>
 
-        <!-- Action para Facturación -->
+        <!-- TU NUEVO ACTION AQUÍ -->
         <record id="facturacion_action" model="ir.actions.act_window">
             <field name="name">Facturación por Servicios</field>
             <field name="type">ir.actions.act_window</field>

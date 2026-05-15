@@ -18,6 +18,12 @@
                             <group string="Información Profesional">
                                 <field name="especialidad_id" required="1"/>
                                 <field name="matricula_profesional"/>
+                                <field name="horario_inicio"/>
+                                <field name="horario_fin"/>
+                                <field name="dias_disponibles"/>
+                            </group>
+                            <group string="Horario">
+                                <field name="observaciones_horario" placeholder="Ej: Atencion solo por la manana"/>
                             </group>
                         </group>
                     </sheet>
@@ -34,6 +40,9 @@
                     <field name="name"/>
                     <field name="especialidad_id"/>
                     <field name="matricula_profesional"/>
+                    <field name="horario_inicio"/>
+                    <field name="horario_fin"/>
+                    <field name="dias_disponibles"/>
                 </list>
             </field>
         </record>
