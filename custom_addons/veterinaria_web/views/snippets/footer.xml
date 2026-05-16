@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!--
+        Footer reutilizable para todas las páginas de VitalPet.
+        Se invoca con: <t t-call="veterinaria_web.footer_partial"/>
+    -->
+    <template id="footer_partial" name="VitalPet - Footer">
+        <footer class="vp-footer">
+            <div class="container">
+                <div class="row g-4">
+
+                    <!-- Marca -->
+                    <div class="col-lg-4">
+                        <div class="vp-footer-brand">
+                            <h3><i class="fa fa-paw me-2"/>VitalPet</h3>
+                            <p>
+                                Más de 10 años brindando atención veterinaria
+                                de calidad. Porque tu mascota es parte de la familia.
+                            </p>
+                            <div class="vp-footer-social">
+                                <a href="#" aria-label="Facebook"><i class="fa fa-facebook"/></a>
+                                <a href="#" aria-label="Instagram"><i class="fa fa-instagram"/></a>
+                                <a href="#" aria-label="WhatsApp"><i class="fa fa-whatsapp"/></a>
+                                <a href="#" aria-label="YouTube"><i class="fa fa-youtube"/></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navegación -->
+                    <div class="col-lg-2 col-md-4">
+                        <h5 class="vp-footer-heading">Navegación</h5>
+                        <ul class="vp-footer-links">
+                            <li><a href="/">Inicio</a></li>
+                            <li><a href="/servicios">Servicios</a></li>
+                            <li><a href="/nosotros">Nosotros</a></li>
+                            <li><a href="/contacto">Contacto</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Servicios -->
+                    <div class="col-lg-3 col-md-4">
+                        <h5 class="vp-footer-heading">Servicios</h5>
+                        <ul class="vp-footer-links">
+                            <li><a href="/servicios">Consulta General</a></li>
+                            <li><a href="/servicios">Vacunación</a></li>
+                            <li><a href="/servicios">Cirugía</a></li>
+                            <li><a href="/servicios">Laboratorio Clínico</a></li>
+                            <li><a href="/servicios">Farmacia Veterinaria</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Contacto -->
+                    <div class="col-lg-3 col-md-4">
+                        <h5 class="vp-footer-heading">Contacto</h5>
+                        <ul class="vp-footer-contact">
+                            <li>
+                                <i class="fa fa-map-marker"/>
+                                Av. Cevallos 12-34 y Mera, Ambato, Ecuador
+                            </li>
+                            <li>
+                                <i class="fa fa-phone"/>
+                                +593 99 123 4567
+                            </li>
+                            <li>
+                                <i class="fa fa-envelope"/>
+                                info@vitalpet.com
+                            </li>
+                            <li>
+                                <i class="fa fa-clock-o"/>
+                                Lun–Sáb: 8:00 – 18:00
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+
+                <div class="vp-footer-bottom">
+                    <p>© 2026 VitalPet · Todos los derechos reservados
+                        · <a href="/contacto" style="color:var(--vp-primary)">Contacto</a>
+                    </p>
+                </div>
+            </div>
+        </footer>
+    </template>
+</odoo>

@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!--
+        Página de Contacto - VitalPet
+        Formulario + info de contacto + mapa + horarios
+    -->
+    <template id="pagina_contacto" name="VitalPet - Contacto">
+        <t t-call="website.layout">
+            <t t-set="title" t-value="titulo_pagina"/>
+            <div id="wrap" class="vitalpet-contacto">
+
+                <!-- PAGE HEADER -->
+                <section class="vp-page-header">
+                    <div class="container">
+                        <span class="vp-section-badge">Estamos aquí para ti</span>
+                        <h1>Ponte en <span class="vp-gradient-text">Contacto</span></h1>
+                        <p>Agenda una cita o resuelve tus dudas con nuestro equipo</p>
+                        <div class="vp-breadcrumb">
+                            <a href="/">Inicio</a>
+                            <span>›</span>
+                            <span style="color:rgba(255,255,255,0.6)">Contacto</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- INFO CARDS -->
+                <section class="vp-section vp-section-contacto">
+                    <div class="container">
+
+                        <!-- Tarjetas de información -->
+                        <div class="row g-4 mb-5">
+                            <div class="col-md-6 col-lg-3" data-vp-animate="fade-up" data-vp-delay="100">
+                                <div class="vp-contact-info-card">
+                                    <div class="vp-contact-info-icon"
+                                         style="background:linear-gradient(135deg,#40C2D6,#2BA8BC)">
+                                        <i class="fa fa-map-marker"/>
+                                    </div>
+                                    <div class="vp-contact-info-text">
+                                        <h5>Dirección</h5>
+                                        <p>Av. Cevallos 12-34 y Mera<br/>Ambato, Ecuador</p>
+                                        <small>Junto al Parque Juan Montalvo</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-3" data-vp-animate="fade-up" data-vp-delay="200">
+                                <div class="vp-contact-info-card">
+                                    <div class="vp-contact-info-icon"
+                                         style="background:linear-gradient(135deg,#9B7EBD,#7C5FA0)">
+                                        <i class="fa fa-phone"/>
+                                    </div>
+                                    <div class="vp-contact-info-text">
+                                        <h5>Teléfono</h5>
+                                        <p>+593 99 123 4567</p>
+                                        <small>Línea directa · WhatsApp</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-3" data-vp-animate="fade-up" data-vp-delay="300">
+                                <div class="vp-contact-info-card">
+                                    <div class="vp-contact-info-icon"
+                                         style="background:linear-gradient(135deg,#F4A4C3,#e07fa0)">
+                                        <i class="fa fa-envelope"/>
+                                    </div>
+                                    <div class="vp-contact-info-text">
+                                        <h5>Email</h5>
+                                        <p>info@vitalpet.com</p>
+                                        <small>Respuesta en menos de 2h</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-3" data-vp-animate="fade-up" data-vp-delay="400">
+                                <div class="vp-contact-info-card">
+                                    <div class="vp-contact-info-icon"
+                                         style="background:linear-gradient(135deg,#F59E0B,#D97706)">
+                                        <i class="fa fa-clock-o"/>
+                                    </div>
+                                    <div class="vp-contact-info-text">
+                                        <h5>Horario</h5>
+                                        <p>Lun – Sáb: 8:00–18:00</p>
+                                        <small>Emergencias 24/7</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Formulario + sidebar -->
+                        <div class="row g-5">
+
+                            <!-- FORMULARIO -->
+                            <div class="col-lg-7" data-vp-animate="fade-right">
+                                <div class="vp-contact-form-wrap">
+
+                                    <!-- Alerta de éxito -->
+                                    <t t-if="enviado">
+                                        <div class="vp-alert-success">
+                                            <i class="fa fa-check-circle"/>
+                                            <div>
+                                                <h5>¡Mensaje enviado, <t t-out="nombre_enviado"/>!</h5>
+                                                <p>
+                                                    Hemos recibido tu solicitud. Nuestro equipo se
+                                                    pondrá en contacto contigo en menos de 2 horas.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </t>
+
+                                    <h3>Envíanos un mensaje</h3>
+                                    <p class="vp-form-subtitle">
+                                        Completa el formulario y te responderemos a la brevedad.
+                                    </p>
+
+                                    <form action="/contacto/enviar" method="POST"
+                                          class="vp-contact-form">
+                                        <input type="hidden" name="csrf_token"
+                                               t-att-value="request.csrf_token()"/>
+
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <div class="vp-form-group">
+                                                    <label class="vp-form-label">
+                                                        Nombre completo
+                                                        <span class="required">*</span>
+                                                    </label>
+                                                    <input type="text" name="nombre"
+                                                           class="vp-form-input"
+                                                           placeholder="Ej: Juan Pérez"
+                                                           required="required"/>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="vp-form-group">
+                                                    <label class="vp-form-label">
+                                                        Correo electrónico
+                                                        <span class="required">*</span>
+                                                    </label>
+                                                    <input type="email" name="email"
+                                                           class="vp-form-input"
+                                                           placeholder="tu@email.com"
+                                                           required="required"/>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="vp-form-group">
+                                                    <label class="vp-form-label">
+                                                        Teléfono / WhatsApp
+                                                    </label>
+                                                    <input type="tel" name="telefono"
+                                                           class="vp-form-input"
+                                                           placeholder="+593 99 000 0000"/>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="vp-form-group">
+                                                    <label class="vp-form-label">
+                                                        Asunto
+                                                        <span class="required">*</span>
+                                                    </label>
+                                                    <select name="asunto" class="vp-form-select"
+                                                            required="required">
+                                                        <option value="">Selecciona un asunto…</option>
+                                                        <option value="cita">Agendar una cita</option>
+                                                        <option value="informacion">Solicitar información</option>
+                                                        <option value="emergencia">Emergencia</option>
+                                                        <option value="planes">Consulta sobre planes</option>
+                                                        <option value="otro">Otro</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="vp-form-group">
+                                                    <label class="vp-form-label">
+                                                        Mensaje
+                                                        <span class="required">*</span>
+                                                    </label>
+                                                    <textarea name="mensaje"
+                                                              class="vp-form-textarea"
+                                                              placeholder="Cuéntanos sobre tu mascota y cómo podemos ayudarte…"
+                                                              required="required"/>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <button type="submit" class="vp-form-btn">
+                                                    <i class="fa fa-paper-plane"/>
+                                                    Enviar Mensaje
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- SIDEBAR HORARIOS -->
+                            <div class="col-lg-5" data-vp-animate="fade-left">
+
+                                <!-- Mapa placeholder -->
+                                <div class="vp-map-placeholder mb-4">
+                                    <i class="fa fa-map-marker"/>
+                                    <strong style="font-size:1.1rem">VitalPet Clínica</strong>
+                                    <p>Av. Cevallos 12-34 y Mera, Ambato</p>
+                                    <a href="https://maps.google.com/maps?q=Av.+Cevallos+Ambato+Ecuador"
+                                       target="_blank"
+                                       style="color:#fff;border:1px solid rgba(255,255,255,0.5);
+                                              padding:8px 20px;border-radius:8px;font-size:0.85rem;
+                                              margin-top:8px;display:inline-block">
+                                        <i class="fa fa-external-link me-1"/>
+                                        Ver en Google Maps
+                                    </a>
+                                </div>
+
+                                <!-- Horarios -->
+                                <div style="background:#fff;border-radius:16px;padding:28px;
+                                            border:1px solid var(--vp-border)">
+                                    <h5 style="font-weight:700;margin-bottom:20px;color:var(--vp-dark)">
+                                        <i class="fa fa-clock-o me-2" style="color:var(--vp-primary)"/>
+                                        Horario de Atención
+                                    </h5>
+                                    <table class="vp-horario-table">
+                                        <tr>
+                                            <td>Lunes – Viernes</td>
+                                            <td><span class="vp-badge-open">08:00 – 18:00</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Sábado</td>
+                                            <td><span class="vp-badge-open">09:00 – 16:00</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Domingo</td>
+                                            <td><span class="vp-badge-closed">Cerrado</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Emergencias</strong></td>
+                                            <td><span class="vp-badge-open">24 / 7</span></td>
+                                        </tr>
+                                    </table>
+
+                                    <div style="margin-top:20px;padding-top:20px;
+                                                border-top:1px solid var(--vp-border)">
+                                        <p style="font-size:0.85rem;color:var(--vp-gray);margin-bottom:12px">
+                                            <i class="fa fa-whatsapp me-2" style="color:#25D366"/>
+                                            ¿Prefires WhatsApp?
+                                        </p>
+                                        <a href="https://wa.me/593991234567"
+                                           target="_blank"
+                                           style="display:flex;align-items:center;gap:10px;
+                                                  background:#25D366;color:#fff;padding:12px 18px;
+                                                  border-radius:10px;font-weight:600;font-size:0.9rem;
+                                                  transition:all 0.3s">
+                                            <i class="fa fa-whatsapp" style="font-size:1.3rem"/>
+                                            Chatear en WhatsApp
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- FOOTER -->
+                <t t-call="veterinaria_web.footer_partial"/>
+
+            </div>
+        </t>
+    </template>
+</odoo>
