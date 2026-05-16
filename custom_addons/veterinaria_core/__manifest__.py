@@ -24,8 +24,12 @@
         'crm',
     ],
     'data': [
-        # Security
+        # Security (groups must load before ACL)
+        'security/veterinaria_security.xml',
         'security/ir.model.access.csv',
+        # Data
+        'data/mail_templates.xml',
+        'data/cron_recordatorio.xml',
         # Views
         'views/propietario_view.xml',
         'views/especialidad_view.xml',
@@ -40,6 +44,7 @@
         'views/venta_view.xml',
         'views/facturacion_view.xml',
         'views/facturacion_linea_view.xml',
+        'views/facturacion_wizard_view.xml',
         'views/documento_venta_view.xml',
         'views/menu.xml',
     ],

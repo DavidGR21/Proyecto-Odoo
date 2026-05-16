@@ -11,6 +11,7 @@
                     <field name="phone"/>
                     <field name="email"/>
                     <field name="cantidad_mascotas" string="Mascotas"/>
+                    <field name="cita_count" string="Citas"/>
                     <field name="es_propietario" invisible="1"/>
                 </list>
             </field>
@@ -33,13 +34,37 @@
             </field>
         </record>
 
+        <!-- Formulario heredado con stat buttons para flujo #6 -->
         <record id="view_veterinaria_propietario_form_inherit" model="ir.ui.view">
             <field name="name">veterinaria.propietario.form.inherit</field>
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <!-- Stat button: Mascotas -->
+                    <button name="action_view_mascotas" type="object"
+                        class="oe_stat_button" icon="fa-paw"
+                        invisible="not es_propietario">
+                        <field name="cantidad_mascotas" widget="statinfo" string="Mascotas"/>
+                    </button>
+                    <!-- Stat button: Citas -->
+                    <button name="action_view_citas" type="object"
+                        class="oe_stat_button" icon="fa-calendar"
+                        invisible="not es_propietario">
+                        <field name="cita_count" widget="statinfo" string="Citas"/>
+                    </button>
+                </xpath>
+
                 <xpath expr="//notebook" position="inside">
                     <page string="Veterinaria">
+                        <!-- Botón Agendar Cita prominente -->
+                        <group>
+                            <button name="action_agendar_cita" type="object"
+                                string="🐾 Agendar Cita"
+                                class="btn btn-primary"
+                                invisible="not es_propietario"/>
+                        </group>
+
                         <group>
                             <group string="Perfil de Dueño">
                                 <field name="es_propietario"/>

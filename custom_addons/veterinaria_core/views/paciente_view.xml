@@ -1,13 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- Vista de Formulario para Paciente MEJORADA -->
+        <!-- ============================================================ -->
+        <!-- Vista Quick Create de Paciente (#9)                          -->
+        <!-- Permite crear mascota rápidamente desde la vista de cita     -->
+        <!-- ============================================================ -->
+        <record id="view_paciente_quick_create_form" model="ir.ui.view">
+            <field name="name">veterinaria.paciente.quick_create.form</field>
+            <field name="model">veterinaria.paciente</field>
+            <field name="priority">1000</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <field name="name" required="1" placeholder="Nombre de la mascota"/>
+                        <field name="especie" required="1"/>
+                        <field name="raza" placeholder="Raza (opcional)"/>
+                        <field name="propietario_id" required="1"
+                            domain="[('es_propietario', '=', True)]"
+                            context="{'default_es_propietario': True}"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <!-- ============================================================ -->
+        <!-- Vista de Formulario para Paciente                            -->
+        <!-- ============================================================ -->
         <record id="view_veterinaria_paciente_form" model="ir.ui.view">
             <field name="name">veterinaria.paciente.form</field>
             <field name="model">veterinaria.paciente</field>
             <field name="arch" type="xml">
                 <form string="Paciente">
                     <header>
+                        <!-- Botón Agendar Cita (#6) -->
+                        <button name="action_agendar_cita" type="object"
+                            string="🐾 Agendar Cita"
+                            class="btn btn-primary"/>
                         <field name="estado" widget="statusbar" statusbar_visible="activo,inactivo,fallecido"/>
                     </header>
                     <sheet>

@@ -6,8 +6,8 @@
             <field name="name">veterinaria.facturacion.form</field>
             <field name="model">veterinaria.facturacion</field>
             <field name="arch" type="xml">
-                <form modifiers="{'readonly': [('estado', '!=', 'borrador')]}">
-                    <!-- HEADER  BOTONES VALIDAD Y GENERAR -->
+                <form>
+                    <!-- HEADER  BOTONES VALIDAR Y GENERAR -->
                     <header>
                         <button name="action_validar_factura" string="Validar y Generar Factura" 
                                 type="object" class="oe_highlight" 
@@ -21,32 +21,36 @@
                                statusbar_visible="borrador,validado,cancelado"/>
                     </header>
 
-                    <sheet modifiers="{'readonly': [('estado', '!=', 'borrador')]}">
+                    <sheet>
                         <div class="oe_title">
                             <h1><field name="name" readonly="1"/></h1>
                         </div>
                         
                         <group>
-                            <field name="fecha_factura" modifiers="{'readonly': [('estado', '!=', 'borrador')]}"/>
-                            <field name="propietario_id" modifiers="{'readonly': [('estado', '!=', 'borrador')]}"/>
-                            <field name="paciente_id" modifiers="{'readonly': [('estado', '!=', 'borrador')]}"/>
+                            <field name="fecha_factura" readonly="estado != 'borrador'"/>
+                            <field name="propietario_id" readonly="estado != 'borrador'"/>
+                            <field name="paciente_id" readonly="estado != 'borrador'"/>
                         </group>
                         
                         <notebook>
                             <page string="Líneas">
-                                <field name="linea_ids" modifiers="{'readonly': [('estado', '!=', 'borrador')]}" >
+                                <field name="linea_ids" readonly="estado != 'borrador'">
                                     <list editable="bottom">
-                                        <field name="tipo_linea" modifiers="{'readonly': [('parent.estado', '!=', 'borrador')]}"/>
+                                        <field name="tipo_linea" readonly="parent.estado != 'borrador'"/>
                                         <field name="cita_id" domain="[('paciente_id.propietario_id', '=', parent.propietario_id)]"
-                                            modifiers="{'readonly': ['|', ('parent.estado', '!=', 'borrador'), ('tipo_linea', '!=', 'cita')], 'required': [('tipo_linea', '=', 'cita')]}"/>
+                                            readonly="parent.estado != 'borrador' or tipo_linea != 'cita'"
+                                            required="tipo_linea == 'cita'"/>
                                         <field name="medicamento_id"
-                                            modifiers="{'readonly': ['|', ('parent.estado', '!=', 'borrador'), ('tipo_linea', '!=', 'medicamento')], 'required': [('tipo_linea', '=', 'medicamento')]}"/>
+                                            readonly="parent.estado != 'borrador' or tipo_linea != 'medicamento'"
+                                            required="tipo_linea == 'medicamento'"/>
                                         <field name="producto_id"
-                                            modifiers="{'readonly': ['|', ('parent.estado', '!=', 'borrador'), ('tipo_linea', '!=', 'producto')], 'required': [('tipo_linea', '=', 'producto')]}"/>
+                                            readonly="parent.estado != 'borrador' or tipo_linea != 'producto'"
+                                            required="tipo_linea == 'producto'"/>
                                         <field name="servicio_id"
-                                            modifiers="{'readonly': ['|', ('parent.estado', '!=', 'borrador'), ('tipo_linea', '!=', 'servicio')], 'required': [('tipo_linea', '=', 'servicio')]}"/>
-                                        <field name="cantidad" modifiers="{'readonly': [('parent.estado', '!=', 'borrador')]}"/>
-                                        <field name="precio_unitario" modifiers="{'readonly': [('parent.estado', '!=', 'borrador')]}"/>
+                                            readonly="parent.estado != 'borrador' or tipo_linea != 'servicio'"
+                                            required="tipo_linea == 'servicio'"/>
+                                        <field name="cantidad" readonly="parent.estado != 'borrador'"/>
+                                        <field name="precio_unitario" readonly="parent.estado != 'borrador'"/>
                                         <field name="subtotal" readonly="1"/>
                                         <field name="total_linea" readonly="1"/>
                                     </list>
@@ -59,7 +63,7 @@
                                 </group>
                             </page>
                             <page string="Observaciones">
-                                <field name="observaciones" modifiers="{'readonly': [('estado', '!=', 'borrador')]}"/>
+                                <field name="observaciones" readonly="estado != 'borrador'"/>
                             </page>
                         </notebook>
                     </sheet>
@@ -97,7 +101,7 @@
             </field>
         </record>
 
-        <!-- TU NUEVO ACTION AQUÍ -->
+        <!-- Action -->
         <record id="facturacion_action" model="ir.actions.act_window">
             <field name="name">Facturación por Servicios</field>
             <field name="type">ir.actions.act_window</field>

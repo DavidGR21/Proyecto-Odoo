@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- ============================================================ -->
+        <!-- CATEGORÍA DEL MÓDULO                                         -->
+        <!-- ============================================================ -->
+        <record id="module_veterinaria_category" model="ir.module.category">
+            <field name="name">Veterinaria</field>
+            <field name="description">Módulo de gestión veterinaria VitalPet</field>
+            <field name="sequence">50</field>
+        </record>
+
+        <!-- ============================================================ -->
+        <!-- GRUPOS DE SEGURIDAD (jerárquicos)                            -->
+        <!-- ============================================================ -->
+
+        <!-- Grupo base: Recepcionista -->
+        <record id="group_veterinaria_recepcionista" model="res.groups">
+            <field name="name">Recepcionista</field>
+            <field name="category_id" ref="module_veterinaria_category"/>
+            <field name="comment">
+                Puede gestionar citas, pacientes y propietarios.
+                Lectura en medicamentos y productos. Sin acceso a facturación.
+            </field>
+        </record>
+
+        <!-- Grupo intermedio: Veterinario (hereda Recepcionista) -->
+        <record id="group_veterinaria_veterinario" model="res.groups">
+            <field name="name">Veterinario</field>
+            <field name="category_id" ref="module_veterinaria_category"/>
+            <field name="implied_ids" eval="[(4, ref('group_veterinaria_recepcionista'))]"/>
+            <field name="comment">
+                Hereda permisos de Recepcionista.
+                Acceso completo a historia clínica y citas asignadas.
+            </field>
+        </record>
+
+        <!-- Grupo superior: Administrador Veterinaria (hereda Veterinario) -->
+        <record id="group_veterinaria_admin" model="res.groups">
+            <field name="name">Administrador Veterinaria</field>
+            <field name="category_id" ref="module_veterinaria_category"/>
+            <field name="implied_ids" eval="[(4, ref('group_veterinaria_veterinario'))]"/>
+            <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+            <field name="comment">
+                Acceso completo a todo el módulo veterinaria.
+                Facturación, ventas, configuración y reportes.
+            </field>
+        </record>
+    </data>
+
+    <data noupdate="1">
+        <!-- ============================================================ -->
+        <!-- REGLAS DE REGISTRO (Record Rules) — #11                      -->
+        <!-- ============================================================ -->
+
+        <!-- Recepcionista: ve todas las citas (necesita gestionar agenda) -->
+        <record id="rule_cita_recepcionista" model="ir.rule">
+            <field name="name">Recepcionista: Acceso completo a citas</field>
+            <field name="model_id" ref="model_veterinaria_cita"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_veterinaria_recepcionista'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Administrador: puede eliminar citas -->
+        <record id="rule_cita_admin" model="ir.rule">
+            <field name="name">Admin: Acceso total a citas</field>
+            <field name="model_id" ref="model_veterinaria_cita"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_veterinaria_admin'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <!-- Recepcionista: ve todos los pacientes -->
+        <record id="rule_paciente_recepcionista" model="ir.rule">
+            <field name="name">Recepcionista: Acceso a pacientes</field>
+            <field name="model_id" ref="model_veterinaria_paciente"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_veterinaria_recepcionista'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Admin: acceso total a pacientes -->
+        <record id="rule_paciente_admin" model="ir.rule">
+            <field name="name">Admin: Acceso total a pacientes</field>
+            <field name="model_id" ref="model_veterinaria_paciente"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_veterinaria_admin'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <!-- Admin: acceso total a facturación -->
+        <record id="rule_facturacion_admin" model="ir.rule">
+            <field name="name">Admin: Acceso total a facturación</field>
+            <field name="model_id" ref="model_veterinaria_facturacion"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_veterinaria_admin'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <!-- Admin: acceso total a ventas -->
+        <record id="rule_venta_admin" model="ir.rule">
+            <field name="name">Admin: Acceso total a ventas</field>
+            <field name="model_id" ref="model_veterinaria_venta"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_veterinaria_admin'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+    </data>
+</odoo>

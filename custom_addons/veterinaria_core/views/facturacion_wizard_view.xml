@@ -22,23 +22,23 @@
                             <group>
                                 <!-- Cita -->
                                 <field name="cita_id" 
-                                       attrs="{'invisible': [('tipo_linea', '!=', 'cita')],
-                                               'required': [('tipo_linea', '=', 'cita')]}"/>
+                                       invisible="tipo_linea != 'cita'"
+                                       required="tipo_linea == 'cita'"/>
                                 
                                 <!-- Medicamento -->
                                 <field name="medicamento_id" 
-                                       attrs="{'invisible': [('tipo_linea', '!=', 'medicamento')],
-                                               'required': [('tipo_linea', '=', 'medicamento')]}"/>
+                                       invisible="tipo_linea != 'medicamento'"
+                                       required="tipo_linea == 'medicamento'"/>
                                 
                                 <!-- Producto -->
                                 <field name="producto_id" 
-                                       attrs="{'invisible': [('tipo_linea', '!=', 'producto')],
-                                               'required': [('tipo_linea', '=', 'producto')]}"/>
+                                       invisible="tipo_linea != 'producto'"
+                                       required="tipo_linea == 'producto'"/>
                                 
                                 <!-- Servicio -->
                                 <field name="servicio_id" 
-                                       attrs="{'invisible': [('tipo_linea', '!=', 'servicio')],
-                                               'required': [('tipo_linea', '=', 'servicio')]}"/>
+                                       invisible="tipo_linea != 'servicio'"
+                                       required="tipo_linea == 'servicio'"/>
                             </group>
                             <group>
                                 <field name="cantidad"/>
@@ -94,46 +94,46 @@
                         <group>
                             <!-- Citas -->
                             <field name="cita_ids" nolabel="1" colspan="2"
-                                   attrs="{'invisible': [('tipo_documento', '!=', 'cita')]}">
-                                <tree editable="bottom" create="false" delete="false">
+                                   invisible="tipo_documento != 'cita'">
+                                <list editable="bottom" create="false" delete="false">
                                     <field name="name"/>
                                     <field name="fecha_hora"/>
                                     <field name="paciente_id"/>
                                     <field name="veterinario_id"/>
                                     <field name="estado"/>
-                                </tree>
+                                </list>
                             </field>
                             
                             <!-- Medicamentos -->
                             <field name="medicamento_ids" nolabel="1" colspan="2"
-                                   attrs="{'invisible': [('tipo_documento', '!=', 'medicamento')]}">
-                                <tree editable="bottom" create="false" delete="false">
+                                   invisible="tipo_documento != 'medicamento'">
+                                <list editable="bottom" create="false" delete="false">
                                     <field name="name"/>
                                     <field name="tipo"/>
                                     <field name="precio_venta"/>
                                     <field name="cantidad_stock"/>
-                                </tree>
+                                </list>
                             </field>
                             
                             <!-- Productos -->
                             <field name="producto_ids" nolabel="1" colspan="2"
-                                   attrs="{'invisible': [('tipo_documento', '!=', 'producto')]}">
-                                <tree editable="bottom" create="false" delete="false">
+                                   invisible="tipo_documento != 'producto'">
+                                <list editable="bottom" create="false" delete="false">
                                     <field name="name"/>
                                     <field name="categoria"/>
                                     <field name="precio_venta"/>
                                     <field name="cantidad_stock"/>
-                                </tree>
+                                </list>
                             </field>
                             
                             <!-- Servicios -->
                             <field name="servicio_ids" nolabel="1" colspan="2"
-                                   attrs="{'invisible': [('tipo_documento', '!=', 'servicio')]}">
-                                <tree editable="bottom" create="false" delete="false">
+                                   invisible="tipo_documento != 'servicio'">
+                                <list editable="bottom" create="false" delete="false">
                                     <field name="name"/>
                                     <field name="descripcion"/>
                                     <field name="precio"/>
-                                </tree>
+                                </list>
                             </field>
                         </group>
                     </sheet>

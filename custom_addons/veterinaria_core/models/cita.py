@@ -2,6 +2,9 @@
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 from datetime import timedelta
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class Cita(models.Model):
@@ -13,13 +16,27 @@ class Cita(models.Model):
     name = fields.Char('Referencia', compute='_compute_name')
     paciente_id = fields.Many2one('veterinaria.paciente', string='Paciente', required=True, 
                                    ondelete='cascade', tracking=True)
-    propietario_id = fields.Many2one('res.partner', string='Propietario', compute='_compute_propietario', store=False)
+    propietario_id = fields.Many2one('res.partner', string='Propietario', 
+                                      compute='_compute_propietario', store=False)
     veterinario_id = fields.Many2one('veterinaria.veterinario', string='Veterinario', ondelete='set null')
     servicio_id = fields.Many2one('veterinaria.servicio', string='Servicio', ondelete='set null')
     fecha_hora = fields.Datetime('Fecha y Hora', required=True, tracking=True)
     duracion = fields.Selection([
         ('0.5', '30 minutos'),
         ('1.0', '1 hora'),
+        ('1.5', '1 hora 30 min'),
+        ('2.0', '2 horas'),
+        ('3.0', '3 horas'),
+        ('4.0', '4 horas'),
+        ('8.0', '8 horas'),
+        ('12.0', '12 horas'),
+        # Fallbacks de cadena para compatibilidad con vistas de calendario/legacy
+        ('1', '1 hora'),
+        ('2', '2 horas'),
+        ('3', '3 horas'),
+        ('4', '4 horas'),
+        ('8', '8 horas'),
+        ('12', '12 horas'),
     ], string='Duración', default='1.0')
     duracion_horas = fields.Float('Duración (horas)', compute='_compute_duracion_horas', store=True)
     
@@ -208,10 +225,105 @@ class Cita(models.Model):
                 update_vals['observaciones'] = record.observaciones
             historia.write(update_vals)
 
+    # ==================================================================
+    # Métodos de envío de correo (#8)
+    # ==================================================================
+    def _send_confirmacion_email(self):
+        """Envía email de confirmación al crear una cita"""
+        template = self.env.ref('veterinaria_core.mail_template_cita_confirmacion', raise_if_not_found=False)
+        if not template:
+            return
+        for record in self:
+            if record.propietario_id and record.propietario_id.email:
+                try:
+                    template.send_mail(record.id, force_send=False)
+                    _logger.info('Email de confirmación enviado para cita %s', record.name)
+                except Exception as e:
+                    _logger.warning('No se pudo enviar email de confirmación para cita %s: %s', record.name, e)
+
+    def _send_completada_email(self):
+        """Envía resumen post-consulta al completar la cita"""
+        template = self.env.ref('veterinaria_core.mail_template_cita_completada', raise_if_not_found=False)
+        if not template:
+            return
+        for record in self:
+            if record.propietario_id and record.propietario_id.email:
+                try:
+                    template.send_mail(record.id, force_send=False)
+                    _logger.info('Email de consulta completada enviado para cita %s', record.name)
+                except Exception as e:
+                    _logger.warning('No se pudo enviar email post-consulta para cita %s: %s', record.name, e)
+
+    @api.model
+    def _cron_enviar_recordatorios(self):
+        """Cron: Envía recordatorio de citas en las próximas 24h"""
+        template = self.env.ref('veterinaria_core.mail_template_cita_recordatorio', raise_if_not_found=False)
+        if not template:
+            _logger.warning('Plantilla de recordatorio no encontrada')
+            return
+
+        now = fields.Datetime.now()
+        en_24h = now + timedelta(hours=24)
+
+        citas = self.search([
+            ('estado', '=', 'programada'),
+            ('recordatorio_enviado', '=', False),
+            ('fecha_hora', '>=', now),
+            ('fecha_hora', '<=', en_24h),
+        ])
+
+        _logger.info('Cron recordatorios: %d citas encontradas', len(citas))
+
+        for cita in citas:
+            if cita.propietario_id and cita.propietario_id.email:
+                try:
+                    template.send_mail(cita.id, force_send=False)
+                    cita.write({'recordatorio_enviado': True})
+                    _logger.info('Recordatorio enviado para cita %s', cita.name)
+                except Exception as e:
+                    _logger.warning('Error enviando recordatorio para cita %s: %s', cita.name, e)
+
+    # ==================================================================
+    # CRUD overrides e Interceptores de Caché (Normalización de Duración)
+    # ==================================================================
+    @api.model
+    def default_get(self, fields_list):
+        res = super().default_get(fields_list)
+        if 'duracion' in res:
+            val = res['duracion']
+            try:
+                fl_val = float(val)
+                str_val = str(fl_val)
+                if str_val in ['0.5', '1.0', '1.5', '2.0', '3.0', '4.0', '8.0', '12.0']:
+                    res['duracion'] = str_val
+            except Exception:
+                pass
+        return res
+
+    def onchange(self, values, field_names, fields_spec):
+        if values and 'duracion' in values:
+            val = values['duracion']
+            try:
+                fl_val = float(val)
+                str_val = str(fl_val)
+                if str_val in ['0.5', '1.0', '1.5', '2.0', '3.0', '4.0', '8.0', '12.0']:
+                    values['duracion'] = str_val
+            except Exception:
+                pass
+        return super().onchange(values, field_names, fields_spec)
+
     @api.model_create_multi
     def create(self, vals_list):
-        # validate overlaps before create
+        # validate overlaps before create and normalize duracion
         for vals in vals_list:
+            if 'duracion' in vals:
+                try:
+                    fl_val = float(vals['duracion'])
+                    str_val = str(fl_val)
+                    if str_val in ['0.5', '1.0', '1.5', '2.0', '3.0', '4.0', '8.0', '12.0']:
+                        vals['duracion'] = str_val
+                except Exception:
+                    pass
             if vals.get('veterinario_id') and vals.get('fecha_hora'):
                 start = fields.Datetime.to_datetime(vals['fecha_hora']) if isinstance(vals['fecha_hora'], str) else vals['fecha_hora']
                 duration = float(vals.get('duracion') or 1.0)
@@ -227,9 +339,19 @@ class Cita(models.Model):
                         raise ValidationError('El veterinario no está disponible en ese horario (conflicto con otra cita).')
         records = super().create(vals_list)
         records._sync_historia()
+        # Enviar email de confirmación (#8)
+        records._send_confirmacion_email()
         return records
 
     def write(self, vals):
+        if 'duracion' in vals:
+            try:
+                fl_val = float(vals['duracion'])
+                str_val = str(fl_val)
+                if str_val in ['0.5', '1.0', '1.5', '2.0', '3.0', '4.0', '8.0', '12.0']:
+                    vals['duracion'] = str_val
+            except Exception:
+                pass
         result = super().write(vals)
         campos_sincronizados = {
             'paciente_id',
@@ -244,8 +366,9 @@ class Cita(models.Model):
         return result
 
     def action_completar_cita(self):
-        """Marcar cita como completada"""
+        """Marcar cita como completada y enviar resumen (#8)"""
         self.write({'estado': 'completada'})
+        self._send_completada_email()
 
     def action_cancelar_cita(self):
         """Cancelar cita"""

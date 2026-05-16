@@ -79,7 +79,22 @@ class Paciente(models.Model):
             'type': 'ir.actions.act_window',
             'name': 'Citas',
             'res_model': 'veterinaria.cita',
-            'view_mode': 'calendar,list,form',
+            'view_mode': 'list,calendar,form',
             'domain': [('paciente_id', '=', self.id)],
             'context': {'default_paciente_id': self.id},
         }
+
+    def action_agendar_cita(self):
+        """Abrir formulario para agendar cita con paciente pre-seleccionado"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Agendar Cita',
+            'res_model': 'veterinaria.cita',
+            'view_mode': 'form',
+            'target': 'current',
+            'context': {
+                'default_paciente_id': self.id,
+            },
+        }
+
