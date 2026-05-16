@@ -143,3 +143,96 @@ class FacturacionMultilineaWizard(models.TransientModel):
             'view_mode': 'form',
             'target': 'current',
         }
+
+
+class ImportarRecetaWizard(models.TransientModel):
+    """Wizard para importar medicamentos de una receta a la factura."""
+    _name = 'veterinaria.importar.receta.wizard'
+    _description = 'Asistente para Importar Receta'
+
+    facturacion_id = fields.Many2one(
+        'veterinaria.facturacion',
+        string='Facturacion',
+        required=True
+    )
+
+    propietario_id = fields.Many2one(
+        'res.partner',
+        string='Propietario',
+        readonly=True
+    )
+
+    cita_id = fields.Many2one(
+        'veterinaria.cita',
+        string='Seleccionar Cita/Receta',
+        required=True,
+    )
+
+    @api.onchange('facturacion_id')
+    def _onchange_facturacion_id(self):
+        """Filtra cita_id para mostrar solo las citas ya presentes en la factura."""
+        if self.facturacion_id:
+            citas_ya_en_factura = self.facturacion_id.linea_ids.filtered(lambda l: l.tipo_linea == 'cita' and l.cita_id).mapped('cita_id')
+            return {'domain': {'cita_id': [('id', 'in', citas_ya_en_factura.ids)]}}
+
+    linea_ids = fields.One2many(
+        'veterinaria.importar.receta.wizard.linea',
+        'wizard_id',
+        string='Medicamentos a Importar'
+    )
+
+    @api.onchange('cita_id')
+    def _onchange_cita_id(self):
+        """Carga las lineas de la receta filtrando solo las de inventario."""
+        # Limpiar lineas anteriores
+        self.linea_ids = [(5, 0, 0)]
+        if self.cita_id:
+            lineas_wizard = []
+            # Recorrer todas las recetas vinculadas a la cita
+            for receta in self.cita_id.receta_ids:
+                for linea in receta.linea_ids:
+                    # Filtro estricto: Solo medicamentos del inventario
+                    if linea.tipo_origen == 'inventario' and linea.medicamento_id:
+                        lineas_wizard.append((0, 0, {
+                            'medicamento_id': linea.medicamento_id.id, # ID explícito
+                            'cantidad_a_facturar': linea.cantidad_total,
+                        }))
+            self.linea_ids = lineas_wizard
+
+    def action_confirmar_importacion(self):
+        """Crea las lineas en la factura usando item_ref y precio unitario."""
+        self.ensure_one()
+        if not self.linea_ids:
+            raise ValidationError("No hay medicamentos seleccionados para importar. Verifique que la cita tenga una receta con medicamentos de inventario.")
+        
+        lineas_creadas = 0
+        for linea in self.linea_ids:
+            if linea.cantidad_a_facturar > 0 and linea.medicamento_id:
+                # Obtenemos el item de inventario para sacar el precio
+                item = linea.medicamento_id
+                self.env['veterinaria.facturacion.linea'].create({
+                    'facturacion_id': self.facturacion_id.id,
+                    'tipo_linea': 'medicamento',
+                    'item_ref': f'veterinaria.inventario,{item.id}',
+                    'inventario_id': item.id,
+                    'cantidad': linea.cantidad_a_facturar,
+                    'precio_unitario': item.precio_venta or 0.0,
+                })
+                lineas_creadas += 1
+        
+        if lineas_creadas == 0:
+            raise ValidationError("No se pudo importar ninguna línea. Asegúrese de que las cantidades sean mayores a cero.")
+            
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload',
+        }
+
+
+class ImportarRecetaWizardLinea(models.TransientModel):
+    _name = 'veterinaria.importar.receta.wizard.linea'
+    _description = 'Linea de Asistente para Importar Receta'
+
+    wizard_id = fields.Many2one('veterinaria.importar.receta.wizard', string='Wizard')
+    medicamento_id = fields.Many2one('veterinaria.inventario', string='Medicamento')
+    cantidad_a_facturar = fields.Float('Cantidad a Facturar')

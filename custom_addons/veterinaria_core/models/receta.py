@@ -161,24 +161,44 @@ class RecetaLinea(models.Model):
             else:
                 rec.nombre_medicamento_display = 'No definido'
 
-    # ── Detalles estructurados ───────────────────────────────────────────────
-    dosis = fields.Char(
-        'Dosis',
+    # ── Detalles estructurados (Refactores para Cálculo) ──────────────────────
+    dosis = fields.Float(
+        'Dosis (unidades/ml)',
         required=True,
-        help='Ej: 1 pastilla, 2.5 ml',
+        default=1.0,
+        help='Cantidad de medicamento por toma (ej: 1.5, 2, 0.5)',
     )
 
-    frecuencia = fields.Char(
-        'Frecuencia',
+    frecuencia_horas = fields.Integer(
+        'Cada (horas)',
         required=True,
-        help='Ej: Cada 8 horas, Cada 12 horas',
+        default=24,
+        help='Intervalo de horas entre tomas (ej: 24, 12, 8, 6)',
     )
 
-    duracion = fields.Char(
-        'Duración',
+    duracion_dias = fields.Integer(
+        'Duración (días)',
         required=True,
-        help='Ej: Por 7 días, Por 3 semanas',
+        default=1,
+        help='Cantidad de días que durará el tratamiento',
     )
+
+    cantidad_total = fields.Float(
+        'Cantidad Total a Entregar',
+        compute='_compute_cantidad_total',
+        store=True,
+        help='Dosis * (24 / Frecuencia) * Duración',
+    )
+
+    @api.depends('dosis', 'frecuencia_horas', 'duracion_dias')
+    def _compute_cantidad_total(self):
+        for rec in self:
+            if rec.frecuencia_horas > 0:
+                tomas_por_dia = 24.0 / rec.frecuencia_horas
+                rec.cantidad_total = rec.dosis * tomas_por_dia * rec.duracion_dias
+            else:
+                # Evitar división por cero
+                rec.cantidad_total = 0.0
 
     # ── Validaciones ──────────────────────────────────────────────────────────
     @api.constrains('tipo_origen', 'medicamento_id', 'medicamento_texto')

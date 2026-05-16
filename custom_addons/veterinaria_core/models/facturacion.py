@@ -104,6 +104,21 @@ class Facturacion(models.Model):
         for record in self:
             record.estado = 'cancelado'
 
+    def action_importar_receta(self):
+        """Abre el wizard para importar medicamentos de una receta."""
+        self.ensure_one()
+        return {
+            'name': 'Importar desde Receta',
+            'type': 'ir.actions.act_window',
+            'res_model': 'veterinaria.importar.receta.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_facturacion_id': self.id,
+                'default_propietario_id': self.propietario_id.id,
+            }
+        }
+
     def write(self, vals):
         for record in self:
             if record.estado != 'borrador':

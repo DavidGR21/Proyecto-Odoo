@@ -33,6 +33,12 @@ class FacturacionLinea(models.Model):
         domain="[('tipo_inventario', '=', tipo_linea), ('activo', '=', True)]"
     )
 
+    # Columna unificada para seleccion (Reference)
+    item_ref = fields.Reference([
+        ('veterinaria.cita', 'Cita Veterinaria'),
+        ('veterinaria.inventario', 'Inventario'),
+    ], string='Item (Ref)')
+
     # Campo calculado para mostrar en la lista de forma unificada
     nombre_item = fields.Char(
         string='Item',
@@ -48,10 +54,12 @@ class FacturacionLinea(models.Model):
 
     # ── Computes ──────────────────────────────────────────────────────────────
 
-    @api.depends('tipo_linea', 'cita_id', 'inventario_id')
+    @api.depends('tipo_linea', 'cita_id', 'inventario_id', 'item_ref')
     def _compute_nombre_item(self):
         for rec in self:
-            if rec.tipo_linea == 'cita' and rec.cita_id:
+            if rec.item_ref:
+                rec.nombre_item = rec.item_ref.display_name
+            elif rec.tipo_linea == 'cita' and rec.cita_id:
                 rec.nombre_item = rec.cita_id.name
             elif rec.tipo_linea in ('medicamento', 'producto', 'servicio') and rec.inventario_id:
                 rec.nombre_item = rec.inventario_id.name
@@ -63,10 +71,12 @@ class FacturacionLinea(models.Model):
         for rec in self:
             rec.subtotal = rec.cantidad * rec.precio_unitario
 
-    @api.depends('tipo_linea', 'cita_id', 'inventario_id', 'cantidad')
+    @api.depends('tipo_linea', 'cita_id', 'inventario_id', 'cantidad', 'item_ref')
     def _compute_descripcion(self):
         for rec in self:
-            if rec.tipo_linea == 'cita' and rec.cita_id:
+            if rec.item_ref:
+                rec.descripcion = f"{rec.item_ref.display_name} (x{rec.cantidad})"
+            elif rec.tipo_linea == 'cita' and rec.cita_id:
                 motivo = rec.cita_id.motivo or ''
                 rec.descripcion = f"Cita - {motivo} (x{rec.cantidad})"
             elif rec.tipo_linea in ('medicamento', 'producto', 'servicio') and rec.inventario_id:
@@ -76,6 +86,20 @@ class FacturacionLinea(models.Model):
                 rec.descripcion = ''
 
     # ── Onchanges ─────────────────────────────────────────────────────────────
+
+    @api.onchange('item_ref')
+    def _onchange_item_ref(self):
+        if self.item_ref:
+            # Si es inventario, intentar sacar el precio
+            if self.item_ref._name == 'veterinaria.inventario':
+                self.precio_unitario = self.item_ref.precio_venta or 0.0
+                self.inventario_id = self.item_ref.id
+                self.tipo_linea = self.item_ref.tipo_inventario
+            elif self.item_ref._name == 'veterinaria.cita':
+                self.cita_id = self.item_ref.id
+                self.tipo_linea = 'cita'
+                if self.item_ref.servicio_id:
+                    self.precio_unitario = self.item_ref.servicio_id.precio or 0.0
 
     @api.onchange('tipo_linea')
     def _onchange_tipo_linea(self):

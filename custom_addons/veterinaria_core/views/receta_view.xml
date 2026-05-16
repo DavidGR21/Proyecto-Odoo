@@ -75,9 +75,10 @@
                                     <!-- Solución #2: Única columna física en el list (tree) -->
                                     <list string="Medicamentos">
                                         <field name="nombre_medicamento_display" string="Medicamento"/>
-                                        <field name="dosis"/>
-                                        <field name="frecuencia"/>
-                                        <field name="duracion"/>
+                                        <field name="dosis" string="Dosis"/>
+                                        <field name="frecuencia_horas" string="Cada (h)"/>
+                                        <field name="duracion_dias" string="Días"/>
+                                        <field name="cantidad_total" string="Total" decoration-bf="1"/>
                                     </list>
 
                                     <!-- Solución #2: Formulario interno para elegir origen sin duplicar columnas -->
@@ -94,9 +95,10 @@
                                                        invisible="tipo_origen == 'inventario'"/>
                                             </group>
                                             <group string="Dosificación">
-                                                <field name="dosis"/>
-                                                <field name="frecuencia"/>
-                                                <field name="duracion"/>
+                                                <field name="dosis" string="Dosis (unidades/ml)"/>
+                                                <field name="frecuencia_horas" string="Cada (horas)"/>
+                                                <field name="duracion_dias" string="Duración (días)"/>
+                                                <field name="cantidad_total" string="Cantidad Total a Entregar" readonly="1"/>
                                             </group>
                                         </group>
                                     </form>

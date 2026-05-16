@@ -22,6 +22,11 @@
                                 string="Cancelar"
                                 type="object"
                                 invisible="estado != 'validado'"/>
+                        <button name="action_importar_receta"
+                                string="Importar desde Receta"
+                                type="object"
+                                class="btn btn-secondary"
+                                invisible="estado != 'borrador'"/>
                         <field name="estado" widget="statusbar"
                                statusbar_visible="borrador,validado,cancelado"/>
                     </header>

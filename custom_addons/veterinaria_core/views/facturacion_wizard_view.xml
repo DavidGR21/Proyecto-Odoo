@@ -97,5 +97,35 @@
             <field name="target">new</field>
         </record>
 
+        <!-- Vista Formulario para Importar Receta Wizard -->
+        <record id="view_importar_receta_wizard_form" model="ir.ui.view">
+            <field name="name">veterinaria.importar.receta.wizard.form</field>
+            <field name="model">veterinaria.importar.receta.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Importar Medicamentos desde Receta">
+                    <group>
+                        <field name="facturacion_id" invisible="1"/>
+                        <field name="propietario_id" invisible="1"/>
+                        <field name="cita_id" string="Cita / Receta a Importar" options="{'no_create': True}"/>
+                    </group>
+                    <separator string="Medicamentos Encontrados en Inventario"/>
+                    <p class="text-muted">
+                        Solo se muestran los medicamentos que pertenecen al inventario de la clínica. 
+                        Los medicamentos externos no pueden ser facturados.
+                    </p>
+                    <field name="linea_ids">
+                        <list editable="bottom" create="0">
+                            <field name="medicamento_id" readonly="1" force_save="1"/>
+                            <field name="cantidad_a_facturar"/>
+                        </list>
+                    </field>
+                    <footer>
+                        <button name="action_confirmar_importacion" string="Importar a Factura" type="object" class="btn-primary"/>
+                        <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
     </data>
 </odoo>
