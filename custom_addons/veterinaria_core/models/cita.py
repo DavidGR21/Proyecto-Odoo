@@ -53,6 +53,7 @@ class Cita(models.Model):
     
     # Relación con historia clínica
     historia_clinica_id = fields.Many2one('veterinaria.historia_clinica', string='Historia Clínica')
+    receta_ids = fields.One2many('veterinaria.receta', 'cita_id', string='Recetas Médicas')
     alergias = fields.Text('Alergias de la Mascota')
     tipo_sangre = fields.Selection([
         ('a_pos', 'A+'),
@@ -373,3 +374,17 @@ class Cita(models.Model):
     def action_cancelar_cita(self):
         """Cancelar cita"""
         self.write({'estado': 'cancelada'})
+
+    def action_crear_receta(self):
+        """Abre el formulario para crear una nueva receta vinculada a esta cita"""
+        self.ensure_one()
+        return {
+            'name': 'Nueva Receta Médica',
+            'type': 'ir.actions.act_window',
+            'res_model': 'veterinaria.receta',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_cita_id': self.id,
+            }
+        }

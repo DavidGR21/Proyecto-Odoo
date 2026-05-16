@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- ============================================================ -->
+        <!-- Extensión de la vista de Cita para gestionar Recetas        -->
+        <!-- ============================================================ -->
+        <record id="view_veterinaria_cita_form_receta_extension" model="ir.ui.view">
+            <field name="name">veterinaria.cita.form.receta.extension</field>
+            <field name="model">veterinaria.cita</field>
+            <field name="inherit_id" ref="veterinaria_core.view_veterinaria_cita_form"/>
+            <field name="arch" type="xml">
+                <!-- Solución #1: Mover botón al Header principal -->
+                <xpath expr="//header" position="inside">
+                    <button name="action_crear_receta"
+                            string="➕ Emitir Receta"
+                            type="object"
+                            class="btn btn-primary"
+                            invisible="estado != 'completada'"/>
+                </xpath>
+
+                <!-- Pestaña de Receta Médica -->
+                <xpath expr="//sheet" position="inside">
+                    <notebook>
+                        <page string="📋 Receta Médica" name="recetas" 
+                              invisible="estado != 'completada'">
+                            <!-- Solución #1: Desactivar creación directa en línea (create="0") -->
+                            <field name="receta_ids" 
+                                   context="{'default_cita_id': id}"
+                                   readonly="1">
+                                <list create="0" delete="0">
+                                    <field name="name" string="Referencia"/>
+                                    <field name="fecha_emision"/>
+                                    <field name="diagnostico"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- ============================================================ -->
+        <!-- Vista Formulario de Receta (Detalle)                        -->
+        <!-- ============================================================ -->
+        <record id="view_veterinaria_receta_form" model="ir.ui.view">
+            <field name="name">veterinaria.receta.form</field>
+            <field name="model">veterinaria.receta</field>
+            <field name="arch" type="xml">
+                <form string="Receta Médica">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1><field name="name" readonly="1"/></h1>
+                        </div>
+
+                        <group>
+                            <group string="Información de la Cita">
+                                <field name="cita_id" readonly="1"/>
+                                <field name="fecha_emision" readonly="1"/>
+                                <field name="veterinario_id" readonly="1"/>
+                            </group>
+                            <group string="Paciente">
+                                <field name="paciente_id" readonly="1"/>
+                                <field name="historia_clinica_id" readonly="1"/>
+                            </group>
+                        </group>
+
+                        <group string="Diagnóstico">
+                            <field name="diagnostico" nolabel="1"
+                                   placeholder="Diagnóstico clínico resumido..."/>
+                        </group>
+
+                        <notebook>
+                            <page string="💊 Tratamiento" name="medicamentos">
+                                <field name="linea_ids">
+                                    <!-- Solución #2: Única columna física en el list (tree) -->
+                                    <list string="Medicamentos">
+                                        <field name="nombre_medicamento_display" string="Medicamento"/>
+                                        <field name="dosis"/>
+                                        <field name="frecuencia"/>
+                                        <field name="duracion"/>
+                                    </list>
+
+                                    <!-- Solución #2: Formulario interno para elegir origen sin duplicar columnas -->
+                                    <form string="Línea de Tratamiento">
+                                        <group>
+                                            <group string="Identificación del Medicamento">
+                                                <field name="tipo_origen" widget="radio" options="{'horizontal': true}"/>
+                                                <field name="medicamento_id" 
+                                                       string="Medicamento (Inventario)"
+                                                       invisible="tipo_origen != 'inventario'"
+                                                       options="{'no_create': True}"/>
+                                                <field name="medicamento_texto" 
+                                                       string="Medicamento (Exterior)"
+                                                       invisible="tipo_origen == 'inventario'"/>
+                                            </group>
+                                            <group string="Dosificación">
+                                                <field name="dosis"/>
+                                                <field name="frecuencia"/>
+                                                <field name="duracion"/>
+                                            </group>
+                                        </group>
+                                    </form>
+                                </field>
+
+                                <group string="Recomendaciones e Instrucciones Adicionales">
+                                    <field name="observaciones_adicionales" nolabel="1"
+                                           placeholder="Ej: Reposo absoluto, evitar luz solar..."/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Vista Lista de Recetas -->
+        <record id="view_veterinaria_receta_list" model="ir.ui.view">
+            <field name="name">veterinaria.receta.list</field>
+            <field name="model">veterinaria.receta</field>
+            <field name="arch" type="xml">
+                <list decoration-info="True" string="Recetas Médicas">
+                    <field name="name"/>
+                    <field name="cita_id"/>
+                    <field name="paciente_id"/>
+                    <field name="veterinario_id"/>
+                    <field name="fecha_emision"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Acción -->
+        <record id="action_veterinaria_receta" model="ir.actions.act_window">
+            <field name="name">Recetas Médicas</field>
+            <field name="res_model">veterinaria.receta</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+    </data>
+</odoo>

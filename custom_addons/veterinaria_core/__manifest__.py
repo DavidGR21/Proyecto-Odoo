@@ -46,6 +46,7 @@
         'views/facturacion_linea_view.xml',
         'views/facturacion_wizard_view.xml',
         'views/documento_venta_view.xml',
+        'views/receta_view.xml',
         'views/menu.xml',
     ],
     'installable': True,

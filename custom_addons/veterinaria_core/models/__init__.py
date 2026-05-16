@@ -14,3 +14,4 @@ from . import especialidad
 from . import servicio
 from . import documento_venta
 from . import inventario
+from . import receta
