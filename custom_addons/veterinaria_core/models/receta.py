@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
 from odoo import api, fields, models
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 
 
 class Receta(models.Model):
@@ -99,7 +98,26 @@ class Receta(models.Model):
         store=True,
     )
 
+    # ── Estado de Facturación ────────────────────────────────────────────────
+    facturada = fields.Boolean(
+        'Ya Facturada',
+        default=False,
+        help='Indica si esta receta ya fue procesada por el área administrativa.',
+        copy=False,
+    )
+
     # ── Validación ────────────────────────────────────────────────────────────
+    _sql_constraints = [
+        ('unique_cita_id', 'unique(cita_id)', '¡Ya existe una receta médica creada para esta cita!'),
+    ]
+
+    @api.constrains('cita_id')
+    def _check_cita_unica(self):
+        for rec in self:
+            recetas = self.search([('cita_id', '=', rec.cita_id.id), ('id', '!=', rec.id)])
+            if recetas:
+                raise ValidationError(f'¡Ya existe una receta médica creada para la cita "{rec.cita_id.name}"!')
+
     @api.constrains('cita_id')
     def _check_cita_tiene_historia(self):
         for rec in self:
@@ -108,6 +126,18 @@ class Receta(models.Model):
                     f'La cita "{rec.cita_id.name}" no tiene una Historia Clínica asociada. '
                     'Por favor, genere la historia clínica primero.'
                 )
+
+    def write(self, vals):
+        for rec in self:
+            if rec.facturada and any(f not in ['facturada'] for f in vals):
+                raise UserError("No se puede modificar una receta médica que ya ha sido facturada.")
+        return super().write(vals)
+
+    def unlink(self):
+        for rec in self:
+            if rec.facturada:
+                raise UserError("No se puede eliminar una receta médica que ya ha sido facturada.")
+        return super().unlink()
 
 
 class RecetaLinea(models.Model):
@@ -208,3 +238,24 @@ class RecetaLinea(models.Model):
                 raise ValidationError('Debe seleccionar un medicamento del inventario.')
             if rec.tipo_origen == 'exterior' and not rec.medicamento_texto:
                 raise ValidationError('Debe escribir el nombre del medicamento exterior.')
+
+    # ── Restricciones tras facturación ───────────────────────────────────────
+    @api.model
+    def create(self, vals):
+        if vals.get('receta_id'):
+            receta = self.env['veterinaria.receta'].browse(vals['receta_id'])
+            if receta.facturada:
+                raise UserError("No se pueden añadir nuevas líneas a una receta que ya ha sido facturada.")
+        return super().create(vals)
+
+    def write(self, vals):
+        for rec in self:
+            if rec.receta_id.facturada:
+                raise UserError("No se puede modificar una línea de receta que ya ha sido facturada.")
+        return super().write(vals)
+
+    def unlink(self):
+        for rec in self:
+            if rec.receta_id.facturada:
+                raise UserError("No se puede eliminar una línea de receta que ya ha sido facturada.")
+        return super().unlink()

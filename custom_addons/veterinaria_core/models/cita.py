@@ -54,6 +54,13 @@ class Cita(models.Model):
     # Relación con historia clínica
     historia_clinica_id = fields.Many2one('veterinaria.historia_clinica', string='Historia Clínica')
     receta_ids = fields.One2many('veterinaria.receta', 'cita_id', string='Recetas Médicas')
+    receta_count = fields.Integer(compute='_compute_receta_count')
+
+    @api.depends('receta_ids')
+    def _compute_receta_count(self):
+        for rec in self:
+            rec.receta_count = len(rec.receta_ids)
+
     alergias = fields.Text('Alergias de la Mascota')
     tipo_sangre = fields.Selection([
         ('a_pos', 'A+'),

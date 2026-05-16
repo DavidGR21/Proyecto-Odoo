@@ -222,6 +222,10 @@ class ImportarRecetaWizard(models.TransientModel):
         
         if lineas_creadas == 0:
             raise ValidationError("No se pudo importar ninguna línea. Asegúrese de que las cantidades sean mayores a cero.")
+        
+        # Marcar la receta como facturada para bloquear edición
+        if self.cita_id:
+            self.cita_id.receta_ids.write({'facturada': True})
             
         return {
             'type': 'ir.actions.client',

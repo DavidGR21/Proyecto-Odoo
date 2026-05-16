@@ -11,11 +11,12 @@
             <field name="arch" type="xml">
                 <!-- Solución #1: Mover botón al Header principal -->
                 <xpath expr="//header" position="inside">
+                    <field name="receta_count" invisible="1"/>
                     <button name="action_crear_receta"
                             string="➕ Emitir Receta"
                             type="object"
                             class="btn btn-primary"
-                            invisible="estado != 'completada'"/>
+                            invisible="estado != 'completada' or receta_count > 0"/>
                 </xpath>
 
                 <!-- Pestaña de Receta Médica -->
@@ -26,11 +27,12 @@
                             <!-- Solución #1: Desactivar creación directa en línea (create="0") -->
                             <field name="receta_ids" 
                                    context="{'default_cita_id': id}"
-                                   readonly="1">
+                                   force_save="1">
                                 <list create="0" delete="0">
                                     <field name="name" string="Referencia"/>
                                     <field name="fecha_emision"/>
                                     <field name="diagnostico"/>
+                                    <field name="facturada" string="Fact." widget="boolean_toggle"/>
                                 </list>
                             </field>
                         </page>
@@ -47,9 +49,13 @@
             <field name="model">veterinaria.receta</field>
             <field name="arch" type="xml">
                 <form string="Receta Médica">
+                    <field name="facturada" invisible="1"/>
                     <sheet>
                         <div class="oe_title">
                             <h1><field name="name" readonly="1"/></h1>
+                            <div class="alert alert-info" role="alert" invisible="not facturada">
+                                <strong>Receta Facturada:</strong> Esta prescripción ya ha sido procesada por administración y no puede ser modificada.
+                            </div>
                         </div>
 
                         <group>
@@ -64,16 +70,19 @@
                             </group>
                         </group>
 
-                        <group string="Diagnóstico">
+                        <group string="Diagnóstico" readonly="facturada">
                             <field name="diagnostico" nolabel="1"
                                    placeholder="Diagnóstico clínico resumido..."/>
                         </group>
 
-                        <notebook>
+                        <notebook readonly="facturada">
                             <page string="💊 Tratamiento" name="medicamentos">
-                                <field name="linea_ids">
-                                    <!-- Solución #2: Única columna física en el list (tree) -->
-                                    <list string="Medicamentos">
+                                <field name="linea_ids" readonly="facturada">
+                                    <!-- Bloqueo dinámico de edición en la lista -->
+                                    <list string="Medicamentos" 
+                                          create="not facturada" 
+                                          delete="not facturada" 
+                                          edit="not facturada">
                                         <field name="nombre_medicamento_display" string="Medicamento"/>
                                         <field name="dosis" string="Dosis"/>
                                         <field name="frecuencia_horas" string="Cada (h)"/>
