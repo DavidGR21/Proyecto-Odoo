@@ -1,0 +1,184 @@
+/* =====================================================
+   VitalPet - Página de Servicios
+   ===================================================== */
+
+/* ---- Grid de servicios ---- */
+.vp-section-servicios-grid { background: var(--vp-bg-light); }
+
+.vp-service-card {
+    background: #EEF8FB;
+    border-radius: var(--vp-radius-lg);
+    padding: 36px 28px;
+    border: 1px solid #C8E8F0;
+    height: 100%;
+    transition: var(--vp-transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.vp-service-card::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--vp-gradient);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: var(--vp-transition);
+}
+
+.vp-service-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--vp-shadow-lg);
+    border-color: transparent;
+}
+
+.vp-service-card:hover::before { transform: scaleX(1); }
+
+.vp-service-icon-wrap {
+    width: 76px; height: 76px;
+    border-radius: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: #fff;
+    margin-bottom: 24px;
+    transition: var(--vp-transition);
+}
+.vp-service-card:hover .vp-service-icon-wrap {
+    transform: scale(1.1) rotate(-8deg);
+    border-radius: 50%;
+}
+
+.vp-service-card h4 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--vp-dark);
+    margin-bottom: 12px;
+}
+
+.vp-service-card p {
+    font-size: 0.9rem;
+    color: var(--vp-gray);
+    line-height: 1.7;
+    margin: 0;
+}
+
+.vp-service-card .vp-service-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--vp-primary);
+    font-size: 0.88rem;
+    font-weight: 600;
+    margin-top: 16px;
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: var(--vp-transition);
+}
+.vp-service-card:hover .vp-service-link {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* ---- Banner CTA servicios ---- */
+.vp-services-cta {
+    background: linear-gradient(135deg, var(--vp-dark) 0%, var(--vp-dark-2) 100%);
+    padding: 80px 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+.vp-services-cta::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(64,194,214,0.2), transparent 60%);
+    pointer-events: none;
+}
+.vp-services-cta .container { position: relative; z-index: 1; }
+.vp-services-cta h2 { color: #fff; font-size: clamp(1.6rem, 3vw, 2.4rem); margin-bottom: 14px; }
+.vp-services-cta p { color: rgba(255,255,255,0.65); font-size: 1rem; margin-bottom: 32px; }
+
+/* ---- Planes / precios ---- */
+.vp-section-planes { background: #fff; }
+
+.vp-plan-card {
+    border-radius: var(--vp-radius-xl);
+    padding: 40px 36px;
+    border: 2px solid var(--vp-border);
+    text-align: center;
+    height: 100%;
+    transition: var(--vp-transition);
+    position: relative;
+}
+.vp-plan-card.featured {
+    background: var(--vp-gradient);
+    border-color: transparent;
+    color: #fff;
+    transform: scale(1.04);
+    box-shadow: var(--vp-shadow-lg);
+}
+.vp-plan-card:not(.featured):hover {
+    border-color: var(--vp-primary);
+    box-shadow: var(--vp-shadow);
+    transform: translateY(-4px);
+}
+
+.vp-plan-badge {
+    position: absolute;
+    top: -14px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--vp-dark);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 5px 16px;
+    border-radius: 50px;
+}
+
+.vp-plan-card h4 { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
+.vp-plan-price {
+    font-size: 2.8rem;
+    font-weight: 900;
+    line-height: 1;
+    margin: 20px 0 4px;
+    letter-spacing: -2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+}
+.vp-plan-price .vp-price-symbol {
+    font-size: 1.4rem;
+    font-weight: 700;
+    align-self: center;
+    letter-spacing: 0;
+}
+.vp-plan-period { font-size: 0.85rem; opacity: 0.7; margin-bottom: 24px; }
+
+.vp-plan-features {
+    list-style: none;
+    padding: 0; margin: 0 0 28px;
+    text-align: left;
+}
+.vp-plan-features li {
+    padding: 8px 0;
+    font-size: 0.88rem;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.vp-plan-card.featured .vp-plan-features li { border-bottom-color: rgba(255,255,255,0.15); }
+.vp-plan-features li i { color: var(--vp-primary); }
+.vp-plan-card.featured .vp-plan-features li i { color: #fff; }
+.vp-plan-features li.disabled { opacity: 0.4; }
+.vp-plan-features li.disabled i { color: var(--vp-gray-light) !important; }
+
+@media (max-width: 991px) {
+    .vp-plan-card.featured { transform: scale(1); }
+}

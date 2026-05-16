@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!--
+        Página Nosotros - VitalPet
+        Historia, valores, equipo y certificaciones
+    -->
+    <template id="pagina_nosotros" name="VitalPet - Nosotros">
+        <t t-call="website.layout">
+            <t t-set="title" t-value="titulo_pagina"/>
+            <div id="wrap" class="vitalpet-nosotros">
+
+                <!-- PAGE HEADER -->
+                <section class="vp-page-header">
+                    <div class="container">
+                        <span class="vp-section-badge">Quiénes somos</span>
+                        <h1>Sobre <span class="vp-gradient-text">VitalPet</span></h1>
+                        <p>Más de 10 años cuidando a quienes más quieres</p>
+                        <div class="vp-breadcrumb">
+                            <a href="/">Inicio</a>
+                            <span>›</span>
+                            <span style="color:rgba(255,255,255,0.6)">Nosotros</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- HISTORIA -->
+                <section class="vp-section vp-section-historia">
+                    <div class="container">
+                        <div class="row align-items-center g-5">
+                            <div class="col-lg-6" data-vp-animate="fade-right">
+                                <div class="vp-historia-grid">
+                                    <!-- Foto principal -->
+                                    <div class="vp-hg-main">
+                                        <img src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=600&amp;q=80"
+                                             alt="Clínica VitalPet"
+                                             class="vp-hg-img"/>
+                                        <div class="vp-hg-badge">
+                                            <i class="fa fa-paw"/>
+                                            <div>
+                                                <strong>Desde 2014</strong>
+                                                <span>Cuidando con amor</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Fila inferior: dos fotos pequeñas -->
+                                    <div class="vp-hg-sub">
+                                        <div class="vp-hg-sub-item">
+                                            <img src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&amp;q=80"
+                                                 alt="Consulta veterinaria"
+                                                 class="vp-hg-img"/>
+                                            <div class="vp-hg-pill">
+                                                <i class="fa fa-heart" style="color:#EF4444"/>
+                                                <span>+5 K mascotas</span>
+                                            </div>
+                                        </div>
+                                        <div class="vp-hg-sub-item">
+                                            <img src="https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?w=400&amp;q=80"
+                                                 alt="Mascotas felices"
+                                                 class="vp-hg-img"/>
+                                            <div class="vp-hg-pill">
+                                                <i class="fa fa-star" style="color:#F59E0B"/>
+                                                <span>4.9 / 5 ★</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6" data-vp-animate="fade-left">
+                                <div class="vp-historia-text">
+                                    <span class="vp-section-badge">Nuestra Historia</span>
+                                    <h2>Nació del amor por los <span class="vp-gradient-text">animales</span></h2>
+                                    <p>
+                                        VitalPet fue fundada en 2014 con una misión clara: ofrecer atención
+                                        veterinaria de primer nivel, accesible y humanizada. Lo que comenzó
+                                        como una pequeña clínica, hoy es un centro de referencia en la ciudad.
+                                    </p>
+                                    <p>
+                                        Nuestro equipo de más de 12 especialistas trabaja con tecnología de
+                                        vanguardia y, sobre todo, con el amor y la dedicación que cada mascota
+                                        merece. Porque para nosotros, ellos también son familia.
+                                    </p>
+                                    <div class="vp-historia-stats">
+                                        <div class="vp-hist-stat">
+                                            <h3>10+</h3>
+                                            <p>Años de experiencia</p>
+                                        </div>
+                                        <div class="vp-hist-stat">
+                                            <h3>5K+</h3>
+                                            <p>Mascotas atendidas</p>
+                                        </div>
+                                        <div class="vp-hist-stat">
+                                            <h3>12</h3>
+                                            <p>Especialistas</p>
+                                        </div>
+                                        <div class="vp-hist-stat">
+                                            <h3>4.9★</h3>
+                                            <p>Calificación media</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VALORES -->
+                <section class="vp-section vp-section-valores">
+                    <div class="container">
+                        <div class="text-center mb-5" data-vp-animate="fade-up">
+                            <span class="vp-section-badge">Lo que nos guía</span>
+                            <h2 class="vp-section-title">
+                                Nuestros <span class="vp-gradient-text">Valores</span>
+                            </h2>
+                        </div>
+                        <div class="row g-4">
+                            <div class="col-md-6 col-lg-3" data-vp-animate="fade-up" data-vp-delay="100">
+                                <div class="vp-valor-card" style="border-top-color:#40C2D6">
+                                    <div class="vp-valor-icon" style="background: linear-gradient(135deg,#40C2D6,#2BA8BC)">
+                                        <i class="fa fa-heart"/>
+                                    </div>
+                                    <h5>Amor y Empatía</h5>
+                                    <p>Tratamos a cada mascota con el cuidado y cariño que daríamos a la nuestra.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-3" data-vp-animate="fade-up" data-vp-delay="200">
+                                <div class="vp-valor-card" style="border-top-color:#9B7EBD">
+                                    <div class="vp-valor-icon" style="background: linear-gradient(135deg,#9B7EBD,#7C5FA0)">
+                                        <i class="fa fa-flask"/>
+                                    </div>
+                                    <h5>Excelencia Técnica</h5>
+                                    <p>Formación continua y equipos de última generación para diagnósticos precisos.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-3" data-vp-animate="fade-up" data-vp-delay="300">
+                                <div class="vp-valor-card" style="border-top-color:#F4A4C3">
+                                    <div class="vp-valor-icon" style="background: linear-gradient(135deg,#F4A4C3,#e07fa6)">
+                                        <i class="fa fa-handshake-o"/>
+                                    </div>
+                                    <h5>Transparencia</h5>
+                                    <p>Comunicación clara y honesta con los dueños en cada paso del tratamiento.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-3" data-vp-animate="fade-up" data-vp-delay="400">
+                                <div class="vp-valor-card" style="border-top-color:#FFD4B8">
+                                    <div class="vp-valor-icon" style="background: linear-gradient(135deg,#FFD4B8,#f0a878)">
+                                        <i class="fa fa-leaf"/>
+                                    </div>
+                                    <h5>Responsabilidad</h5>
+                                    <p>Compromiso con el bienestar animal y con el medio ambiente en cada acción.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- EQUIPO -->
+                <section class="vp-section vp-section-equipo">
+                    <div class="container">
+                        <div class="text-center mb-5" data-vp-animate="fade-up">
+                            <span class="vp-section-badge">Las personas detrás</span>
+                            <h2 class="vp-section-title">
+                                Nuestro <span class="vp-gradient-text">Equipo</span>
+                            </h2>
+                            <p class="vp-section-subtitle">
+                                Profesionales apasionados, comprometidos con el bienestar de tu mascota.
+                            </p>
+                        </div>
+                        <div class="row g-4">
+                            <t t-foreach="equipo" t-as="miembro">
+                                <div class="col-md-6 col-lg-3"
+                                     data-vp-animate="fade-up"
+                                     t-att-data-vp-delay="str(miembro_index * 100 + 100)">
+                                    <div class="vp-team-card">
+                                        <div class="vp-team-avatar-box">
+                                            <img t-att-src="miembro.get('foto', '')"
+                                                 t-att-alt="miembro['nombre']"
+                                                 class="vp-team-photo"
+                                                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+                                            <span class="vp-team-initials"
+                                                  t-att-style="'background:' + miembro.get('color','#40C2D6') + ';display:none'"
+                                                  t-out="miembro.get('iniciales','')"/>
+                                        </div>
+                                        <div class="vp-team-info">
+                                            <h4 t-out="miembro['nombre']"/>
+                                            <span class="vp-team-cargo" t-out="miembro['cargo']"/>
+                                            <p t-out="miembro['descripcion']"/>
+                                            <div class="vp-team-social">
+                                                <a href="#"><i class="fa fa-linkedin"/></a>
+                                                <a href="#"><i class="fa fa-envelope"/></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- CERTIFICACIONES -->
+                <section class="vp-section vp-section-certif">
+                    <div class="container">
+                        <div class="text-center mb-5" data-vp-animate="fade-up">
+                            <span class="vp-section-badge">Avales</span>
+                            <h2 class="vp-section-title">
+                                Certificaciones y <span class="vp-gradient-text">Reconocimientos</span>
+                            </h2>
+                        </div>
+                        <div class="row g-4 justify-content-center">
+                            <div class="col-md-4 col-lg-2" data-vp-animate="scale-in" data-vp-delay="100">
+                                <div class="vp-certif-item">
+                                    <i class="fa fa-certificate"/>
+                                    <h6>AVMA</h6>
+                                    <p>Asociación Veterinaria Americana</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-2" data-vp-animate="scale-in" data-vp-delay="200">
+                                <div class="vp-certif-item">
+                                    <i class="fa fa-globe"/>
+                                    <h6>WSAVA</h6>
+                                    <p>World Small Animal Veterinary Assoc.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-2" data-vp-animate="scale-in" data-vp-delay="300">
+                                <div class="vp-certif-item">
+                                    <i class="fa fa-check-circle"/>
+                                    <h6>ISO 9001</h6>
+                                    <p>Gestión de Calidad Certificada</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-2" data-vp-animate="scale-in" data-vp-delay="400">
+                                <div class="vp-certif-item">
+                                    <i class="fa fa-star"/>
+                                    <h6>Top Vet 2024</h6>
+                                    <p>Premio Nacional Veterinario</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-2" data-vp-animate="scale-in" data-vp-delay="500">
+                                <div class="vp-certif-item">
+                                    <i class="fa fa-shield"/>
+                                    <h6>Bienestar Animal</h6>
+                                    <p>Certificado Five Freedoms</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- FOOTER -->
+                <t t-call="veterinaria_web.footer_partial"/>
+
+            </div>
+        </t>
+    </template>
+</odoo>

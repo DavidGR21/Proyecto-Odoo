@@ -1,0 +1,252 @@
+/* =====================================================
+   VitalPet - Página de Contacto
+   ===================================================== */
+
+/* ---- Layout contacto ---- */
+.vp-section-contacto { background: var(--vp-bg-light); }
+
+/* ---- Info cards ---- */
+.vp-contact-info-card {
+    background: #EEF8FB;
+    border-radius: var(--vp-radius-lg);
+    padding: 28px 24px;
+    border: 1px solid #C8E8F0;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    transition: var(--vp-transition);
+    height: 100%;
+}
+.vp-contact-info-card:hover {
+    box-shadow: var(--vp-shadow);
+    border-color: rgba(64,194,214,0.2);
+    transform: translateY(-4px);
+}
+
+.vp-contact-info-icon {
+    width: 56px; height: 56px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.vp-contact-info-text h5 {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--vp-gray);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+}
+.vp-contact-info-text p {
+    font-size: 0.95rem;
+    color: var(--vp-dark);
+    font-weight: 600;
+    margin: 0;
+    line-height: 1.5;
+}
+.vp-contact-info-text small {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--vp-gray);
+    margin-top: 3px;
+}
+
+/* ---- Formulario ---- */
+.vp-contact-form-wrap {
+    background: #EEF8FB;
+    border-radius: var(--vp-radius-xl);
+    padding: 48px 44px;
+    box-shadow: var(--vp-shadow-lg);
+    border: 1px solid #C8E8F0;
+}
+
+@media (max-width: 767px) {
+    .vp-contact-form-wrap { padding: 32px 24px; }
+}
+
+.vp-contact-form-wrap h3 {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--vp-dark);
+    margin-bottom: 6px;
+}
+.vp-contact-form-wrap .vp-form-subtitle {
+    font-size: 0.9rem;
+    color: var(--vp-gray);
+    margin-bottom: 32px;
+}
+
+/* Campos del formulario */
+.vp-form-group { margin-bottom: 20px; }
+
+.vp-form-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--vp-dark-3);
+    margin-bottom: 8px;
+    letter-spacing: 0.3px;
+}
+.vp-form-label .required { color: #EF4444; margin-left: 3px; }
+
+.vp-form-input,
+.vp-form-select,
+.vp-form-textarea {
+    display: block;
+    width: 100%;
+    padding: 13px 16px;
+    font-size: 0.93rem;
+    color: var(--vp-dark);
+    background: var(--vp-bg-light);
+    border: 1.5px solid var(--vp-border);
+    border-radius: var(--vp-radius);
+    transition: var(--vp-transition);
+    font-family: var(--vp-font-base);
+    outline: none;
+    -webkit-appearance: none;
+}
+
+.vp-form-input:focus,
+.vp-form-select:focus,
+.vp-form-textarea:focus {
+    border-color: var(--vp-primary);
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(64,194,214,0.1);
+}
+
+.vp-form-input::placeholder,
+.vp-form-textarea::placeholder {
+    color: var(--vp-gray-light);
+}
+
+.vp-form-textarea {
+    resize: vertical;
+    min-height: 130px;
+}
+
+.vp-form-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%2364748b' stroke-width='1.5' d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 16px;
+    padding-right: 40px;
+    cursor: pointer;
+}
+
+.vp-form-btn {
+    width: 100%;
+    padding: 15px;
+    font-size: 1rem;
+    font-weight: 700;
+    background: var(--vp-gradient);
+    color: #fff;
+    border: none;
+    border-radius: var(--vp-radius);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: var(--vp-transition);
+    box-shadow: var(--vp-shadow-color);
+    letter-spacing: 0.3px;
+}
+.vp-form-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(64,194,214,0.4);
+}
+.vp-form-btn:active { transform: translateY(0); }
+
+/* ---- Alerta éxito ---- */
+.vp-alert-success {
+    background: rgba(64,194,214,0.08);
+    border: 1.5px solid rgba(64,194,214,0.3);
+    border-radius: var(--vp-radius);
+    padding: 20px 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 24px;
+}
+.vp-alert-success i {
+    color: var(--vp-primary);
+    font-size: 1.3rem;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+.vp-alert-success h5 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--vp-primary-dark);
+    margin-bottom: 4px;
+}
+.vp-alert-success p {
+    font-size: 0.88rem;
+    color: var(--vp-dark-3);
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* ---- Mapa / Horarios ---- */
+.vp-section-mapa { background: #EEF8FB; }
+
+.vp-map-placeholder {
+    background: var(--vp-gradient);
+    border-radius: var(--vp-radius-lg);
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1rem;
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+}
+.vp-map-placeholder i { font-size: 3rem; opacity: 0.9; }
+.vp-map-placeholder p { font-size: 0.9rem; opacity: 0.8; margin: 0; }
+
+.vp-horario-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.vp-horario-table tr {
+    border-bottom: 1px solid var(--vp-border);
+    transition: var(--vp-transition);
+}
+.vp-horario-table tr:hover { background: var(--vp-bg-light); }
+.vp-horario-table tr:last-child { border-bottom: none; }
+.vp-horario-table td {
+    padding: 12px 8px;
+    font-size: 0.9rem;
+    color: var(--vp-dark-3);
+}
+.vp-horario-table td:last-child { text-align: right; }
+.vp-badge-open {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(64,194,214,0.1);
+    color: var(--vp-primary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 50px;
+}
+.vp-badge-open::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--vp-primary);
+    border-radius: 50%;
+    display: inline-block;
+}
+.vp-badge-closed {
+    color: var(--vp-gray-light);
+    font-size: 0.85rem;
+}

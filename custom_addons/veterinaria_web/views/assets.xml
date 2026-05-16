@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!--
+        Assets: Registro de archivos CSS y JS para el frontend.
+        Usa el bundle 'web.assets_frontend' de Odoo 18.
+        Nota: Los assets se declaran en __manifest__.py bajo la clave 'assets'.
+        Este archivo queda como referencia y para assets adicionales si es necesario.
+    -->
+</odoo>

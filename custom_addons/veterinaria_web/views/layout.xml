@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!--
+        Layout principal del sitio VitalPet.
+        Hereda del layout base del website de Odoo para mantener
+        compatibilidad con el sistema de temas y SEO.
+    -->
+
+    <!-- Override del layout principal para agregar clases personalizadas -->
+    <template id="vitalpet_layout" name="VitalPet Layout"
+              inherit_id="website.layout">
+        <xpath expr="//div[@id='wrapwrap']" position="attributes">
+            <attribute name="t-attf-class" add="vitalpet-site" separator=" "/>
+        </xpath>
+    </template>
+
+</odoo>

@@ -1,0 +1,45 @@
+/* =====================================================
+   VitalPet - Variables CSS Globales
+   ===================================================== */
+
+:root {
+    /* Colores principales */
+    --vp-primary: #40C2D6;
+    --vp-primary-dark: #2BA8BC;
+    --vp-primary-light: #6DD4E3;
+    --vp-secondary: #9B7EBD;
+    --vp-secondary-dark: #7C5FA0;
+    --vp-accent: #F4A4C3;
+
+    /* Colores neutros */
+    --vp-dark: #1A2B3C;
+    --vp-dark-2: #243447;
+    --vp-dark-3: #3D5166;
+    --vp-gray: #6B7E92;
+    --vp-gray-light: #9BAEBB;
+    --vp-border: #D8EDF3;
+    --vp-bg-light: #EDF7FA;
+    --vp-white: #F7FCFD;
+
+    /* Tipografía */
+    --vp-font-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --vp-font-heading: 'Poppins', var(--vp-font-base);
+
+    /* Tamaños */
+    --vp-radius: 12px;
+    --vp-radius-lg: 20px;
+    --vp-radius-xl: 32px;
+    --vp-shadow-sm: 0 2px 8px rgba(64,194,214,0.08);
+    --vp-shadow: 0 8px 30px rgba(64,194,214,0.12);
+    --vp-shadow-lg: 0 20px 60px rgba(64,194,214,0.18);
+    --vp-shadow-color: 0 8px 30px rgba(64,194,214,0.25);
+
+    /* Transiciones */
+    --vp-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --vp-transition-fast: all 0.15s ease;
+
+    /* Gradientes */
+    --vp-gradient: linear-gradient(135deg, #40C2D6 0%, #9B7EBD 100%);
+    --vp-gradient-dark: linear-gradient(135deg, #2BA8BC 0%, #7C5FA0 100%);
+    --vp-gradient-soft: linear-gradient(135deg, rgba(64,194,214,0.12) 0%, rgba(155,126,189,0.12) 100%);
+}

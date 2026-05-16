@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!--
+        Página de Inicio - Landing Page de VitalPet
+        Incluye: Hero, Servicios destacados, Estadísticas,
+        CTA de App Móvil, Testimonios y CTA final.
+    -->
+
+    <template id="pagina_inicio" name="VitalPet - Inicio">
+        <t t-call="website.layout">
+            <t t-set="title" t-value="titulo_pagina"/>
+
+            <div id="wrap" class="vitalpet-inicio">
+
+                <!-- ============================================= -->
+                <!-- HERO SECTION -->
+                <!-- ============================================= -->
+                <section class="vp-hero">
+                    <div class="vp-hero-overlay"/>
+                    <div class="container position-relative">
+                        <div class="row align-items-center min-vh-80">
+                            <div class="col-lg-7">
+                                <div class="vp-hero-content" data-vp-animate="fade-up">
+                                    <span class="vp-hero-badge">
+                                        <i class="fa fa-paw me-2"/>
+                                        Clínica Veterinaria de Confianza
+                                    </span>
+                                    <h1 class="vp-hero-title">
+                                        El cuidado que tu
+                                        <span class="vp-gradient-text">mascota merece</span>
+                                    </h1>
+                                    <p class="vp-hero-subtitle">
+                                        En VitalPet combinamos tecnología de vanguardia con
+                                        el amor por los animales. Más de 10 años cuidando
+                                        a quienes más quieres.
+                                    </p>
+                                    <div class="vp-hero-actions">
+                                        <a href="/contacto" class="btn vp-btn-primary vp-btn-lg">
+                                            <i class="fa fa-calendar me-2"/>
+                                            Agendar Cita
+                                        </a>
+                                        <a href="/servicios" class="btn vp-btn-outline-white vp-btn-lg ms-3">
+                                            <i class="fa fa-th-large me-2"/>
+                                            Ver Servicios
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-5 d-none d-lg-block">
+                                <div class="vp-hero-visual" data-vp-animate="fade-left">
+                                    <div class="vp-hero-card">
+                                        <div class="vp-hero-card-icon">
+                                            <i class="fa fa-paw"/>
+                                        </div>
+                                        <h3>+5,000</h3>
+                                        <p>Mascotas Atendidas</p>
+                                    </div>
+                                    <div class="vp-hero-card vp-hero-card-secondary">
+                                        <div class="vp-hero-card-icon">
+                                            <i class="fa fa-star"/>
+                                        </div>
+                                        <h3>4.9/5</h3>
+                                        <p>Calificación</p>
+                                    </div>
+                                    <div class="vp-hero-card vp-hero-card-tertiary">
+                                        <div class="vp-hero-card-icon">
+                                            <i class="fa fa-users"/>
+                                        </div>
+                                        <h3>+3,200</h3>
+                                        <p>Clientes Satisfechos</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Decorative shapes -->
+                    <div class="vp-hero-shape vp-hero-shape-1"/>
+                    <div class="vp-hero-shape vp-hero-shape-2"/>
+                </section>
+
+                <!-- ============================================= -->
+                <!-- SERVICIOS DESTACADOS -->
+                <!-- ============================================= -->
+                <section class="vp-section vp-section-services">
+                    <div class="container">
+                        <div class="text-center mb-5" data-vp-animate="fade-up">
+                            <span class="vp-section-badge">Nuestros Servicios</span>
+                            <h2 class="vp-section-title">
+                                Todo lo que tu mascota
+                                <span class="vp-gradient-text">necesita</span>
+                            </h2>
+                            <p class="vp-section-subtitle">
+                                Ofrecemos atención integral con los más altos
+                                estándares de calidad veterinaria.
+                            </p>
+                        </div>
+                        <div class="row g-4">
+                            <!-- Servicio 1 -->
+                            <div class="col-md-6 col-lg-3" data-vp-animate="fade-up" data-vp-delay="100">
+                                <div class="vp-feature-card">
+                                    <div class="vp-feature-icon" style="background: linear-gradient(135deg, #40C2D6, #2BA8BC);">
+                                        <i class="fa fa-heartbeat"/>
+                                    </div>
+                                    <h4>Consulta General</h4>
+                                    <p>Diagnóstico completo y tratamiento personalizado.</p>
+                                </div>
+                            </div>
+                            <!-- Servicio 2 -->
+                            <div class="col-md-6 col-lg-3" data-vp-animate="fade-up" data-vp-delay="200">
+                                <div class="vp-feature-card">
+                                    <div class="vp-feature-icon" style="background: linear-gradient(135deg, #9B7EBD, #7C5FA0);">
+                                        <i class="fa fa-shield"/>
+                                    </div>
+                                    <h4>Vacunación</h4>
+                                    <p>Programa completo con seguimiento y recordatorios.</p>
+                                </div>
+                            </div>
+                            <!-- Servicio 3 -->
+                            <div class="col-md-6 col-lg-3" data-vp-animate="fade-up" data-vp-delay="300">
+                                <div class="vp-feature-card">
+                                    <div class="vp-feature-icon" style="background: linear-gradient(135deg, #F4A4C3, #e07fa0);">
+                                        <i class="fa fa-cut"/>
+                                    </div>
+                                    <h4>Cirugía</h4>
+                                    <p>Equipos de última generación y monitoreo continuo.</p>
+                                </div>
+                            </div>
+                            <!-- Servicio 4 -->
+                            <div class="col-md-6 col-lg-3" data-vp-animate="fade-up" data-vp-delay="400">
+                                <div class="vp-feature-card">
+                                    <div class="vp-feature-icon" style="background: linear-gradient(135deg, #F59E0B, #D97706);">
+                                        <i class="fa fa-medkit"/>
+                                    </div>
+                                    <h4>Farmacia</h4>
+                                    <p>Medicamentos y alimentos terapéuticos especializados.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center mt-5" data-vp-animate="fade-up">
+                            <a href="/servicios" class="btn vp-btn-primary">
+                                Ver todos los servicios
+                                <i class="fa fa-arrow-right ms-2"/>
+                            </a>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============================================= -->
+                <!-- ESTADÍSTICAS -->
+                <!-- ============================================= -->
+                <section class="vp-section vp-section-stats">
+                    <div class="container">
+                        <div class="row g-4 text-center">
+                            <div class="col-6 col-lg-3" data-vp-animate="fade-up" data-vp-delay="100">
+                                <div class="vp-stat-item">
+                                    <div class="vp-stat-number">10+</div>
+                                    <div class="vp-stat-label">Años de Experiencia</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-lg-3" data-vp-animate="fade-up" data-vp-delay="200">
+                                <div class="vp-stat-item">
+                                    <div class="vp-stat-number">5K+</div>
+                                    <div class="vp-stat-label">Mascotas Atendidas</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-lg-3" data-vp-animate="fade-up" data-vp-delay="300">
+                                <div class="vp-stat-item">
+                                    <div class="vp-stat-number">12</div>
+                                    <div class="vp-stat-label">Especialistas</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-lg-3" data-vp-animate="fade-up" data-vp-delay="400">
+                                <div class="vp-stat-item">
+                                    <div class="vp-stat-number">24/7</div>
+                                    <div class="vp-stat-label">Emergencias</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============================================= -->
+                <!-- APP MÓVIL CTA -->
+                <!-- ============================================= -->
+                <section class="vp-section vp-section-app">
+                    <div class="container">
+                        <div class="row align-items-center">
+                            <div class="col-lg-6" data-vp-animate="fade-right">
+                                <span class="vp-section-badge">Aplicación Móvil</span>
+                                <h2 class="vp-section-title text-start">
+                                    Tu mascota siempre
+                                    <span class="vp-gradient-text">en tus manos</span>
+                                </h2>
+                                <p class="vp-section-subtitle text-start">
+                                    Descarga nuestra app y lleva el control total
+                                    de la salud de tu mascota desde tu celular.
+                                </p>
+                                <ul class="vp-app-features">
+                                    <li>
+                                        <i class="fa fa-check-circle me-2"/>
+                                        Agenda citas en segundos
+                                    </li>
+                                    <li>
+                                        <i class="fa fa-check-circle me-2"/>
+                                        Historial clínico digital completo
+                                    </li>
+                                    <li>
+                                        <i class="fa fa-check-circle me-2"/>
+                                        Recordatorios de vacunación
+                                    </li>
+                                    <li>
+                                        <i class="fa fa-check-circle me-2"/>
+                                        Chat con veterinarios
+                                    </li>
+                                    <li>
+                                        <i class="fa fa-check-circle me-2"/>
+                                        Tienda de productos en línea
+                                    </li>
+                                </ul>
+                                <div class="vp-app-buttons mt-4">
+                                    <a href="#" class="vp-store-btn">
+                                        <i class="fa fa-apple me-2"/>
+                                        <div>
+                                            <small>Descargar en</small>
+                                            <strong>App Store</strong>
+                                        </div>
+                                    </a>
+                                    <a href="#" class="vp-store-btn ms-3">
+                                        <i class="fa fa-android me-2"/>
+                                        <div>
+                                            <small>Disponible en</small>
+                                            <strong>Google Play</strong>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 text-center" data-vp-animate="fade-left">
+                                <div class="vp-app-mockup">
+                                    <div class="vp-phone-frame">
+                                        <div class="vp-phone-screen">
+                                            <div class="vp-phone-header">
+                                                <i class="fa fa-paw"/>
+                                                <span>VitalPet</span>
+                                            </div>
+                                            <div class="vp-phone-content">
+                                                <div class="vp-phone-card">
+                                                    <i class="fa fa-calendar"/>
+                                                    <span>Próxima cita: 15 Jun</span>
+                                                </div>
+                                                <div class="vp-phone-card">
+                                                    <i class="fa fa-syringe"/>
+                                                    <span>Vacuna pendiente</span>
+                                                </div>
+                                                <div class="vp-phone-card">
+                                                    <i class="fa fa-file-text"/>
+                                                    <span>Historial actualizado</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============================================= -->
+                <!-- TESTIMONIOS -->
+                <!-- ============================================= -->
+                <section class="vp-section vp-section-testimonials">
+                    <div class="container">
+                        <div class="text-center mb-5" data-vp-animate="fade-up">
+                            <span class="vp-section-badge">Testimonios</span>
+                            <h2 class="vp-section-title">
+                                Lo que dicen nuestros
+                                <span class="vp-gradient-text">clientes</span>
+                            </h2>
+                        </div>
+                        <div class="row g-4">
+                            <div class="col-md-4" data-vp-animate="fade-up" data-vp-delay="100">
+                                <div class="vp-testimonial-card">
+                                    <div class="vp-testimonial-stars">
+                                        <i class="fa fa-star"/><i class="fa fa-star"/>
+                                        <i class="fa fa-star"/><i class="fa fa-star"/>
+                                        <i class="fa fa-star"/>
+                                    </div>
+                                    <p class="vp-testimonial-text">
+                                        "Excelente atención. Mi perrito Luna fue operada
+                                        y el seguimiento post-operatorio fue impecable.
+                                        Totalmente recomendados."
+                                    </p>
+                                    <div class="vp-testimonial-author">
+                                        <div class="vp-testimonial-avatar" style="background: #40C2D6;">
+                                            PA
+                                        </div>
+                                        <div>
+                                            <strong>Patricia Álvarez</strong>
+                                            <span>Dueña de Luna</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4" data-vp-animate="fade-up" data-vp-delay="200">
+                                <div class="vp-testimonial-card">
+                                    <div class="vp-testimonial-stars">
+                                        <i class="fa fa-star"/><i class="fa fa-star"/>
+                                        <i class="fa fa-star"/><i class="fa fa-star"/>
+                                        <i class="fa fa-star"/>
+                                    </div>
+                                    <p class="vp-testimonial-text">
+                                        "La app es genial. Puedo ver todo el historial
+                                        de Max y recibo notificaciones de sus vacunas.
+                                        Muy profesionales."
+                                    </p>
+                                    <div class="vp-testimonial-author">
+                                        <div class="vp-testimonial-avatar" style="background: #9B7EBD;">
+                                            RM
+                                        </div>
+                                        <div>
+                                            <strong>Roberto Martínez</strong>
+                                            <span>Dueño de Max</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4" data-vp-animate="fade-up" data-vp-delay="300">
+                                <div class="vp-testimonial-card">
+                                    <div class="vp-testimonial-stars">
+                                        <i class="fa fa-star"/><i class="fa fa-star"/>
+                                        <i class="fa fa-star"/><i class="fa fa-star"/>
+                                        <i class="fa fa-star"/>
+                                    </div>
+                                    <p class="vp-testimonial-text">
+                                        "Llevar a mis 3 gatos siempre fue complicado,
+                                        pero aquí el trato es tan cariñoso que ya ni
+                                        se estresan. Los mejores."
+                                    </p>
+                                    <div class="vp-testimonial-author">
+                                        <div class="vp-testimonial-avatar" style="background: #F4A4C3;">
+                                            SC
+                                        </div>
+                                        <div>
+                                            <strong>Sofía Castillo</strong>
+                                            <span>Dueña de Milo, Nala y Coco</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============================================= -->
+                <!-- CTA FINAL -->
+                <!-- ============================================= -->
+                <section class="vp-section vp-section-cta">
+                    <div class="container text-center" data-vp-animate="fade-up">
+                        <h2 class="vp-cta-title">
+                            ¿Listo para darle lo mejor a tu mascota?
+                        </h2>
+                        <p class="vp-cta-subtitle">
+                            Agenda tu primera consulta y obtén un 20% de descuento.
+                            Tu mascota merece atención de calidad.
+                        </p>
+                        <div class="vp-cta-actions">
+                            <a href="/contacto" class="btn vp-btn-white vp-btn-lg">
+                                <i class="fa fa-calendar me-2"/>
+                                Agendar Ahora
+                            </a>
+                            <a href="tel:+593991234567" class="btn vp-btn-outline-white vp-btn-lg ms-3">
+                                <i class="fa fa-phone me-2"/>
+                                Llamar Ahora
+                            </a>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============================================= -->
+                <!-- FOOTER -->
+                <!-- ============================================= -->
+                <t t-call="veterinaria_web.footer_partial"/>
+
+            </div>
+        </t>
+    </template>
+
+</odoo>
