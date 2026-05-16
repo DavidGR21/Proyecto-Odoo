@@ -1,23 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- Form View para Facturación -->
+
+        <!-- ============================================================
+             VISTA FORMULARIO - Facturacion
+             El encabezado ya NO tiene paciente_id.
+             Las lineas usan item_ref (Reference) para un unico selector.
+             ============================================================ -->
         <record id="facturacion_form_view" model="ir.ui.view">
             <field name="name">veterinaria.facturacion.form</field>
             <field name="model">veterinaria.facturacion</field>
             <field name="arch" type="xml">
-                <form>
-                    <!-- HEADER  BOTONES VALIDAR Y GENERAR -->
+                <form string="Factura de Servicios">
                     <header>
-                        <button name="action_validar_factura" string="Validar y Generar Factura" 
-                                type="object" class="oe_highlight" 
+                        <button name="action_validar_factura"
+                                string="Validar Factura"
+                                type="object"
+                                class="oe_highlight"
                                 invisible="estado != 'borrador'"/>
-                        
-                        <button name="action_cancelar_factura" string="Cancelar" 
-                                type="object" 
+                        <button name="action_cancelar_factura"
+                                string="Cancelar"
+                                type="object"
                                 invisible="estado != 'validado'"/>
-                        
-                        <field name="estado" widget="statusbar" 
+                        <field name="estado" widget="statusbar"
                                statusbar_visible="borrador,validado,cancelado"/>
                     </header>
 
@@ -25,45 +30,65 @@
                         <div class="oe_title">
                             <h1><field name="name" readonly="1"/></h1>
                         </div>
-                        
+
                         <group>
-                            <field name="fecha_factura" readonly="estado != 'borrador'"/>
-                            <field name="propietario_id" readonly="estado != 'borrador'"/>
-                            <field name="paciente_id" readonly="estado != 'borrador'"/>
+                            <group string="Datos del Cliente">
+                                <field name="fecha_factura"
+                                       readonly="estado != 'borrador'"/>
+                                <field name="propietario_id"
+                                       readonly="estado != 'borrador'"/>
+                                <field name="impuesto_id"
+                                       readonly="estado != 'borrador'"
+                                       options="{'no_create': True}"/>
+                            </group>
                         </group>
-                        
+
                         <notebook>
-                            <page string="Líneas">
+                            <page string="Lineas de Facturacion">
+                                <div class="alert alert-info" role="alert"
+                                     invisible="estado != 'borrador'">
+                                    <strong>Instrucciones:</strong>
+                                    En la columna <b>Item</b> seleccione primero el tipo de registro
+                                    (Cita Veterinaria o Producto/Medicamento/Servicio) y luego el
+                                    registro especifico. El precio se auto-completa.
+                                </div>
+
                                 <field name="linea_ids" readonly="estado != 'borrador'">
-                                    <list editable="bottom">
-                                        <field name="tipo_linea" readonly="parent.estado != 'borrador'"/>
-                                        <field name="cita_id" domain="[('paciente_id.propietario_id', '=', parent.propietario_id)]"
-                                            readonly="parent.estado != 'borrador' or tipo_linea != 'cita'"
-                                            required="tipo_linea == 'cita'"/>
-                                        <field name="medicamento_id"
-                                            readonly="parent.estado != 'borrador' or tipo_linea != 'medicamento'"
-                                            required="tipo_linea == 'medicamento'"/>
-                                        <field name="producto_id"
-                                            readonly="parent.estado != 'borrador' or tipo_linea != 'producto'"
-                                            required="tipo_linea == 'producto'"/>
-                                        <field name="servicio_id"
-                                            readonly="parent.estado != 'borrador' or tipo_linea != 'servicio'"
-                                            required="tipo_linea == 'servicio'"/>
-                                        <field name="cantidad" readonly="parent.estado != 'borrador'"/>
-                                        <field name="precio_unitario" readonly="parent.estado != 'borrador'"/>
+                                    <list>
+                                        <!-- Columna tipo (calculada, solo lectura) -->
+                                        <field name="tipo_linea"
+                                               string="Tipo"
+                                               readonly="1"
+                                               optional="show"/>
+
+                                        <!-- Columna unificada: nombre -->
+                                        <field name="nombre_item"
+                                               string="Item"
+                                               readonly="1"/>
+
+                                        <field name="descripcion"
+                                               string="Descripcion"
+                                               readonly="1"/>
+                                        <field name="cantidad"
+                                               readonly="parent.estado != 'borrador'"/>
+                                        <field name="precio_unitario"
+                                               readonly="parent.estado != 'borrador'"/>
                                         <field name="subtotal" readonly="1"/>
-                                        <field name="total_linea" readonly="1"/>
                                     </list>
                                 </field>
-                                
+
                                 <group class="oe_subtotal_footer oe_right">
                                     <field name="subtotal" readonly="1"/>
                                     <field name="impuesto_total" readonly="1"/>
-                                    <field name="total" class="oe_subtotal_footer_separator" readonly="1"/>
+                                    <field name="total"
+                                           class="oe_subtotal_footer_separator"
+                                           readonly="1"/>
                                 </group>
                             </page>
+
                             <page string="Observaciones">
-                                <field name="observaciones" readonly="estado != 'borrador'"/>
+                                <field name="observaciones"
+                                       readonly="estado != 'borrador'"/>
                             </page>
                         </notebook>
                     </sheet>
@@ -71,48 +96,68 @@
             </field>
         </record>
 
-        <!-- List View (Principal) -->
+        <!-- VISTA LISTA -->
         <record id="facturacion_list_view" model="ir.ui.view">
             <field name="name">veterinaria.facturacion.list</field>
             <field name="model">veterinaria.facturacion</field>
             <field name="arch" type="xml">
-                <list>
+                <list decoration-info="estado == 'borrador'"
+                      decoration-success="estado == 'validado'"
+                      decoration-danger="estado == 'cancelado'">
                     <field name="name"/>
-                    <field name="paciente_id"/>
+                    <field name="fecha_factura"/>
                     <field name="propietario_id"/>
+                    <field name="subtotal"/>
+                    <field name="impuesto_total"/>
                     <field name="total"/>
                     <field name="estado"/>
                 </list>
             </field>
         </record>
 
-        <!-- Search View -->
+        <!-- VISTA BUSQUEDA -->
         <record id="facturacion_search_view" model="ir.ui.view">
             <field name="name">veterinaria.facturacion.search</field>
             <field name="model">veterinaria.facturacion</field>
             <field name="arch" type="xml">
                 <search>
-                    <field name="name"/>
-                    <field name="paciente_id"/>
-                    <field name="propietario_id"/>
-                    <filter name="borrador" domain="[('estado', '=', 'borrador')]" string="Borrador"/>
-                    <filter name="validado" domain="[('estado', '=', 'validado')]" string="Validado"/>
+                    <field name="name" string="N° Factura"/>
+                    <field name="propietario_id" string="Cliente"/>
+                    <filter name="borrador" string="Borrador"
+                            domain="[('estado', '=', 'borrador')]"/>
+                    <filter name="validado" string="Validado"
+                            domain="[('estado', '=', 'validado')]"/>
+                    <filter name="cancelado" string="Cancelado"
+                            domain="[('estado', '=', 'cancelado')]"/>
+                    <group expand="0" string="Agrupar por">
+                        <filter string="Estado" name="group_estado"
+                                context="{'group_by': 'estado'}"/>
+                        <filter string="Cliente" name="group_cliente"
+                                context="{'group_by': 'propietario_id'}"/>
+                        <filter string="Fecha" name="group_fecha"
+                                context="{'group_by': 'fecha_factura'}"/>
+                    </group>
                 </search>
             </field>
         </record>
 
-        <!-- Action -->
+        <!-- ACCION -->
         <record id="facturacion_action" model="ir.actions.act_window">
-            <field name="name">Facturación por Servicios</field>
+            <field name="name">Facturacion por Servicios</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">veterinaria.facturacion</field>
             <field name="view_mode">list,form</field>
             <field name="context">{}</field>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
-                    Crear una nueva factura por servicios (citas completadas)
+                    Crear una nueva factura
+                </p>
+                <p>
+                    Una factura puede incluir citas, productos, medicamentos y
+                    servicios de distintas mascotas del mismo cliente.
                 </p>
             </field>
         </record>
+
     </data>
 </odoo>

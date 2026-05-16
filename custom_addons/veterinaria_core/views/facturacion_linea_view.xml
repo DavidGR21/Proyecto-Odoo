@@ -1,101 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- Form View para Línea de Facturación -->
+        <!-- Form View para Linea de Facturacion -->
         <record id="facturacion_linea_form_view" model="ir.ui.view">
             <field name="name">veterinaria.facturacion.linea.form</field>
             <field name="model">veterinaria.facturacion.linea</field>
             <field name="arch" type="xml">
-                <form string="Línea de Facturación">
+                <form string="Linea de Facturacion">
                     <sheet>
                         <group>
                             <group>
-                                <field name="tipo_linea" required="1" widget="radio" 
-                                       options="{'horizontal': true}"/>
+                                <field name="tipo_linea" string="Tipo"/>
                             </group>
                         </group>
 
                         <group>
                             <group>
-                                <!-- Cita -->
-                                <field name="cita_id" 
-                                       invisible="tipo_linea != 'cita'"
-                                       required="tipo_linea == 'cita'"/>
-                                
-                                <!-- Medicamento -->
-                                <field name="medicamento_id" 
-                                       invisible="tipo_linea != 'medicamento'"
-                                       required="tipo_linea == 'medicamento'"/>
-                                
-                                <!-- Producto -->
-                                <field name="producto_id" 
-                                       invisible="tipo_linea != 'producto'"
-                                       required="tipo_linea == 'producto'"/>
-                                
-                                <!-- Servicio -->
-                                <field name="servicio_id" 
-                                       invisible="tipo_linea != 'servicio'"
-                                       required="tipo_linea == 'servicio'"/>
+                                <field name="cita_id" string="Cita Veterinaria" invisible="tipo_linea != 'cita'"/>
+                                <field name="inventario_id" string="Item" invisible="tipo_linea == 'cita'"/>
                             </group>
                             <group>
                                 <field name="cantidad"/>
                                 <field name="precio_unitario"/>
-                            </group>
-                        </group>
-
-                        <group>
-                            <group>
-                                <field name="impuesto_id" widget="many2many_tags" 
-                                       options="{'no_create': True}"/>
-                            </group>
-                            <group>
                                 <field name="subtotal" readonly="1"/>
-                                <field name="impuesto" readonly="1"/>
-                                <field name="total_linea" readonly="1"/>
                             </group>
                         </group>
 
                         <group>
                             <field name="descripcion" readonly="1" colspan="2"/>
-                            <field name="observaciones_linea" colspan="2"/>
                         </group>
                     </sheet>
                 </form>
             </field>
         </record>
 
-        <!-- List View para Línea de Facturación (inline) -->
+        <!-- List View para Linea de Facturacion (inline) -->
         <record id="facturacion_linea_list_view" model="ir.ui.view">
             <field name="name">veterinaria.facturacion.linea.list</field>
             <field name="model">veterinaria.facturacion.linea</field>
             <field name="arch" type="xml">
-                <list string="Líneas de Facturación" editable="bottom">
+                <list string="Lineas de Facturacion" editable="bottom">
                     <field name="tipo_linea" readonly="1"/>
+                    <field name="nombre_item" readonly="1"/>
                     <field name="descripcion" readonly="1"/>
                     <field name="cantidad"/>
                     <field name="precio_unitario"/>
                     <field name="subtotal" readonly="1"/>
-                    <field name="impuesto" readonly="1"/>
-                    <field name="total_linea" readonly="1"/>
                 </list>
             </field>
         </record>
 
-        <!-- Search View para Línea de Facturación -->
+        <!-- Search View para Linea de Facturacion -->
         <record id="facturacion_linea_search_view" model="ir.ui.view">
             <field name="name">veterinaria.facturacion.linea.search</field>
             <field name="model">veterinaria.facturacion.linea</field>
             <field name="arch" type="xml">
-                <search string="Líneas de Facturación">
-                    <field name="descripcion" string="Descripción"/>
+                <search string="Lineas de Facturacion">
+                    <field name="descripcion" string="Descripcion"/>
                     <field name="tipo_linea" string="Tipo"/>
                     <separator/>
-                    <filter name="filter_cita" string="Citas" domain="[('tipo_linea', '=', 'cita')]"/>
-                    <filter name="filter_medicamento" string="Medicamentos" domain="[('tipo_linea', '=', 'medicamento')]"/>
-                    <filter name="filter_producto" string="Productos" domain="[('tipo_linea', '=', 'producto')]"/>
-                    <filter name="filter_servicio" string="Servicios" domain="[('tipo_linea', '=', 'servicio')]"/>
-                    <separator/>
-                    <filter name="filter_por_factura" string="Por Facturación" 
+                    <filter name="filter_por_factura" string="Por Facturacion" 
                             context="{'group_by': 'facturacion_id'}"/>
                     <filter name="filter_por_tipo" string="Por Tipo" 
                             context="{'group_by': 'tipo_linea'}"/>
