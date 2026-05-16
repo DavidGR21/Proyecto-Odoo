@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Vista de Formulario Unificada para Inventario -->
+        <record id="view_veterinaria_inventario_form" model="ir.ui.view">
+            <field name="name">veterinaria.inventario.form</field>
+            <field name="model">veterinaria.inventario</field>
+            <field name="arch" type="xml">
+                <form string="Inventario Veterinario" create="true" edit="true">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" placeholder="Nombre"/>
+                            </h1>
+                        </div>
+
+                        <!-- Selector de Tipo -->
+                        <group>
+                            <group>
+                                <field name="tipo_inventario" required="1" widget="selection"/>
+                            </group>
+                            <group>
+                                <field name="activo" widget="boolean_toggle"/>
+                            </group>
+                        </group>
+
+                        <group>
+                            <group string="Descripción">
+                                <field name="descripcion" placeholder="Descripción..."/>
+                            </group>
+                        </group>
+
+                        <!-- Campos Comunes de Precios -->
+                        <group string="Precios">
+                            <group>
+                                <field name="precio_costo" string="Precio de Costo"/>
+                                <field name="precio_venta" required="1" string="Precio de Venta"/>
+                            </group>
+                            <group>
+                                <field name="margen_ganancia" readonly="1" string="Margen (%)"/>
+                                <field name="proveedor_id" invisible="tipo_inventario == 'servicio'"
+                                    domain="[('supplier_rank', '&gt;', 0)]" widget="res_partner_many2one"/>
+                                <field name="veterinario_servicio_id" invisible="tipo_inventario != 'servicio'"/>
+                            </group>
+                        </group>
+
+                        <!-- SECCIÓN PRODUCTO -->
+                        <group invisible="tipo_inventario != 'producto'" string="Información del Producto">
+                            <group>
+                                <field name="categoria"/>
+                                <field name="unidad_medida"/>
+                            </group>
+                            <group>
+                                <field name="cantidad_stock" string="Stock Actual"/>
+                                <field name="cantidad_minima" string="Stock Mínimo"/>
+                            </group>
+                        </group>
+
+                        <group invisible="tipo_inventario != 'producto'" string="Configuración Adicional">
+                            <group>
+                                <field name="impuesto_id" widget="many2many_tags" string="Impuestos"/>
+                            </group>
+                        </group>
+
+                        <!-- SECCIÓN MEDICAMENTO -->
+                        <group invisible="tipo_inventario != 'medicamento'" string="Información Farmacéutica">
+                            <group>
+                                <field name="principio_activo" placeholder="Ej: Amoxicilina"/>
+                                <field name="tipo_medicamento"/>
+                            </group>
+                            <group>
+                                <field name="dosis" placeholder="Ej: 250mg"/>
+                                <field name="dosis_recomendada" placeholder="Ej: 250mg cada 8 horas"/>
+                            </group>
+                        </group>
+
+                        <group invisible="tipo_inventario != 'medicamento'" string="Administración">
+                            <group>
+                                <field name="via_administracion"/>
+                                <field name="cantidad_stock" string="Stock Disponible"/>
+                            </group>
+                        </group>
+
+                        <group invisible="tipo_inventario != 'medicamento'" string="Precauciones">
+                            <group string="Contraindicaciones">
+                                <field name="contraindicaciones" placeholder="Liste las contraindicaciones..."/>
+                            </group>
+                            <group string="Efectos Secundarios">
+                                <field name="efectos_secundarios" placeholder="Liste posibles efectos secundarios..."/>
+                            </group>
+                        </group>
+
+                        <group invisible="tipo_inventario != 'medicamento'" string="Control">
+                            <field name="fecha_registro" readonly="1" string="Fecha de Registro"/>
+                        </group>
+
+                        <!-- SECCIÓN SERVICIO -->
+                        <group invisible="tipo_inventario != 'servicio'" string="Información del Servicio">
+                            <group>
+                                <field name="categoria_servicio"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Vista de Lista Unificada -->
+        <record id="view_veterinaria_inventario_list" model="ir.ui.view">
+            <field name="name">veterinaria.inventario.list</field>
+            <field name="model">veterinaria.inventario</field>
+            <field name="arch" type="xml">
+                <list>
+                    <field name="name"/>
+                    <field name="tipo_inventario" string="Tipo"/>
+                    <field name="precio_venta" string="Precio"/>
+                    <field name="cantidad_stock" string="Stock" optional="hide"/>
+                    <field name="margen_ganancia" string="Margen %" optional="hide"/>
+                    <field name="activo" widget="boolean"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Vista de búsqueda para Inventario -->
+        <record id="view_veterinaria_inventario_search" model="ir.ui.view">
+            <field name="name">veterinaria.inventario.search</field>
+            <field name="model">veterinaria.inventario</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <field name="tipo_inventario"/>
+                    <field name="proveedor_id"/>
+                    <separator/>
+                    <filter name="productos" string="Productos" domain="[('tipo_inventario', '=', 'producto')]"/>
+                    <filter name="servicios" string="Servicios" domain="[('tipo_inventario', '=', 'servicio')]"/>
+                    <filter name="medicamentos" string="Medicamentos" domain="[('tipo_inventario', '=', 'medicamento')]"/>
+                    <separator/>
+                    <filter name="activos" string="Activos" domain="[('activo', '=', True)]"/>
+                    <filter name="inactivos" string="Inactivos" domain="[('activo', '=', False)]"/>
+                    <separator/>
+                    <filter name="bajo_stock" string="Stock Bajo" domain="[('cantidad_stock', '&lt;', 5), ('tipo_inventario', '=', 'producto')]"/>
+                    <group expand="0" string="Agrupar por">
+                        <filter string="Tipo" name="group_by_tipo" context="{'group_by': 'tipo_inventario'}"/>
+                        <filter string="Proveedor" name="group_by_proveedor" context="{'group_by': 'proveedor_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Acción para Inventario Unificado -->
+        <record id="action_veterinaria_inventario" model="ir.actions.act_window">
+            <field name="name">Inventario</field>
+            <field name="res_model">veterinaria.inventario</field>
+            <field name="view_mode">list,form</field>
+            <field name="context">{'create': True, 'edit': True}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Crear un nuevo elemento de inventario
+                </p>
+                <p>
+                    Gestiona productos, servicios y medicamentos en un solo lugar. 
+                    Al crear un nuevo registro, selecciona el tipo de inventario para ver los campos específicos.
+                </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

@@ -6,7 +6,13 @@ access_veterinaria_historia_clinica_all,Acceso a Historia Clínica,model_veterin
 access_veterinaria_medicamento_all,Acceso a Medicamentos,model_veterinaria_medicamento,,1,1,1,1
 access_veterinaria_cita_all,Acceso a Citas,model_veterinaria_cita,,1,1,1,1
 access_veterinaria_producto_all,Acceso a Productos,model_veterinaria_producto,,1,1,1,1
+access_veterinaria_servicio_all,Acceso a Servicios,model_veterinaria_servicio,,1,1,1,1
+access_veterinaria_inventario_all,Acceso a Inventario,model_veterinaria_inventario,,1,1,1,1
 access_veterinaria_venta_all,Acceso a Ventas,model_veterinaria_venta,,1,1,1,1
 access_veterinaria_venta_linea_all,Acceso a Líneas de Venta,model_veterinaria_venta_linea,,1,1,1,1
 access_veterinaria_facturacion_all,Acceso a Facturación,model_veterinaria_facturacion,,1,1,1,1
+access_veterinaria_facturacion_linea_all,Acceso a Líneas de Facturación,model_veterinaria_facturacion_linea,,1,1,1,1
+access_veterinaria_facturacion_linea_wizard_all,Acceso a Wizard de Línea,model_veterinaria_facturacion_linea_wizard,,1,1,1,1
+access_veterinaria_facturacion_multilinea_wizard_all,Acceso a Wizard Múltiple,model_veterinaria_facturacion_multilinea_wizard,,1,1,1,1
+access_veterinaria_documento_venta_all,Acceso a Documentos de Venta,model_veterinaria_documento_venta,,1,1,1,1
 
