@@ -16,7 +16,10 @@
 
                         <group>
                             <group>
-                                <field name="cita_id" string="Cita Veterinaria" invisible="tipo_linea != 'cita'"/>
+                                <field name="cita_id" 
+                                       string="Cita Veterinaria" 
+                                       invisible="tipo_linea != 'cita'"
+                                       domain="[('estado', '=', 'completada'), ('facturada', '=', False), ('propietario_id', '=', parent.propietario_id)]"/>
                                 <field name="inventario_id" string="Item" invisible="tipo_linea == 'cita'"/>
                             </group>
                             <group>

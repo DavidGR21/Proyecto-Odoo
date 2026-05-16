@@ -91,17 +91,23 @@ class Facturacion(models.Model):
                             f"Stock insuficiente para '{inv.name}': "
                             f"disponible {inv.cantidad_stock}, solicitado {line.cantidad}"
                         )
-            # Descontar stock
+            # Descontar stock y marcar citas como facturadas
             for line in lineas_con_item:
                 if line.tipo_linea in ('medicamento', 'producto') and line.inventario_id:
                     inv = line.inventario_id
                     inv.cantidad_stock -= line.cantidad
+                if line.tipo_linea == 'cita' and line.cita_id:
+                    line.cita_id.facturada = True
 
             record.estado = 'validado'
 
     def action_cancelar_factura(self):
         """Cancela la factura y libera citas."""
         for record in self:
+            # Liberar citas
+            for line in record.linea_ids:
+                if line.tipo_linea == 'cita' and line.cita_id:
+                    line.cita_id.facturada = False
             record.estado = 'cancelado'
 
     def action_importar_receta(self):

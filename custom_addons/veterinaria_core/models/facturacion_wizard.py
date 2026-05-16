@@ -168,12 +168,11 @@ class ImportarRecetaWizard(models.TransientModel):
         required=True,
     )
 
-    @api.onchange('facturacion_id')
-    def _onchange_facturacion_id(self):
-        """Filtra cita_id para mostrar solo las citas ya presentes en la factura."""
-        if self.facturacion_id:
-            citas_ya_en_factura = self.facturacion_id.linea_ids.filtered(lambda l: l.tipo_linea == 'cita' and l.cita_id).mapped('cita_id')
-            return {'domain': {'cita_id': [('id', 'in', citas_ya_en_factura.ids)]}}
+    @api.onchange('propietario_id')
+    def _onchange_propietario_id(self):
+        """Filtra cita_id para mostrar todas las citas con receta del propietario."""
+        if self.propietario_id:
+            return {'domain': {'cita_id': [('propietario_id', '=', self.propietario_id.id), ('receta_ids', '!=', False)]}}
 
     linea_ids = fields.One2many(
         'veterinaria.importar.receta.wizard.linea',
