@@ -232,28 +232,50 @@
                         <div class="p-3 text-muted">No hay recetas registradas.</div>
                     </t>
                     <t t-if="pet.receta_ids">
-                        <table class="table table-sm mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Fecha</th>
-                                    <th>Medicamento</th>
-                                    <th>Dosis</th>
-                                    <th>Frecuencia</th>
-                                    <th>Duración</th>
-                                    <th>Veterinario</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr t-foreach="pet.receta_ids" t-as="r">
-                                    <td t-out="r.fecha"/>
-                                    <td t-out="r.medicamento_id.name"/>
-                                    <td t-out="r.dosis or '-'"/>
-                                    <td t-out="r.frecuencia or '-'"/>
-                                    <td><t t-out="r.duracion_dias or 0"/> días</td>
-                                    <td t-out="r.veterinario_id.name or '-'"/>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <t t-foreach="pet.receta_ids" t-as="r">
+                            <div class="border-bottom p-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div>
+                                        <strong t-out="r.name"/>
+                                        <span class="text-muted ms-2" t-out="r.fecha_emision"/>
+                                    </div>
+                                    <span class="badge bg-secondary"
+                                          t-out="r.veterinario_id.name or 'Sin veterinario'"/>
+                                </div>
+                                <t t-if="r.diagnostico">
+                                    <p class="small mb-2"><em>Diagnóstico:</em>
+                                        <t t-out="r.diagnostico"/></p>
+                                </t>
+                                <t t-if="r.linea_ids">
+                                    <table class="table table-sm mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Medicamento</th>
+                                                <th>Dosis</th>
+                                                <th>Cada (h)</th>
+                                                <th>Días</th>
+                                                <th>Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr t-foreach="r.linea_ids" t-as="l">
+                                                <td t-out="l.nombre_medicamento_display"/>
+                                                <td t-out="l.dosis"/>
+                                                <td t-out="l.frecuencia_horas"/>
+                                                <td t-out="l.duracion_dias"/>
+                                                <td t-out="l.cantidad_total"/>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </t>
+                                <t t-if="r.observaciones_adicionales">
+                                    <p class="small text-muted mt-2 mb-0">
+                                        <em>Indicaciones:</em>
+                                        <t t-out="r.observaciones_adicionales"/>
+                                    </p>
+                                </t>
+                            </div>
+                        </t>
                     </t>
                 </div>
             </div>
@@ -380,12 +402,20 @@
                                     <t t-if="h.receta_ids">
                                         <h6 class="mt-3">Recetas emitidas</h6>
                                         <ul>
-                                            <li t-foreach="h.receta_ids" t-as="r">
-                                                <t t-out="r.medicamento_id.name"/> -
-                                                <t t-out="r.dosis or ''"/> -
-                                                <t t-out="r.frecuencia or ''"/>
-                                                (<t t-out="r.duracion_dias or 0"/> días)
-                                            </li>
+                                            <t t-foreach="h.receta_ids" t-as="r">
+                                                <li>
+                                                    <strong t-out="r.name"/> -
+                                                    <span t-out="r.fecha_emision"/>
+                                                    <ul t-if="r.linea_ids">
+                                                        <li t-foreach="r.linea_ids" t-as="l">
+                                                            <t t-out="l.nombre_medicamento_display"/> —
+                                                            <t t-out="l.dosis"/> ud cada
+                                                            <t t-out="l.frecuencia_horas"/>h por
+                                                            <t t-out="l.duracion_dias"/> días
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                            </t>
                                         </ul>
                                     </t>
                                 </div>
@@ -407,32 +437,58 @@
                 <div class="alert alert-light">No tiene recetas registradas.</div>
             </t>
             <t t-if="recetas">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Mascota</th>
-                            <th>Medicamento</th>
-                            <th>Dosis</th>
-                            <th>Frecuencia</th>
-                            <th>Duración</th>
-                            <th>Veterinario</th>
-                            <th>Indicaciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr t-foreach="recetas" t-as="r">
-                            <td t-out="r.fecha"/>
-                            <td t-out="r.paciente_id.name"/>
-                            <td t-out="r.medicamento_id.name"/>
-                            <td t-out="r.dosis or '-'"/>
-                            <td t-out="r.frecuencia or '-'"/>
-                            <td><t t-out="r.duracion_dias or 0"/> días</td>
-                            <td t-out="r.veterinario_id.name or '-'"/>
-                            <td t-out="r.observaciones or '-'"/>
-                        </tr>
-                    </tbody>
-                </table>
+                <t t-foreach="recetas" t-as="r">
+                    <div class="card mb-3 shadow-sm">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong t-out="r.name"/>
+                                <span class="text-muted ms-2" t-out="r.fecha_emision"/>
+                            </div>
+                            <div>
+                                <span class="badge bg-info me-1">
+                                    <i class="fa fa-paw"/> <t t-out="r.paciente_id.name"/>
+                                </span>
+                                <span class="badge bg-secondary">
+                                    <t t-out="r.veterinario_id.name or 'Sin veterinario'"/>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <t t-if="r.diagnostico">
+                                <p class="mb-2"><strong>Diagnóstico:</strong>
+                                    <t t-out="r.diagnostico"/></p>
+                            </t>
+                            <t t-if="r.linea_ids">
+                                <table class="table table-sm mb-2">
+                                    <thead>
+                                        <tr>
+                                            <th>Medicamento</th>
+                                            <th>Dosis</th>
+                                            <th>Cada (h)</th>
+                                            <th>Días</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="r.linea_ids" t-as="l">
+                                            <td t-out="l.nombre_medicamento_display"/>
+                                            <td t-out="l.dosis"/>
+                                            <td t-out="l.frecuencia_horas"/>
+                                            <td t-out="l.duracion_dias"/>
+                                            <td t-out="l.cantidad_total"/>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </t>
+                            <t t-if="r.observaciones_adicionales">
+                                <p class="small text-muted mb-0">
+                                    <strong>Indicaciones:</strong>
+                                    <t t-out="r.observaciones_adicionales"/>
+                                </p>
+                            </t>
+                        </div>
+                    </div>
+                </t>
             </t>
         </t>
     </template>

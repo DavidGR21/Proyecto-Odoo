@@ -148,7 +148,7 @@ class VeterinariaPortal(CustomerPortal):
         partner = request.env.user.partner_id
         recetas = request.env['veterinaria.receta'].search([
             ('propietario_id', '=', partner.id),
-        ], order='fecha DESC')
+        ], order='fecha_emision DESC')
         values = {
             'recetas': recetas,
             'page_name': 'prescriptions',

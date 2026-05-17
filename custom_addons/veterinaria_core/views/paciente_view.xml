@@ -119,12 +119,11 @@
                             <page string="Recetas" name="recetas">
                                 <field name="receta_ids" nolabel="1" readonly="1" mode="list">
                                     <list>
-                                        <field name="fecha"/>
-                                        <field name="medicamento_id"/>
-                                        <field name="dosis"/>
-                                        <field name="frecuencia"/>
-                                        <field name="duracion_dias"/>
+                                        <field name="name"/>
+                                        <field name="fecha_emision"/>
+                                        <field name="cita_id"/>
                                         <field name="veterinario_id"/>
+                                        <field name="facturada" widget="boolean_toggle"/>
                                     </list>
                                 </field>
                             </page>
