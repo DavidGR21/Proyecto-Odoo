@@ -2,6 +2,42 @@
 <odoo>
 
     <!-- =====================================================
+         Añadir campo de foto al formulario /my/account
+         ===================================================== -->
+    <template id="portal_my_details_inherit_photo"
+              name="Veterinaria: foto de perfil"
+              inherit_id="portal.portal_my_details" priority="20">
+        <!-- El form de /my/account no tiene clase, lo identificamos por su action -->
+        <xpath expr="//form[@action='/my/account']" position="attributes">
+            <attribute name="enctype">multipart/form-data</attribute>
+        </xpath>
+        <!-- Insertar el bloque foto justo antes de los campos del formulario -->
+        <xpath expr="//t[@t-call='portal.portal_my_details_fields']" position="before">
+            <div class="col-12 mb-4">
+                <div class="text-center mb-3">
+                    <t t-if="partner.image_1920">
+                        <img t-attf-src="/web/image/res.partner/#{partner.id}/image_1920"
+                             class="rounded-circle"
+                             style="width:120px;height:120px;object-fit:cover;border:3px solid #2E86AB;"
+                             alt="Foto de perfil"/>
+                    </t>
+                    <t t-else="">
+                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center"
+                             style="width:120px;height:120px;background:#e9ecef;border:3px solid #2E86AB;">
+                            <i class="fa fa-user fa-3x text-secondary"/>
+                        </div>
+                    </t>
+                </div>
+                <label for="image_1920" class="form-label fw-bold">
+                    Cambiar foto de perfil
+                </label>
+                <input type="file" name="image_1920" id="image_1920"
+                       class="form-control" accept="image/*"/>
+            </div>
+        </xpath>
+    </template>
+
+    <!-- =====================================================
          Inyectar tarjetas en el dashboard /my/home
          Hereda portal.portal_my_home y añade entradas usando
          el helper estándar portal.portal_docs_entry
@@ -38,6 +74,164 @@
                 <t t-set="url" t-value="'/my/invoices_vet'"/>
                 <t t-set="text">Facturas emitidas por servicios y productos</t>
                 <t t-set="placeholder_count" t-value="'invoice_count_vet'"/>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- =====================================================
+         /my/security simplificado para Cliente Veterinaria
+         Solo cambio de contraseña + eliminar cuenta
+         ===================================================== -->
+    <template id="portal_my_security_simple"
+              name="Veterinaria: /my/security simplificado">
+        <t t-call="portal.portal_layout">
+            <div class="o_portal_security_body w-md-75 w-lg-50 pb-5">
+                <t t-set="additional_title">Seguridad</t>
+                <t t-set="no_breadcrumbs" t-value="1"/>
+
+                <div class="alert alert-danger" role="alert" t-if="errors and errors.get('errors')">
+                    <t t-esc="errors['errors']"/>
+                </div>
+
+                <div class="d-flex gap-2 my-3">
+                    <a href="/my/" title="Volver" class="btn btn-light px-2">
+                        <i class="oi oi-chevron-left"/>
+                    </a>
+                    <h3 class="my-0">Conexión y Seguridad</h3>
+                </div>
+
+                <!-- Cambiar contraseña -->
+                <section name="portal_change_password">
+                    <h4>Cambiar contraseña</h4>
+                    <div class="alert alert-success" role="alert"
+                         t-if="success and success.get('password')">
+                        ¡Contraseña actualizada!
+                    </div>
+                    <div class="alert alert-danger" role="alert"
+                         t-if="errors and errors.get('password')">
+                        <t t-esc="errors['password']"/>
+                    </div>
+                    <form action="/my/security" method="post" class="oe_reset_password_form">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <input type="hidden" name="op" value="password"/>
+                        <div class="mb-3">
+                            <label for="current">Contraseña actual:</label>
+                            <input type="password" class="form-control form-control-sm"
+                                   id="current" name="old"
+                                   autocomplete="current-password" required="required"/>
+                        </div>
+                        <div class="mb-3">
+                            <label for="new">Nueva contraseña:</label>
+                            <input type="password" class="form-control form-control-sm"
+                                   id="new" name="new1"
+                                   autocomplete="new-password" required="required"/>
+                        </div>
+                        <div class="mb-3">
+                            <label for="new2">Confirmar nueva contraseña:</label>
+                            <input type="password" class="form-control form-control-sm"
+                                   id="new2" name="new2"
+                                   autocomplete="new-password" required="required"/>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Cambiar contraseña</button>
+                    </form>
+                </section>
+
+                <!-- Eliminar cuenta -->
+                <section name="portal_deactivate_account" class="mt-5">
+                    <h4>Eliminar cuenta</h4>
+                    <t t-set="deactivate_error" t-value="errors and errors.get('deactivate')"/>
+                    <button class="btn btn-outline-danger" data-bs-toggle="modal"
+                            data-bs-target="#portal_deactivate_account_modal">
+                        Eliminar mi cuenta
+                    </button>
+                    <div t-attf-class="modal #{'show d-block' if open_deactivate_modal else ''}"
+                         id="portal_deactivate_account_modal" tabindex="-1" role="dialog">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header bg-danger text-white">
+                                    <h5 class="modal-title">¿Estás seguro?</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"/>
+                                </div>
+                                <form action="/my/deactivate_account" method="post"
+                                      class="modal-body"
+                                      id="portal_deactivate_account_form">
+                                    <div>
+                                        <div class="alert alert-danger"
+                                             t-if="deactivate_error == 'other'">
+                                            Ha ocurrido un error.
+                                        </div>
+                                        <p class="text-muted">
+                                            Esta acción desactiva tu cuenta y no podrás
+                                            volver a iniciar sesión.<br/>
+                                            <b>
+                                                <i class="fa fa-exclamation-triangle text-danger"/>
+                                                Esta acción no se puede deshacer.
+                                            </b>
+                                        </p>
+                                        <hr/>
+                                        <p>1. Ingresa tu contraseña para confirmar:</p>
+                                        <input name="password" type="password" required="1"
+                                               class="form-control"
+                                               placeholder="Contraseña"/>
+                                        <hr/>
+                                        <p>
+                                            2. Confirma escribiendo tu login
+                                            (<t t-esc="env.user.login"/>):
+                                        </p>
+                                        <input name="validation" type="text" required="1"
+                                               class="form-control"/>
+                                    </div>
+                                    <input type="hidden" name="csrf_token"
+                                           t-att-value="request.csrf_token()"/>
+                                </form>
+                                <div class="modal-footer justify-content-start">
+                                    <input type="submit" class="btn btn-danger"
+                                           form="portal_deactivate_account_form"
+                                           value="Eliminar cuenta"/>
+                                    <button type="button" class="btn btn-light"
+                                            data-bs-dismiss="modal">
+                                        Cancelar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </t>
+    </template>
+
+    <!-- =====================================================
+         Ocultar entradas "Cotizaciones para revisar" y "Tus pedidos"
+         de /my para usuarios del grupo Cliente Veterinaria.
+         Usamos position="replace" para garantizar que los <t t-call>
+         sólo se rendericen cuando el usuario NO es cliente vet.
+         ===================================================== -->
+    <template id="portal_hide_sale_entries"
+              name="Veterinaria: ocultar órdenes/cotizaciones"
+              inherit_id="sale.portal_my_home_sale" priority="50">
+        <!-- Primer bloque: 'Quotations to review' -->
+        <xpath expr="//div[@id='portal_alert_category']/t[@t-call='portal.portal_docs_entry']"
+               position="replace">
+            <t t-if="not request.env.user.has_group('veterinaria_core.group_veterinaria_cliente')"
+               t-call="portal.portal_docs_entry">
+                <t t-set="bg_color" t-value="'alert alert-primary align-items-center'"/>
+                <t t-set="placeholder_count" t-value="'quotation_count'"/>
+                <t t-set="title">Quotations to review</t>
+                <t t-set="url" t-value="'/my/quotes'"/>
+                <t t-set="show_count" t-value="True"/>
+            </t>
+        </xpath>
+        <!-- Segundo bloque: 'Your Orders' -->
+        <xpath expr="//div[@id='portal_client_category']/t[@t-call='portal.portal_docs_entry']"
+               position="replace">
+            <t t-if="not request.env.user.has_group('veterinaria_core.group_veterinaria_cliente')"
+               t-call="portal.portal_docs_entry">
+                <t t-set="icon" t-value="'/sale/static/src/img/bag.svg'"/>
+                <t t-set="title">Your Orders</t>
+                <t t-set="url" t-value="'/my/orders'"/>
+                <t t-set="text">Follow, view or pay your orders</t>
+                <t t-set="placeholder_count" t-value="'order_count'"/>
             </t>
         </xpath>
     </template>
