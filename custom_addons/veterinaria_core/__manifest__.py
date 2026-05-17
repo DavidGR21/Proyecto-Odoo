@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Veterinaria Core',
-    'version': '18.0.1.4.0',
+    'version': '18.0.1.5.1',
     'category': 'Veterinary',
     'summary': 'Módulo base para la gestión de veterinaria, incluyendo portal del cliente',
     'description': """
