@@ -10,37 +10,31 @@ _logger = logging.getLogger(__name__)
 class Cita(models.Model):
     _name = 'veterinaria.cita'
     _description = 'Cita Veterinaria'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'fecha_hora DESC'
 
     name = fields.Char('Referencia', compute='_compute_name')
     paciente_id = fields.Many2one('veterinaria.paciente', string='Paciente', required=True, 
-                                   ondelete='cascade', tracking=True)
-    propietario_id = fields.Many2one('res.partner', string='Propietario', 
-                                      compute='_compute_propietario', store=False)
+                                   ondelete='cascade')
+    propietario_id = fields.Many2one(
+        'res.partner',
+        string='Propietario',
+        required=False,
+        domain=[('es_propietario', '=', True)],
+        store=True,
+        index=True,
+    )
+    facturada = fields.Boolean('Facturada', default=False)
     veterinario_id = fields.Many2one('veterinaria.veterinario', string='Veterinario', ondelete='set null')
     servicio_id = fields.Many2one('veterinaria.servicio', string='Servicio', ondelete='set null')
-    fecha_hora = fields.Datetime('Fecha y Hora', required=True, tracking=True)
+    company_id = fields.Many2one('res.company', string='Compañía', default=lambda self: self.env.company)
+    fecha_hora = fields.Datetime('Fecha y Hora', required=True)
     duracion = fields.Selection([
         ('0.5', '30 minutos'),
         ('1.0', '1 hora'),
-        ('1.5', '1 hora 30 min'),
-        ('2.0', '2 horas'),
-        ('3.0', '3 horas'),
-        ('4.0', '4 horas'),
-        ('8.0', '8 horas'),
-        ('12.0', '12 horas'),
-        # Fallbacks de cadena para compatibilidad con vistas de calendario/legacy
-        ('1', '1 hora'),
-        ('2', '2 horas'),
-        ('3', '3 horas'),
-        ('4', '4 horas'),
-        ('8', '8 horas'),
-        ('12', '12 horas'),
     ], string='Duración', default='1.0')
     duracion_horas = fields.Float('Duración (horas)', compute='_compute_duracion_horas', store=True)
     
-    motivo = fields.Text('Motivo de la Cita', required=True, tracking=True)
+    motivo = fields.Text('Motivo de la Cita', required=True)
     observaciones = fields.Text('Observaciones')
     
     # Estado
@@ -49,10 +43,18 @@ class Cita(models.Model):
         ('completada', 'Completada'),
         ('cancelada', 'Cancelada'),
         ('no_asistio', 'No Asistió'),
-    ], string='Estado', default='programada', tracking=True)
+    ], string='Estado', default='programada')
     
     # Relación con historia clínica
     historia_clinica_id = fields.Many2one('veterinaria.historia_clinica', string='Historia Clínica')
+    receta_ids = fields.One2many('veterinaria.receta', 'cita_id', string='Recetas Médicas')
+    receta_count = fields.Integer(compute='_compute_receta_count')
+
+    @api.depends('receta_ids')
+    def _compute_receta_count(self):
+        for rec in self:
+            rec.receta_count = len(rec.receta_ids)
+
     alergias = fields.Text('Alergias de la Mascota')
     tipo_sangre = fields.Selection([
         ('a_pos', 'A+'),
@@ -139,15 +141,19 @@ class Cita(models.Model):
 
             return {'domain': {'veterinario_id': [('id', 'in', available_ids)]}}
 
+    @api.onchange('propietario_id')
+    def _onchange_propietario_id(self):
+        for record in self:
+            if record.propietario_id and record.paciente_id:
+                if record.paciente_id.propietario_id != record.propietario_id:
+                    record.paciente_id = False
+            elif not record.propietario_id:
+                record.paciente_id = False
+
     @api.depends('paciente_id', 'fecha_hora')
     def _compute_name(self):
         for record in self:
             record.name = f"Cita {record.paciente_id.name} - {record.fecha_hora.strftime('%d/%m/%Y') if record.fecha_hora else ''}"
-
-    @api.depends('paciente_id')
-    def _compute_propietario(self):
-        for record in self:
-            record.propietario_id = record.paciente_id.propietario_id if record.paciente_id else False
 
     @api.constrains('veterinario_id', 'motivo', 'fecha_hora')
     def _check_required_fields(self):
@@ -236,7 +242,7 @@ class Cita(models.Model):
         for record in self:
             if record.propietario_id and record.propietario_id.email:
                 try:
-                    template.send_mail(record.id, force_send=False)
+                    template.send_mail(record.id, force_send=True)
                     _logger.info('Email de confirmación enviado para cita %s', record.name)
                 except Exception as e:
                     _logger.warning('No se pudo enviar email de confirmación para cita %s: %s', record.name, e)
@@ -249,7 +255,7 @@ class Cita(models.Model):
         for record in self:
             if record.propietario_id and record.propietario_id.email:
                 try:
-                    template.send_mail(record.id, force_send=False)
+                    template.send_mail(record.id, force_send=True)
                     _logger.info('Email de consulta completada enviado para cita %s', record.name)
                 except Exception as e:
                     _logger.warning('No se pudo enviar email post-consulta para cita %s: %s', record.name, e)
@@ -277,7 +283,7 @@ class Cita(models.Model):
         for cita in citas:
             if cita.propietario_id and cita.propietario_id.email:
                 try:
-                    template.send_mail(cita.id, force_send=False)
+                    template.send_mail(cita.id, force_send=True)
                     cita.write({'recordatorio_enviado': True})
                     _logger.info('Recordatorio enviado para cita %s', cita.name)
                 except Exception as e:
@@ -294,7 +300,7 @@ class Cita(models.Model):
             try:
                 fl_val = float(val)
                 str_val = str(fl_val)
-                if str_val in ['0.5', '1.0', '1.5', '2.0', '3.0', '4.0', '8.0', '12.0']:
+                if str_val in ['0.5', '1.0']:
                     res['duracion'] = str_val
             except Exception:
                 pass
@@ -306,7 +312,7 @@ class Cita(models.Model):
             try:
                 fl_val = float(val)
                 str_val = str(fl_val)
-                if str_val in ['0.5', '1.0', '1.5', '2.0', '3.0', '4.0', '8.0', '12.0']:
+                if str_val in ['0.5', '1.0']:
                     values['duracion'] = str_val
             except Exception:
                 pass
@@ -320,7 +326,7 @@ class Cita(models.Model):
                 try:
                     fl_val = float(vals['duracion'])
                     str_val = str(fl_val)
-                    if str_val in ['0.5', '1.0', '1.5', '2.0', '3.0', '4.0', '8.0', '12.0']:
+                    if str_val in ['0.5', '1.0']:
                         vals['duracion'] = str_val
                 except Exception:
                     pass
@@ -348,7 +354,7 @@ class Cita(models.Model):
             try:
                 fl_val = float(vals['duracion'])
                 str_val = str(fl_val)
-                if str_val in ['0.5', '1.0', '1.5', '2.0', '3.0', '4.0', '8.0', '12.0']:
+                if str_val in ['0.5', '1.0']:
                     vals['duracion'] = str_val
             except Exception:
                 pass
@@ -373,3 +379,17 @@ class Cita(models.Model):
     def action_cancelar_cita(self):
         """Cancelar cita"""
         self.write({'estado': 'cancelada'})
+
+    def action_crear_receta(self):
+        """Abre el formulario para crear una nueva receta vinculada a esta cita"""
+        self.ensure_one()
+        return {
+            'name': 'Nueva Receta Médica',
+            'type': 'ir.actions.act_window',
+            'res_model': 'veterinaria.receta',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_cita_id': self.id,
+            }
+        }

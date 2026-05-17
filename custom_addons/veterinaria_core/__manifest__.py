@@ -34,6 +34,7 @@
         'security/portal_security.xml',
         'security/ir.model.access.csv',
         # Data
+        'data/mail_server.xml',
         'data/mail_templates.xml',
         'data/cron_recordatorio.xml',
         # Views
@@ -54,6 +55,7 @@
         'views/facturacion_wizard_view.xml',
         'views/documento_venta_view.xml',
         # Menús base (deben cargarse antes de vacunas/recetas porque éstas anidan menús bajo ellos)
+        'views/receta_view.xml',
         'views/menu.xml',
         'views/vacuna_view.xml',
         'views/receta_view.xml',

@@ -1,155 +1,140 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
-from datetime import datetime
 
 
 class Facturacion(models.Model):
     _name = 'veterinaria.facturacion'
-    _description = 'Facturación Multiservicio'
+    _description = 'Facturacion Multiservicio'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    name = fields.Char('Número de Factura', readonly=True)
-    
-    
+    name = fields.Char('Numero de Factura', readonly=True)
+
     propietario_id = fields.Many2one(
         'res.partner',
         string='Cliente (Propietario)',
-        readonly=False,
+        required=True,
         domain=[('es_propietario', '=', True)]
     )
-    
-    paciente_id = fields.Many2one(
-        'veterinaria.paciente',
-        string='Paciente (Mascota)',
-        readonly=False,
-        domain="[('propietario_id', '=', propietario_id)]"
-    )
-    
-    fecha_cita = fields.Datetime('Fecha de la Cita')
-    
-    motivo_cita = fields.Text('Motivo de la Cita')
-    
-    # Líneas de facturación (multiservicio)
+
+    # paciente_id eliminado del encabezado:
+    # un cliente puede pagar items de varias mascotas en una sola factura.
+    # La mascota queda referenciada en cada linea de la factura (via item_ref -> cita).
+
     linea_ids = fields.One2many(
         'veterinaria.facturacion.linea',
         'facturacion_id',
-        string='Líneas de Facturación',
+        string='Lineas de Facturacion',
         copy=True
     )
-    
-    # Totales
+
     subtotal = fields.Float('Subtotal', compute='_compute_totales', store=True)
-    impuesto_total = fields.Float('Total Impuestos', compute='_compute_totales', store=True)
-    total = fields.Float('Total', compute='_compute_totales', store=True)
     
-    # Invoice relacionada
-    move_id = fields.Many2one(
-        'account.move',
-        string='Factura Contable',
-        ondelete='cascade',
-        readonly=True
+    impuesto_id = fields.Many2one(
+        'account.tax',
+        string='Impuesto',
+        domain=[('type_tax_use', '=', 'sale')],
+        tracking=True
     )
     
+    impuesto_total = fields.Float('Total Impuestos', compute='_compute_totales', store=True)
+    total = fields.Float('Total', compute='_compute_totales', store=True)
+
     estado = fields.Selection([
         ('borrador', 'Borrador'),
         ('validado', 'Validado'),
         ('cancelado', 'Cancelado'),
     ], string='Estado', default='borrador', tracking=True)
-    
-    impuesto_id = fields.Many2many(
-        'account.tax',
-        string='Impuestos por Defecto',
-        domain=[('type_tax_use', '=', 'sale')]
-    )
-    
+
     observaciones = fields.Text('Observaciones')
-    fecha_factura = fields.Date('Fecha de Factura', default=fields.Date.today,
-                               states={'validado': [('readonly', True)], 'cancelado': [('readonly', True)]})
-    
-    
-    @api.depends('linea_ids.subtotal', 'linea_ids.impuesto', 'linea_ids.total_linea')
+    fecha_factura = fields.Date(
+        'Fecha de Factura',
+        default=fields.Date.today,
+        states={'validado': [('readonly', True)], 'cancelado': [('readonly', True)]}
+    )
+
+    @api.depends('linea_ids.subtotal', 'impuesto_id')
     def _compute_totales(self):
         for record in self:
-            record.subtotal = sum(line.subtotal for line in record.linea_ids)
-            record.impuesto_total = sum(line.impuesto for line in record.linea_ids)
-            record.total = sum(line.total_linea for line in record.linea_ids)
+            subtotal = sum(line.subtotal for line in record.linea_ids)
+            record.subtotal = subtotal
+            
+            if record.impuesto_id:
+                if record.impuesto_id.amount_type == 'percent':
+                    record.impuesto_total = subtotal * (record.impuesto_id.amount / 100.0)
+                elif record.impuesto_id.amount_type == 'fixed':
+                    record.impuesto_total = record.impuesto_id.amount
+                else:
+                    record.impuesto_total = 0.0
+            else:
+                record.impuesto_total = 0.0
+                
+            record.total = subtotal + record.impuesto_total
 
-    @api.constrains('linea_ids')
-    def _check_lineas(self):
-        for record in self:
-            if not record.linea_ids:
-                raise ValidationError('Debe agregar al menos una línea de facturación')
-    
     def action_validar_factura(self):
-        """Genera la factura contable desde la facturación multiservicio"""
+        """Valida la factura y descuenta stock donde aplica."""
         for record in self:
             if record.estado != 'borrador':
                 raise ValidationError('Solo se pueden validar facturas en borrador')
-            
             if not record.propietario_id:
-                raise ValidationError('Falta el cliente (propietario) para generar la factura')
-            
-            if not record.linea_ids:
-                raise ValidationError('Debe agregar al menos una línea de facturación')
+                raise ValidationError('Falta el cliente (propietario)')
+            lineas_con_item = record.linea_ids.filtered(lambda l: l.tipo_linea)
+            if not lineas_con_item:
+                raise ValidationError('Debe agregar al menos una linea con un item seleccionado')
 
-            # Validar y descontar stock para productos/medicamentos
-            for line in record.linea_ids:
-                if line.tipo_linea in ('producto', 'medicamento'):
-                    inventario = line.producto_id if line.tipo_linea == 'producto' else line.medicamento_id
-                    if not inventario:
-                        raise ValidationError('Debe seleccionar un producto o medicamento válido')
-                    if inventario.cantidad_stock < line.cantidad:
+            # Validar stock para medicamentos y productos
+            for line in lineas_con_item:
+                if line.tipo_linea in ('medicamento', 'producto') and line.inventario_id:
+                    inv = line.inventario_id
+                    if inv.cantidad_stock < line.cantidad:
                         raise ValidationError(
-                            f"Stock insuficiente para {inventario.name}: disponible {inventario.cantidad_stock}"
+                            f"Stock insuficiente para '{inv.name}': "
+                            f"disponible {inv.cantidad_stock}, solicitado {line.cantidad}"
                         )
-            for line in record.linea_ids:
-                if line.tipo_linea in ('producto', 'medicamento'):
-                    inventario = line.producto_id if line.tipo_linea == 'producto' else line.medicamento_id
-                    inventario.cantidad_stock -= line.cantidad
-            
-            # Construir líneas de la factura contable
-            invoice_lines = []
-            for line in record.linea_ids:
-                invoice_lines.append((0, 0, {
-                    'name': line.descripcion,
-                    'quantity': line.cantidad,
-                    'price_unit': line.precio_unitario,
-                    'tax_ids': [(6, 0, line.impuesto_id.ids)],
-                }))
-            
-            # Crear factura contable (account.move)
-            move_vals = {
-                'move_type': 'out_invoice',
-                'partner_id': record.propietario_id.id,
-                'invoice_date': record.fecha_factura,
-                'ref': f"{record.name} - {record.paciente_id.name if record.paciente_id else 'General'}",
-                'invoice_line_ids': invoice_lines,
-            }
-            
-            move = self.env['account.move'].create(move_vals)
-            record.move_id = move
+            # Descontar stock y marcar citas como facturadas
+            for line in lineas_con_item:
+                if line.tipo_linea in ('medicamento', 'producto') and line.inventario_id:
+                    inv = line.inventario_id
+                    inv.cantidad_stock -= line.cantidad
+                if line.tipo_linea == 'cita' and line.cita_id:
+                    line.cita_id.facturada = True
+
             record.estado = 'validado'
-    
+
     def action_cancelar_factura(self):
-        """Cancela la facturación"""
+        """Cancela la factura y libera citas."""
         for record in self:
-            if record.move_id:
-                record.move_id.button_cancel()
+            # Liberar citas
+            for line in record.linea_ids:
+                if line.tipo_linea == 'cita' and line.cita_id:
+                    line.cita_id.facturada = False
             record.estado = 'cancelado'
 
+    def action_importar_receta(self):
+        """Abre el wizard para importar medicamentos de una receta."""
+        self.ensure_one()
+        return {
+            'name': 'Importar desde Receta',
+            'type': 'ir.actions.act_window',
+            'res_model': 'veterinaria.importar.receta.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_facturacion_id': self.id,
+                'default_propietario_id': self.propietario_id.id,
+            }
+        }
+
     def write(self, vals):
-        """Bloquea ediciones cuando la factura esta validada o cancelada."""
         for record in self:
             if record.estado != 'borrador':
                 allowed_fields = {'estado'}
                 if set(vals.keys()) - allowed_fields:
                     raise ValidationError('No se puede editar una factura validada o cancelada')
         return super().write(vals)
-    
+
     @api.model
     def create(self, vals):
-        """Override create para validaciones y generar nombre"""
         record = super().create(vals)
         if not record.name or record.name == 'Factura':
             record.name = f"FAC-{record.id:05d}"
