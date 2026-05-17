@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
+import base64
 from odoo import http, fields
 from odoo.http import request
-from odoo.addons.portal.controllers.portal import CustomerPortal
+from odoo.addons.portal.controllers.portal import CustomerPortal, get_error
 
 
 class VeterinariaPortal(CustomerPortal):
@@ -11,6 +12,66 @@ class VeterinariaPortal(CustomerPortal):
     secciones para mascotas, citas, historia clínica, recetas, facturas y
     el carnet de vacunación (PDF descargable).
     """
+
+    # ------------------------------------------------------------------
+    # Permitir actualizar la foto de perfil desde /my/account
+    # ------------------------------------------------------------------
+    def details_form_validate(self, data, partner_creation=False):
+        """No validamos el campo image_1920 — solo lo dejamos pasar."""
+        error, error_message = super().details_form_validate(data, partner_creation)
+        # image_1920 viene como FileStorage; lo manejamos en account_update
+        return error, error_message
+
+    @http.route(['/my/account'], type='http', auth='user', website=True)
+    def account(self, redirect=None, **post):
+        """Override de la página /my/account para procesar la foto de perfil."""
+        if post and request.httprequest.method == 'POST':
+            # Procesar foto si viene en el form
+            image_file = post.get('image_1920')
+            # FileStorage de werkzeug expone .filename y .read()
+            if image_file and hasattr(image_file, 'read'):
+                content = image_file.read()
+                if content:
+                    request.env.user.partner_id.sudo().write({
+                        'image_1920': base64.b64encode(content),
+                    })
+            # Eliminar la clave para no romper la validación estándar
+            post.pop('image_1920', None)
+        return super().account(redirect=redirect, **post)
+
+    # ------------------------------------------------------------------
+    # /my/security simplificado para Cliente Veterinaria
+    # ------------------------------------------------------------------
+    @http.route('/my/security', type='http', auth='user', website=True,
+                methods=['GET', 'POST'])
+    def security(self, **post):
+        """Si el user es Cliente Vet, renderiza nuestra versión simplificada
+        del template (solo cambio password + eliminar cuenta).
+        Para todos los demás, usa la página estándar de Odoo."""
+        if not request.env.user.has_group('veterinaria_core.group_veterinaria_cliente'):
+            return super().security(**post)
+
+        values = self._prepare_portal_layout_values()
+        values['get_error'] = get_error
+        values['errors'] = {}
+        values['success'] = {}
+        values['open_deactivate_modal'] = False
+
+        if request.httprequest.method == 'POST':
+            values.update(self._update_password(
+                (post.get('old') or '').strip(),
+                (post.get('new1') or '').strip(),
+                (post.get('new2') or '').strip(),
+            ))
+
+        return request.render(
+            'veterinaria_core.portal_my_security_simple',
+            values,
+            headers={
+                'X-Frame-Options': 'SAMEORIGIN',
+                'Content-Security-Policy': "frame-ancestors 'self'",
+            },
+        )
 
     # ------------------------------------------------------------------
     # Home portal: contadores en /my
