@@ -1,22 +1,27 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Veterinaria Core',
-    'version': '18.0.1.0.0',
+    'version': '18.0.1.3.0',
     'category': 'Veterinary',
-    'summary': 'Módulo base para la gestión de veterinaria',
+    'summary': 'Módulo base para la gestión de veterinaria, incluyendo portal del cliente',
     'description': """
         Módulo principal para VitalPet
         - Gestión de mascotas (pacientes)
         - Gestión de historia clínica
         - Gestión de medicamentos
         - Integración con Calendario, Inventario, Ventas, Contabilidad y CRM
+        - Portal del cliente: mascotas, citas, historia, facturas, recetas
+          y carnet de vacunación descargable en PDF
     """,
     'author': 'VitalPet Team',
     'website': 'https://www.vitalpet.com',
     'license': 'LGPL-3',
     'depends': [
         'base',
-        'mail',      # Agregado: Necesario para el chatter (mail.thread y mail.activity.mixin)
+        'mail',
+        'web',
+        'portal',
+        'auth_signup',  # permite enviar invitación por email al crear el portal user
         'sale',
         'account',
         'calendar',
@@ -26,11 +31,13 @@
     'data': [
         # Security (groups must load before ACL)
         'security/veterinaria_security.xml',
+        'security/portal_security.xml',
         'security/ir.model.access.csv',
         # Data
         'data/mail_templates.xml',
         'data/cron_recordatorio.xml',
         # Views
+        'views/credential_wizard_view.xml',
         'views/propietario_view.xml',
         'views/especialidad_view.xml',
         'views/veterinario_view.xml',
@@ -46,7 +53,14 @@
         'views/facturacion_linea_view.xml',
         'views/facturacion_wizard_view.xml',
         'views/documento_venta_view.xml',
+        # Menús base (deben cargarse antes de vacunas/recetas porque éstas anidan menús bajo ellos)
         'views/menu.xml',
+        'views/vacuna_view.xml',
+        'views/receta_view.xml',
+        # Portal templates (deben cargarse tras los menús)
+        'views/portal_templates.xml',
+        # Reports
+        'reports/carnet_vacunas_report.xml',
     ],
     'installable': True,
     'auto_install': False,
