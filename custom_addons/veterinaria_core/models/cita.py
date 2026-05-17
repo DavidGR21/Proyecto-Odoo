@@ -31,19 +31,6 @@ class Cita(models.Model):
     duracion = fields.Selection([
         ('0.5', '30 minutos'),
         ('1.0', '1 hora'),
-        ('1.5', '1 hora 30 min'),
-        ('2.0', '2 horas'),
-        ('3.0', '3 horas'),
-        ('4.0', '4 horas'),
-        ('8.0', '8 horas'),
-        ('12.0', '12 horas'),
-        # Fallbacks de cadena para compatibilidad con vistas de calendario/legacy
-        ('1', '1 hora'),
-        ('2', '2 horas'),
-        ('3', '3 horas'),
-        ('4', '4 horas'),
-        ('8', '8 horas'),
-        ('12', '12 horas'),
     ], string='Duración', default='1.0')
     duracion_horas = fields.Float('Duración (horas)', compute='_compute_duracion_horas', store=True)
     
@@ -313,7 +300,7 @@ class Cita(models.Model):
             try:
                 fl_val = float(val)
                 str_val = str(fl_val)
-                if str_val in ['0.5', '1.0', '1.5', '2.0', '3.0', '4.0', '8.0', '12.0']:
+                if str_val in ['0.5', '1.0']:
                     res['duracion'] = str_val
             except Exception:
                 pass
@@ -325,7 +312,7 @@ class Cita(models.Model):
             try:
                 fl_val = float(val)
                 str_val = str(fl_val)
-                if str_val in ['0.5', '1.0', '1.5', '2.0', '3.0', '4.0', '8.0', '12.0']:
+                if str_val in ['0.5', '1.0']:
                     values['duracion'] = str_val
             except Exception:
                 pass
@@ -339,7 +326,7 @@ class Cita(models.Model):
                 try:
                     fl_val = float(vals['duracion'])
                     str_val = str(fl_val)
-                    if str_val in ['0.5', '1.0', '1.5', '2.0', '3.0', '4.0', '8.0', '12.0']:
+                    if str_val in ['0.5', '1.0']:
                         vals['duracion'] = str_val
                 except Exception:
                     pass
@@ -367,7 +354,7 @@ class Cita(models.Model):
             try:
                 fl_val = float(vals['duracion'])
                 str_val = str(fl_val)
-                if str_val in ['0.5', '1.0', '1.5', '2.0', '3.0', '4.0', '8.0', '12.0']:
+                if str_val in ['0.5', '1.0']:
                     vals['duracion'] = str_val
             except Exception:
                 pass
