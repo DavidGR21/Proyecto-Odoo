@@ -36,7 +36,7 @@
                     <div class="row">
                         <div class="col-3 text-center">
                             <t t-if="doc.foto">
-                                <img t-attf-src="/web/image/veterinaria.paciente/#{doc.id}/foto"
+                                <img t-att-src="image_data_uri(doc.foto)"
                                      class="vet-pet-photo"/>
                             </t>
                             <t t-else="">
