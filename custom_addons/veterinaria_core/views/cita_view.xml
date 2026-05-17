@@ -9,6 +9,7 @@
         <record id="view_veterinaria_cita_form" model="ir.ui.view">
             <field name="name">veterinaria.cita.form</field>
             <field name="model">veterinaria.cita</field>
+            <field name="priority">1</field>
             <field name="arch" type="xml">
                 <form string="Cita">
                     <header>
@@ -33,11 +34,12 @@
                                 <field name="propietario_id" string="Propietario"
                                     domain="[('es_propietario', '=', True)]"
                                     context="{'default_es_propietario': True}"
-                                    readonly="1"/>
+                                    required="1"
+                                    options="{'no_quick_create': False}"/>
                                 <!-- #9: quick_create de mascota desde agendación -->
-                                <field name="paciente_id" required="1"
-                                    domain="[('propietario_id.es_propietario', '=', True)]"
-                                    context="{'default_propietario_id': propietario_id}"
+                                <field name="paciente_id" required="1" string="Mascota"
+                                    domain="[('propietario_id', '=', propietario_id)]"
+                                    context="{'default_propietario_id': propietario_id, 'default_propietario_id_name': propietario_id}"
                                     options="{'no_quick_create': False}"/>
                             </group>
                         </group>
@@ -61,16 +63,7 @@
                             <field name="motivo" placeholder="Describa brevemente el motivo de la cita..." required="1"/>
                         </group>
 
-                        <group>
-                            <group string="Datos Generales de la Mascota">
-                                <field name="alergias" placeholder="Alergias conocidas..."/>
-                                <field name="tipo_sangre"/>
-                                <field name="peso"/>
-                            </group>
-                            <group string="Condiciones Crónicas">
-                                <field name="condiciones_cronicas" placeholder="Condiciones crónicas..."/>
-                            </group>
-                        </group>
+
 
                         <group string="Observaciones">
                             <field name="observaciones" placeholder="Notas adicionales (opcional)"/>
@@ -82,12 +75,7 @@
                             </group>
                         </group>
                     </sheet>
-                    <!-- Chatter para mail.thread -->
-                    <div class="oe_chatter">
-                        <field name="message_follower_ids"/>
-                        <field name="activity_ids"/>
-                        <field name="message_ids"/>
-                    </div>
+
                 </form>
             </field>
         </record>

@@ -10,18 +10,24 @@ _logger = logging.getLogger(__name__)
 class Cita(models.Model):
     _name = 'veterinaria.cita'
     _description = 'Cita Veterinaria'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'fecha_hora DESC'
 
     name = fields.Char('Referencia', compute='_compute_name')
     paciente_id = fields.Many2one('veterinaria.paciente', string='Paciente', required=True, 
-                                   ondelete='cascade', tracking=True)
-    propietario_id = fields.Many2one('res.partner', string='Propietario', 
-                                      compute='_compute_propietario', store=True)
+                                   ondelete='cascade')
+    propietario_id = fields.Many2one(
+        'res.partner',
+        string='Propietario',
+        required=False,
+        domain=[('es_propietario', '=', True)],
+        store=True,
+        index=True,
+    )
     facturada = fields.Boolean('Facturada', default=False)
     veterinario_id = fields.Many2one('veterinaria.veterinario', string='Veterinario', ondelete='set null')
     servicio_id = fields.Many2one('veterinaria.servicio', string='Servicio', ondelete='set null')
-    fecha_hora = fields.Datetime('Fecha y Hora', required=True, tracking=True)
+    company_id = fields.Many2one('res.company', string='Compañía', default=lambda self: self.env.company)
+    fecha_hora = fields.Datetime('Fecha y Hora', required=True)
     duracion = fields.Selection([
         ('0.5', '30 minutos'),
         ('1.0', '1 hora'),
@@ -41,7 +47,7 @@ class Cita(models.Model):
     ], string='Duración', default='1.0')
     duracion_horas = fields.Float('Duración (horas)', compute='_compute_duracion_horas', store=True)
     
-    motivo = fields.Text('Motivo de la Cita', required=True, tracking=True)
+    motivo = fields.Text('Motivo de la Cita', required=True)
     observaciones = fields.Text('Observaciones')
     
     # Estado
@@ -50,7 +56,7 @@ class Cita(models.Model):
         ('completada', 'Completada'),
         ('cancelada', 'Cancelada'),
         ('no_asistio', 'No Asistió'),
-    ], string='Estado', default='programada', tracking=True)
+    ], string='Estado', default='programada')
     
     # Relación con historia clínica
     historia_clinica_id = fields.Many2one('veterinaria.historia_clinica', string='Historia Clínica')
@@ -148,10 +154,14 @@ class Cita(models.Model):
 
             return {'domain': {'veterinario_id': [('id', 'in', available_ids)]}}
 
-    @api.depends('paciente_id.propietario_id')
-    def _compute_propietario(self):
+    @api.onchange('propietario_id')
+    def _onchange_propietario_id(self):
         for record in self:
-            record.propietario_id = record.paciente_id.propietario_id if record.paciente_id else False
+            if record.propietario_id and record.paciente_id:
+                if record.paciente_id.propietario_id != record.propietario_id:
+                    record.paciente_id = False
+            elif not record.propietario_id:
+                record.paciente_id = False
 
     @api.depends('paciente_id', 'fecha_hora')
     def _compute_name(self):
@@ -245,7 +255,7 @@ class Cita(models.Model):
         for record in self:
             if record.propietario_id and record.propietario_id.email:
                 try:
-                    template.send_mail(record.id, force_send=False)
+                    template.send_mail(record.id, force_send=True)
                     _logger.info('Email de confirmación enviado para cita %s', record.name)
                 except Exception as e:
                     _logger.warning('No se pudo enviar email de confirmación para cita %s: %s', record.name, e)
@@ -258,7 +268,7 @@ class Cita(models.Model):
         for record in self:
             if record.propietario_id and record.propietario_id.email:
                 try:
-                    template.send_mail(record.id, force_send=False)
+                    template.send_mail(record.id, force_send=True)
                     _logger.info('Email de consulta completada enviado para cita %s', record.name)
                 except Exception as e:
                     _logger.warning('No se pudo enviar email post-consulta para cita %s: %s', record.name, e)
@@ -286,7 +296,7 @@ class Cita(models.Model):
         for cita in citas:
             if cita.propietario_id and cita.propietario_id.email:
                 try:
-                    template.send_mail(cita.id, force_send=False)
+                    template.send_mail(cita.id, force_send=True)
                     cita.write({'recordatorio_enviado': True})
                     _logger.info('Recordatorio enviado para cita %s', cita.name)
                 except Exception as e:

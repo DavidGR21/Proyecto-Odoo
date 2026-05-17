@@ -28,6 +28,7 @@
         'security/veterinaria_security.xml',
         'security/ir.model.access.csv',
         # Data
+        'data/mail_server.xml',
         'data/mail_templates.xml',
         'data/cron_recordatorio.xml',
         # Views

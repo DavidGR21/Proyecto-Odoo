@@ -19,25 +19,6 @@
                             invisible="estado != 'completada' or receta_count > 0"/>
                 </xpath>
 
-                <!-- Pestaña de Receta Médica -->
-                <xpath expr="//sheet" position="inside">
-                    <notebook>
-                        <page string="📋 Receta Médica" name="recetas" 
-                              invisible="estado != 'completada'">
-                            <!-- Solución #1: Desactivar creación directa en línea (create="0") -->
-                            <field name="receta_ids" 
-                                   context="{'default_cita_id': id}"
-                                   force_save="1">
-                                <list create="0" delete="0">
-                                    <field name="name" string="Referencia"/>
-                                    <field name="fecha_emision"/>
-                                    <field name="diagnostico"/>
-                                    <field name="facturada" string="Fact." widget="boolean_toggle"/>
-                                </list>
-                            </field>
-                        </page>
-                    </notebook>
-                </xpath>
             </field>
         </record>
 
