@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_veterinaria_receta_list" model="ir.ui.view">
+            <field name="name">veterinaria.receta.list</field>
+            <field name="model">veterinaria.receta</field>
+            <field name="arch" type="xml">
+                <list string="Recetas">
+                    <field name="fecha"/>
+                    <field name="paciente_id"/>
+                    <field name="medicamento_id"/>
+                    <field name="dosis"/>
+                    <field name="frecuencia"/>
+                    <field name="duracion_dias"/>
+                    <field name="veterinario_id"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_veterinaria_receta_form" model="ir.ui.view">
+            <field name="name">veterinaria.receta.form</field>
+            <field name="model">veterinaria.receta</field>
+            <field name="arch" type="xml">
+                <form string="Receta">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="historia_clinica_id"/>
+                                <field name="paciente_id" readonly="1"/>
+                                <field name="cita_id"/>
+                                <field name="veterinario_id"/>
+                            </group>
+                            <group>
+                                <field name="medicamento_id"/>
+                                <field name="dosis"/>
+                                <field name="frecuencia"/>
+                                <field name="duracion_dias"/>
+                                <field name="fecha"/>
+                            </group>
+                        </group>
+                        <group string="Indicaciones">
+                            <field name="observaciones" nolabel="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_veterinaria_receta" model="ir.actions.act_window">
+            <field name="name">Recetas Médicas</field>
+            <field name="res_model">veterinaria.receta</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+        <menuitem id="menu_veterinaria_recetas" name="Recetas"
+            parent="menu_veterinaria_gestion" sequence="28"
+            action="action_veterinaria_receta"
+            groups="group_veterinaria_veterinario"/>
+    </data>
+</odoo>

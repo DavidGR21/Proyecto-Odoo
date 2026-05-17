@@ -1,0 +1,481 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- =====================================================
+         Inyectar tarjetas en el dashboard /my/home
+         Hereda portal.portal_my_home y añade entradas usando
+         el helper estándar portal.portal_docs_entry
+         ===================================================== -->
+    <template id="portal_my_home_veterinaria" name="Veterinaria entries"
+              inherit_id="portal.portal_my_home" customize_show="True" priority="40">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="icon" t-value="'/veterinaria_core/static/src/img/paw.svg'"/>
+                <t t-set="title">Mis Mascotas</t>
+                <t t-set="url" t-value="'/my/pets'"/>
+                <t t-set="text">Listado de mis mascotas registradas</t>
+                <t t-set="placeholder_count" t-value="'pet_count'"/>
+            </t>
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">Mis Citas</t>
+                <t t-set="url" t-value="'/my/appointments'"/>
+                <t t-set="text">Próximas citas y citas pasadas</t>
+                <t t-set="placeholder_count" t-value="'appointment_count'"/>
+            </t>
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">Historia Clínica</t>
+                <t t-set="url" t-value="'/my/medical_records'"/>
+                <t t-set="text">Expedientes médicos de mis mascotas</t>
+            </t>
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">Recetas Médicas</t>
+                <t t-set="url" t-value="'/my/prescriptions'"/>
+                <t t-set="text">Medicamentos recetados a mis mascotas</t>
+                <t t-set="placeholder_count" t-value="'prescription_count'"/>
+            </t>
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">Mis Facturas Veterinarias</t>
+                <t t-set="url" t-value="'/my/invoices_vet'"/>
+                <t t-set="text">Facturas emitidas por servicios y productos</t>
+                <t t-set="placeholder_count" t-value="'invoice_count_vet'"/>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- =====================================================
+         Sidebar / breadcrumbs: añadimos enlace estable
+         ===================================================== -->
+    <template id="portal_breadcrumbs_veterinaria" name="Veterinaria breadcrumbs"
+              inherit_id="portal.portal_breadcrumbs" priority="40">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+            <li t-if="page_name == 'pets'" t-attf-class="breadcrumb-item active">Mis mascotas</li>
+            <li t-if="page_name == 'pet_detail'" t-attf-class="breadcrumb-item">
+                <a href="/my/pets">Mis mascotas</a>
+            </li>
+            <li t-if="page_name == 'pet_detail'" t-attf-class="breadcrumb-item active">
+                <t t-out="pet.name"/>
+            </li>
+            <li t-if="page_name == 'appointments'" t-attf-class="breadcrumb-item active">Mis citas</li>
+            <li t-if="page_name == 'medical_records'" t-attf-class="breadcrumb-item active">Historia clínica</li>
+            <li t-if="page_name == 'prescriptions'" t-attf-class="breadcrumb-item active">Recetas</li>
+            <li t-if="page_name == 'invoices_vet'" t-attf-class="breadcrumb-item active">Facturas veterinarias</li>
+        </xpath>
+    </template>
+
+    <!-- =====================================================
+         /my/pets — Listado de mascotas
+         ===================================================== -->
+    <template id="portal_my_pets" name="Mis Mascotas">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Mis Mascotas</t>
+            </t>
+            <t t-if="not pets">
+                <div class="alert alert-info" role="alert">
+                    Aún no tiene mascotas registradas. Contacte a la clínica para registrar a su primera mascota.
+                </div>
+            </t>
+            <t t-if="pets">
+                <div class="row mt-3">
+                    <t t-foreach="pets" t-as="pet">
+                        <div class="col-md-4 col-sm-6 mb-4">
+                            <div class="card h-100 shadow-sm">
+                                <div class="text-center pt-3">
+                                    <t t-if="pet.foto">
+                                        <img t-attf-src="/web/image/veterinaria.paciente/#{pet.id}/foto"
+                                             class="rounded-circle"
+                                             style="width:120px;height:120px;object-fit:cover;"
+                                             alt="Foto de la mascota"/>
+                                    </t>
+                                    <t t-else="">
+                                        <span class="fa fa-paw fa-5x text-secondary"/>
+                                    </t>
+                                </div>
+                                <div class="card-body text-center">
+                                    <h5 class="card-title mb-1">
+                                        <a t-attf-href="/my/pets/#{pet.id}" t-out="pet.name"/>
+                                    </h5>
+                                    <p class="text-muted small mb-1">
+                                        <t t-out="dict(pet._fields['especie'].selection).get(pet.especie, '')"/>
+                                        <t t-if="pet.raza"> · <t t-out="pet.raza"/></t>
+                                    </p>
+                                    <p class="small mb-2">
+                                        <span class="badge bg-info" t-out="dict(pet._fields['estado_vacunacion'].selection).get(pet.estado_vacunacion, '')"/>
+                                    </p>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a t-attf-href="/my/pets/#{pet.id}" class="btn btn-outline-primary">
+                                            <i class="fa fa-eye"/> Ver
+                                        </a>
+                                        <a t-attf-href="/my/vaccination_card/#{pet.id}" class="btn btn-outline-success">
+                                            <i class="fa fa-file-pdf-o"/> Carnet
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- =====================================================
+         /my/pets/<id> — Detalle de la mascota
+         ===================================================== -->
+    <template id="portal_my_pet_detail" name="Detalle de Mascota">
+        <t t-call="portal.portal_layout">
+            <div class="card mt-3 shadow-sm">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 text-center">
+                            <t t-if="pet.foto">
+                                <img t-attf-src="/web/image/veterinaria.paciente/#{pet.id}/foto"
+                                     class="rounded-circle"
+                                     style="width:150px;height:150px;object-fit:cover;"
+                                     alt="Foto"/>
+                            </t>
+                            <t t-else="">
+                                <span class="fa fa-paw fa-5x text-secondary"/>
+                            </t>
+                            <div class="mt-3">
+                                <a t-attf-href="/my/vaccination_card/#{pet.id}" class="btn btn-success btn-sm">
+                                    <i class="fa fa-file-pdf-o"/> Descargar Carnet
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <h3 t-out="pet.name"/>
+                            <table class="table table-sm mt-3">
+                                <tr><th>Especie</th><td t-out="dict(pet._fields['especie'].selection).get(pet.especie, '')"/></tr>
+                                <tr><th>Raza</th><td t-out="pet.raza or '-'"/></tr>
+                                <tr><th>Fecha de nacimiento</th><td t-out="pet.fecha_nacimiento or '-'"/></tr>
+                                <tr><th>Peso</th><td><t t-out="pet.peso or 0"/> kg</td></tr>
+                                <tr><th>Microchip</th><td t-out="pet.microchip or '-'"/></tr>
+                                <tr><th>Estado de vacunación</th>
+                                    <td><span class="badge bg-info" t-out="dict(pet._fields['estado_vacunacion'].selection).get(pet.estado_vacunacion, '')"/></td>
+                                </tr>
+                                <tr><th>Alergias</th><td t-out="pet.alergias or 'Ninguna registrada'"/></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Historia clínica de esta mascota -->
+            <div class="card mt-4 shadow-sm">
+                <div class="card-header"><strong>Historia Clínica</strong></div>
+                <div class="card-body p-0">
+                    <t t-if="not pet.historia_clinica_ids">
+                        <div class="p-3 text-muted">Sin historia clínica registrada.</div>
+                    </t>
+                    <t t-if="pet.historia_clinica_ids">
+                        <table class="table table-sm mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Tipo sangre</th>
+                                    <th>Peso</th>
+                                    <th>Observaciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="pet.historia_clinica_ids" t-as="h">
+                                    <td t-out="h.fecha_apertura"/>
+                                    <td t-out="dict(h._fields['tipo_sangre'].selection).get(h.tipo_sangre, '-')"/>
+                                    <td><t t-out="h.peso or 0"/> kg</td>
+                                    <td t-out="h.observaciones or '-'"/>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </t>
+                </div>
+            </div>
+
+            <!-- Vacunas aplicadas -->
+            <div class="card mt-4 shadow-sm">
+                <div class="card-header"><strong>Vacunas aplicadas</strong></div>
+                <div class="card-body p-0">
+                    <t t-if="not pet.vacuna_aplicada_ids">
+                        <div class="p-3 text-muted">No hay vacunas registradas.</div>
+                    </t>
+                    <t t-if="pet.vacuna_aplicada_ids">
+                        <table class="table table-sm mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Vacuna</th>
+                                    <th>Veterinario</th>
+                                    <th>Lote</th>
+                                    <th>Próxima dosis</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="pet.vacuna_aplicada_ids" t-as="v">
+                                    <td t-out="v.fecha_aplicacion"/>
+                                    <td t-out="v.vacuna_id.name"/>
+                                    <td t-out="v.veterinario_id.name or '-'"/>
+                                    <td t-out="v.lote or '-'"/>
+                                    <td t-out="v.proxima_dosis or '-'"/>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </t>
+                </div>
+            </div>
+
+            <!-- Recetas -->
+            <div class="card mt-4 mb-5 shadow-sm">
+                <div class="card-header"><strong>Recetas</strong></div>
+                <div class="card-body p-0">
+                    <t t-if="not pet.receta_ids">
+                        <div class="p-3 text-muted">No hay recetas registradas.</div>
+                    </t>
+                    <t t-if="pet.receta_ids">
+                        <table class="table table-sm mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Medicamento</th>
+                                    <th>Dosis</th>
+                                    <th>Frecuencia</th>
+                                    <th>Duración</th>
+                                    <th>Veterinario</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="pet.receta_ids" t-as="r">
+                                    <td t-out="r.fecha"/>
+                                    <td t-out="r.medicamento_id.name"/>
+                                    <td t-out="r.dosis or '-'"/>
+                                    <td t-out="r.frecuencia or '-'"/>
+                                    <td><t t-out="r.duracion_dias or 0"/> días</td>
+                                    <td t-out="r.veterinario_id.name or '-'"/>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </t>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- =====================================================
+         /my/appointments — Citas pasadas y futuras
+         ===================================================== -->
+    <template id="portal_my_appointments" name="Mis Citas">
+        <t t-call="portal.portal_layout">
+            <h3 class="mt-3">Mis Citas</h3>
+
+            <h5 class="mt-4">Próximas citas</h5>
+            <t t-if="not upcoming">
+                <div class="alert alert-light">No tiene citas programadas.</div>
+            </t>
+            <t t-if="upcoming">
+                <table class="table table-striped table-sm">
+                    <thead>
+                        <tr>
+                            <th>Fecha y hora</th>
+                            <th>Mascota</th>
+                            <th>Veterinario</th>
+                            <th>Servicio</th>
+                            <th>Motivo</th>
+                            <th>Duración</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="upcoming" t-as="c">
+                            <td t-out="c.fecha_hora"/>
+                            <td><a t-attf-href="/my/pets/#{c.paciente_id.id}" t-out="c.paciente_id.name"/></td>
+                            <td t-out="c.veterinario_id.name or '-'"/>
+                            <td t-out="c.servicio_id.name or '-'"/>
+                            <td t-out="c.motivo"/>
+                            <td><t t-out="c.duracion_horas"/> h</td>
+                            <td>
+                                <span class="badge bg-primary"
+                                      t-out="dict(c._fields['estado'].selection).get(c.estado, '')"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </t>
+
+            <h5 class="mt-4">Citas pasadas</h5>
+            <t t-if="not past">
+                <div class="alert alert-light">Sin citas pasadas.</div>
+            </t>
+            <t t-if="past">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Mascota</th>
+                            <th>Veterinario</th>
+                            <th>Motivo</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="past" t-as="c">
+                            <td t-out="c.fecha_hora"/>
+                            <td t-out="c.paciente_id.name"/>
+                            <td t-out="c.veterinario_id.name or '-'"/>
+                            <td t-out="c.motivo"/>
+                            <td>
+                                <span t-attf-class="badge bg-#{ 'success' if c.estado=='completada' else ('danger' if c.estado in ('cancelada','no_asistio') else 'secondary') }"
+                                      t-out="dict(c._fields['estado'].selection).get(c.estado, '')"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </t>
+        </t>
+    </template>
+
+    <!-- =====================================================
+         /my/medical_records — Historia clínica
+         ===================================================== -->
+    <template id="portal_my_medical_records" name="Historia Clínica">
+        <t t-call="portal.portal_layout">
+            <h3 class="mt-3">Historia Clínica</h3>
+            <t t-if="not historias">
+                <div class="alert alert-light">No hay registros de historia clínica.</div>
+            </t>
+            <t t-if="historias">
+                <div class="accordion mt-3" id="accordionHistoria">
+                    <t t-foreach="historias" t-as="h">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" t-attf-id="heading#{h.id}">
+                                <button class="accordion-button collapsed" type="button"
+                                        data-bs-toggle="collapse"
+                                        t-attf-data-bs-target="#collapse#{h.id}"
+                                        aria-expanded="false">
+                                    <strong t-out="h.paciente_id.name"/> -
+                                    <span class="ms-2 text-muted" t-out="h.fecha_apertura"/>
+                                </button>
+                            </h2>
+                            <div t-attf-id="collapse#{h.id}" class="accordion-collapse collapse"
+                                 data-bs-parent="#accordionHistoria">
+                                <div class="accordion-body">
+                                    <p><strong>Alergias:</strong> <t t-out="h.alergias or '-'"/></p>
+                                    <p><strong>Tipo de sangre:</strong>
+                                        <t t-out="dict(h._fields['tipo_sangre'].selection).get(h.tipo_sangre, '-')"/>
+                                    </p>
+                                    <p><strong>Peso:</strong> <t t-out="h.peso or 0"/> kg</p>
+                                    <p><strong>Condiciones crónicas:</strong> <t t-out="h.condiciones_cronicas or '-'"/></p>
+                                    <p><strong>Observaciones:</strong> <t t-out="h.observaciones or '-'"/></p>
+
+                                    <t t-if="h.cita_ids">
+                                        <h6 class="mt-3">Consultas asociadas</h6>
+                                        <ul>
+                                            <li t-foreach="h.cita_ids" t-as="c">
+                                                <t t-out="c.fecha_hora"/> -
+                                                Veterinario: <t t-out="c.veterinario_id.name or '-'"/> -
+                                                Motivo: <t t-out="c.motivo"/>
+                                            </li>
+                                        </ul>
+                                    </t>
+
+                                    <t t-if="h.receta_ids">
+                                        <h6 class="mt-3">Recetas emitidas</h6>
+                                        <ul>
+                                            <li t-foreach="h.receta_ids" t-as="r">
+                                                <t t-out="r.medicamento_id.name"/> -
+                                                <t t-out="r.dosis or ''"/> -
+                                                <t t-out="r.frecuencia or ''"/>
+                                                (<t t-out="r.duracion_dias or 0"/> días)
+                                            </li>
+                                        </ul>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- =====================================================
+         /my/prescriptions — Recetas
+         ===================================================== -->
+    <template id="portal_my_prescriptions" name="Recetas Médicas">
+        <t t-call="portal.portal_layout">
+            <h3 class="mt-3">Recetas Médicas</h3>
+            <t t-if="not recetas">
+                <div class="alert alert-light">No tiene recetas registradas.</div>
+            </t>
+            <t t-if="recetas">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Mascota</th>
+                            <th>Medicamento</th>
+                            <th>Dosis</th>
+                            <th>Frecuencia</th>
+                            <th>Duración</th>
+                            <th>Veterinario</th>
+                            <th>Indicaciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="recetas" t-as="r">
+                            <td t-out="r.fecha"/>
+                            <td t-out="r.paciente_id.name"/>
+                            <td t-out="r.medicamento_id.name"/>
+                            <td t-out="r.dosis or '-'"/>
+                            <td t-out="r.frecuencia or '-'"/>
+                            <td><t t-out="r.duracion_dias or 0"/> días</td>
+                            <td t-out="r.veterinario_id.name or '-'"/>
+                            <td t-out="r.observaciones or '-'"/>
+                        </tr>
+                    </tbody>
+                </table>
+            </t>
+        </t>
+    </template>
+
+    <!-- =====================================================
+         /my/invoices_vet — Facturas veterinarias
+         ===================================================== -->
+    <template id="portal_my_vet_invoices" name="Mis Facturas Veterinarias">
+        <t t-call="portal.portal_layout">
+            <h3 class="mt-3">Mis Facturas</h3>
+            <t t-if="not facturas">
+                <div class="alert alert-light">No tiene facturas registradas.</div>
+            </t>
+            <t t-if="facturas">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Nº</th>
+                            <th>Fecha</th>
+                            <th>Mascota</th>
+                            <th>Subtotal</th>
+                            <th>Impuestos</th>
+                            <th>Total</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="facturas" t-as="f">
+                            <td t-out="f.name"/>
+                            <td t-out="f.fecha_factura"/>
+                            <td t-out="f.paciente_id.name or '-'"/>
+                            <td t-out="'%.2f' % (f.subtotal or 0)"/>
+                            <td t-out="'%.2f' % (f.impuesto_total or 0)"/>
+                            <td><strong t-out="'%.2f' % (f.total or 0)"/></td>
+                            <td>
+                                <span t-attf-class="badge bg-#{ 'success' if f.estado=='validado' else ('danger' if f.estado=='cancelado' else 'secondary') }"
+                                      t-out="dict(f._fields['estado'].selection).get(f.estado, '')"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </t>
+        </t>
+    </template>
+
+</odoo>
