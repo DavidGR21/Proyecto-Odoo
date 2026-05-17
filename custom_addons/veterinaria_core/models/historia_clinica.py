@@ -21,9 +21,13 @@ class HistoriaClinica(models.Model):
         ('desconocido', 'Desconocido'),
     ]
 
-    paciente_id = fields.Many2one('veterinaria.paciente', string='Paciente', required=True, 
+    paciente_id = fields.Many2one('veterinaria.paciente', string='Paciente', required=True,
                                    ondelete='cascade', tracking=True)
     cita_ids = fields.One2many('veterinaria.cita', 'historia_clinica_id', string='Citas')
+    receta_ids = fields.One2many('veterinaria.receta', 'historia_clinica_id', string='Recetas')
+    # Relación inversa para record rules del portal
+    propietario_id = fields.Many2one(related='paciente_id.propietario_id',
+                                      store=True, readonly=True)
     fecha_apertura = fields.Datetime('Fecha de Apertura', default=fields.Datetime.now, required=True, tracking=True)
     activa = fields.Boolean('Activa', default=True, tracking=True)
     alergias = fields.Text('Alergias')

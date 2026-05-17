@@ -2,7 +2,7 @@
 <odoo>
     <data>
         <!-- ============================================================ -->
-        <!-- Extensión de la vista de Cita para gestionar Recetas        -->
+        <!-- Extensión de la vista de Cita para gestionar Recetas         -->
         <!-- ============================================================ -->
         <record id="view_veterinaria_cita_form_receta_extension" model="ir.ui.view">
             <field name="name">veterinaria.cita.form.receta.extension</field>
@@ -18,12 +18,11 @@
                             class="btn btn-primary"
                             invisible="estado != 'completada' or receta_count > 0"/>
                 </xpath>
-
             </field>
         </record>
 
         <!-- ============================================================ -->
-        <!-- Vista Formulario de Receta (Detalle)                        -->
+        <!-- Vista Formulario de Receta (Detalle)                         -->
         <!-- ============================================================ -->
         <record id="view_veterinaria_receta_form" model="ir.ui.view">
             <field name="name">veterinaria.receta.form</field>
@@ -60,9 +59,9 @@
                             <page string="💊 Tratamiento" name="medicamentos">
                                 <field name="linea_ids" readonly="facturada">
                                     <!-- Bloqueo dinámico de edición en la lista -->
-                                    <list string="Medicamentos" 
-                                          create="not facturada" 
-                                          delete="not facturada" 
+                                    <list string="Medicamentos"
+                                          create="not facturada"
+                                          delete="not facturada"
                                           edit="not facturada">
                                         <field name="nombre_medicamento_display" string="Medicamento"/>
                                         <field name="dosis" string="Dosis"/>
@@ -76,11 +75,11 @@
                                         <group>
                                             <group string="Identificación del Medicamento">
                                                 <field name="tipo_origen" widget="radio" options="{'horizontal': true}"/>
-                                                <field name="medicamento_id" 
+                                                <field name="medicamento_id"
                                                        string="Medicamento (Inventario)"
                                                        invisible="tipo_origen != 'inventario'"
                                                        options="{'no_create': True}"/>
-                                                <field name="medicamento_texto" 
+                                                <field name="medicamento_texto"
                                                        string="Medicamento (Exterior)"
                                                        invisible="tipo_origen == 'inventario'"/>
                                             </group>
@@ -127,5 +126,10 @@
             <field name="view_mode">list,form</field>
         </record>
 
+        <!-- Menú (proviene de feature/Cliente) -->
+        <menuitem id="menu_veterinaria_recetas" name="Recetas"
+            parent="menu_veterinaria_gestion" sequence="28"
+            action="action_veterinaria_receta"
+            groups="group_veterinaria_veterinario"/>
     </data>
 </odoo>

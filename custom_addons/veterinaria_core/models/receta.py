@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError, UserError
 
@@ -51,6 +52,15 @@ class Receta(models.Model):
         'veterinaria.paciente',
         string='Paciente',
         related='cita_id.paciente_id',
+        store=True,
+        readonly=True,
+    )
+
+    # Propietario (related) — necesario para las record rules del portal del cliente
+    propietario_id = fields.Many2one(
+        'res.partner',
+        string='Propietario',
+        related='paciente_id.propietario_id',
         store=True,
         readonly=True,
     )
@@ -155,6 +165,21 @@ class RecetaLinea(models.Model):
         ondelete='cascade',
     )
 
+    # Propietario (related) — para record rules del portal
+    propietario_id = fields.Many2one(
+        'res.partner',
+        related='receta_id.propietario_id',
+        store=True,
+        readonly=True,
+    )
+
+    paciente_id = fields.Many2one(
+        'veterinaria.paciente',
+        related='receta_id.paciente_id',
+        store=True,
+        readonly=True,
+    )
+
     # ── Origen del Medicamento ─────────────────────────────────────────────────
     tipo_origen = fields.Selection([
         ('inventario', 'De Inventario'),
@@ -227,7 +252,6 @@ class RecetaLinea(models.Model):
                 tomas_por_dia = 24.0 / rec.frecuencia_horas
                 rec.cantidad_total = rec.dosis * tomas_por_dia * rec.duracion_dias
             else:
-                # Evitar división por cero
                 rec.cantidad_total = 0.0
 
     # ── Validaciones ──────────────────────────────────────────────────────────

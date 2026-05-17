@@ -36,6 +36,11 @@ class Paciente(models.Model):
     historia_clinica_ids = fields.One2many('veterinaria.historia_clinica', 'paciente_id', string='Historia Clínica')
     historia_clinica_count = fields.Integer(string='Consultas', compute='_compute_historia_clinica_count')
     cita_count = fields.Integer(string='Citas', compute='_compute_cita_count')
+
+    # Vacunas aplicadas (carnet de vacunación) y recetas asociadas
+    vacuna_aplicada_ids = fields.One2many('veterinaria.vacuna.aplicada', 'paciente_id',
+                                           string='Vacunas aplicadas')
+    receta_ids = fields.One2many('veterinaria.receta', 'paciente_id', string='Recetas')
     
     # Información adicional
     microchip = fields.Char('Número Microchip')

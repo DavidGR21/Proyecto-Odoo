@@ -105,6 +105,28 @@
                                     </list>
                                 </field>
                             </page>
+                            <page string="Carnet de Vacunas" name="vacunas">
+                                <field name="vacuna_aplicada_ids" nolabel="1" mode="list">
+                                    <list editable="bottom">
+                                        <field name="fecha_aplicacion"/>
+                                        <field name="vacuna_id"/>
+                                        <field name="veterinario_id"/>
+                                        <field name="lote"/>
+                                        <field name="proxima_dosis"/>
+                                    </list>
+                                </field>
+                            </page>
+                            <page string="Recetas" name="recetas">
+                                <field name="receta_ids" nolabel="1" readonly="1" mode="list">
+                                    <list>
+                                        <field name="name"/>
+                                        <field name="fecha_emision"/>
+                                        <field name="cita_id"/>
+                                        <field name="veterinario_id"/>
+                                        <field name="facturada" widget="boolean_toggle"/>
+                                    </list>
+                                </field>
+                            </page>
                         </notebook>
                     </sheet>
                 </form>

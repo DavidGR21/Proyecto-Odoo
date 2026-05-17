@@ -69,10 +69,23 @@
                             <group string="Perfil de Dueño">
                                 <field name="es_propietario"/>
                                 <field name="cantidad_mascotas" readonly="1"/>
+                                <field name="tiene_acceso_portal" readonly="1"/>
                             </group>
                             <group string="Observaciones">
                                 <field name="observaciones_veterinaria" placeholder="Notas clínicas o administrativas..."/>
                             </group>
+                        </group>
+
+                        <group>
+                            <button name="action_crear_acceso_portal" type="object"
+                                string="🔐 Crear / Refrescar acceso al Portal"
+                                class="btn btn-secondary"
+                                invisible="not es_propietario or tiene_acceso_portal"
+                                help="Crea un usuario portal para que este cliente acceda con su email. Requiere email."/>
+                            <button name="action_crear_acceso_portal" type="object"
+                                string="✓ Acceso portal activo (re-aplicar grupo Cliente)"
+                                class="btn btn-success"
+                                invisible="not tiene_acceso_portal"/>
                         </group>
                         <group string="Mascotas Asociadas">
                             <field name="paciente_ids" nolabel="1" readonly="1">

@@ -46,6 +46,21 @@
                 Facturación, ventas, configuración y reportes.
             </field>
         </record>
+
+        <!-- ============================================================ -->
+        <!-- Grupo Cliente Portal: dueño de mascota que accede al portal  -->
+        <!-- Hereda base.group_portal para poder loguearse en /web/login   -->
+        <!-- ============================================================ -->
+        <record id="group_veterinaria_cliente" model="res.groups">
+            <field name="name">Cliente Veterinaria (Portal)</field>
+            <field name="category_id" ref="module_veterinaria_category"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_portal'))]"/>
+            <field name="comment">
+                Cliente (propietario de mascotas) con acceso al portal.
+                Solo ve sus propias mascotas, citas, historia clínica,
+                facturas, recetas y carnet de vacunación.
+            </field>
+        </record>
     </data>
 
     <data noupdate="1">

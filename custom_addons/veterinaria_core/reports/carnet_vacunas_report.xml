@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Definición de la acción de reporte (PDF) -->
+    <record id="action_report_carnet_vacunas" model="ir.actions.report">
+        <field name="name">Carnet de Vacunas</field>
+        <field name="model">veterinaria.paciente</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">veterinaria_core.report_carnet_vacunas_template</field>
+        <field name="report_file">veterinaria_core.report_carnet_vacunas_template</field>
+        <field name="print_report_name">'Carnet_Vacunas_%s' % (object.name or '')</field>
+        <field name="binding_model_id" ref="model_veterinaria_paciente"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Plantilla del documento -->
+    <template id="report_carnet_vacunas_document">
+        <t t-call="web.external_layout">
+            <t t-set="doc" t-value="doc.with_context(lang=doc.propietario_id.lang)"/>
+            <div class="page">
+                <style>
+                    .vet-card { border: 2px solid #2E86AB; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+                    .vet-card h2 { color: #2E86AB; margin-bottom: 5px; }
+                    .vet-card .subtitle { color: #555; font-size: 14px; }
+                    .vet-info-row { margin-top: 15px; }
+                    .vet-info-row td { padding: 4px 8px; }
+                    .vet-info-row th { background: #f0f8ff; padding: 4px 8px; text-align: left; width: 35%; }
+                    .vet-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+                    .vet-table th { background: #2E86AB; color: #fff; padding: 8px; font-size: 12px; }
+                    .vet-table td { border: 1px solid #ddd; padding: 6px; font-size: 12px; }
+                    .vet-pet-photo { width: 110px; height: 110px; object-fit: cover; border-radius: 50%; border: 3px solid #2E86AB; }
+                    .vet-empty { color: #999; font-style: italic; padding: 12px; }
+                </style>
+
+                <div class="vet-card">
+                    <div class="row">
+                        <div class="col-3 text-center">
+                            <t t-if="doc.foto">
+                                <img t-att-src="image_data_uri(doc.foto)"
+                                     class="vet-pet-photo"/>
+                            </t>
+                            <t t-else="">
+                                <span class="fa fa-paw fa-4x" style="color:#2E86AB;"/>
+                            </t>
+                        </div>
+                        <div class="col-9">
+                            <h2>🐾 Carnet de Vacunación</h2>
+                            <p class="subtitle">VitalPet - Clínica Veterinaria</p>
+                            <table class="vet-info-row">
+                                <tr><th>Mascota</th><td><strong t-out="doc.name"/></td></tr>
+                                <tr><th>Especie</th>
+                                    <td t-out="dict(doc._fields['especie'].selection).get(doc.especie, '')"/></tr>
+                                <tr><th>Raza</th><td t-out="doc.raza or '-'"/></tr>
+                                <tr><th>Fecha de nacimiento</th><td t-out="doc.fecha_nacimiento or '-'"/></tr>
+                                <tr><th>Microchip</th><td t-out="doc.microchip or '-'"/></tr>
+                                <tr><th>Propietario</th><td t-out="doc.propietario_id.name or '-'"/></tr>
+                                <tr><th>Estado de vacunación</th>
+                                    <td><strong t-out="dict(doc._fields['estado_vacunacion'].selection).get(doc.estado_vacunacion, '')"/></td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 style="color:#2E86AB;">Vacunas aplicadas</h4>
+                <t t-if="doc.vacuna_aplicada_ids">
+                    <table class="vet-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Vacuna</th>
+                                <th>Lote</th>
+                                <th>Veterinario</th>
+                                <th>Próxima dosis</th>
+                                <th>Observaciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="doc.vacuna_aplicada_ids" t-as="v">
+                                <td t-out="v.fecha_aplicacion"/>
+                                <td t-out="v.vacuna_id.name"/>
+                                <td t-out="v.lote or '-'"/>
+                                <td t-out="v.veterinario_id.name or '-'"/>
+                                <td t-out="v.proxima_dosis or '-'"/>
+                                <td t-out="v.observaciones or '-'"/>
+                            </tr>
+                        </tbody>
+                    </table>
+                </t>
+                <t t-else="">
+                    <div class="vet-empty">Sin vacunas aplicadas registradas.</div>
+                </t>
+
+                <div class="mt-5">
+                    <p style="font-size: 11px; color:#888; text-align:center;">
+                        Documento generado por VitalPet
+                    </p>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Template raíz que renderiza varios pacientes -->
+    <template id="report_carnet_vacunas_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="veterinaria_core.report_carnet_vacunas_document"/>
+            </t>
+        </t>
+    </template>
+
+</odoo>

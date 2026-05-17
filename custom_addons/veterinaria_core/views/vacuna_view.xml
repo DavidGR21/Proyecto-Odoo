@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Catálogo de vacunas -->
+        <record id="view_veterinaria_vacuna_list" model="ir.ui.view">
+            <field name="name">veterinaria.vacuna.list</field>
+            <field name="model">veterinaria.vacuna</field>
+            <field name="arch" type="xml">
+                <list string="Vacunas">
+                    <field name="name"/>
+                    <field name="especie_sugerida"/>
+                    <field name="frecuencia_meses"/>
+                    <field name="activo"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_veterinaria_vacuna_form" model="ir.ui.view">
+            <field name="name">veterinaria.vacuna.form</field>
+            <field name="model">veterinaria.vacuna</field>
+            <field name="arch" type="xml">
+                <form string="Vacuna">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="especie_sugerida"/>
+                                <field name="frecuencia_meses"/>
+                                <field name="activo"/>
+                            </group>
+                        </group>
+                        <group string="Descripción">
+                            <field name="descripcion" nolabel="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_veterinaria_vacuna" model="ir.actions.act_window">
+            <field name="name">Catálogo de Vacunas</field>
+            <field name="res_model">veterinaria.vacuna</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+        <!-- Vacunas aplicadas -->
+        <record id="view_veterinaria_vacuna_aplicada_list" model="ir.ui.view">
+            <field name="name">veterinaria.vacuna.aplicada.list</field>
+            <field name="model">veterinaria.vacuna.aplicada</field>
+            <field name="arch" type="xml">
+                <list string="Vacunas aplicadas">
+                    <field name="fecha_aplicacion"/>
+                    <field name="paciente_id"/>
+                    <field name="vacuna_id"/>
+                    <field name="veterinario_id"/>
+                    <field name="lote"/>
+                    <field name="proxima_dosis"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_veterinaria_vacuna_aplicada_form" model="ir.ui.view">
+            <field name="name">veterinaria.vacuna.aplicada.form</field>
+            <field name="model">veterinaria.vacuna.aplicada</field>
+            <field name="arch" type="xml">
+                <form string="Vacuna aplicada">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="paciente_id"/>
+                                <field name="vacuna_id"/>
+                                <field name="veterinario_id"/>
+                            </group>
+                            <group>
+                                <field name="fecha_aplicacion"/>
+                                <field name="proxima_dosis"/>
+                                <field name="lote"/>
+                            </group>
+                        </group>
+                        <group string="Observaciones">
+                            <field name="observaciones" nolabel="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_veterinaria_vacuna_aplicada" model="ir.actions.act_window">
+            <field name="name">Vacunas Aplicadas</field>
+            <field name="res_model">veterinaria.vacuna.aplicada</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+        <!-- Menú: bajo Gestión Clínica -->
+        <menuitem id="menu_veterinaria_vacunas" name="Vacunas"
+            parent="menu_veterinaria_gestion" sequence="25"
+            action="action_veterinaria_vacuna_aplicada"
+            groups="group_veterinaria_veterinario"/>
+
+        <menuitem id="menu_veterinaria_vacunas_catalogo" name="Catálogo de Vacunas"
+            parent="menu_veterinaria_configuracion" sequence="10"
+            action="action_veterinaria_vacuna"
+            groups="group_veterinaria_admin"/>
+    </data>
+</odoo>

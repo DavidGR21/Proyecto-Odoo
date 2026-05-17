@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!--
+            Record rules para el grupo Cliente Portal.
+            La cadena de propiedad es:
+                propietario_id (res.partner) -> user_ids (res.users)
+            Por eso usamos: ('propietario_id.user_ids', 'in', [user.id]).
+            Para modelos enlazados a través de paciente_id, se encadena.
+        -->
+
+        <!-- Mascotas: el cliente solo ve las suyas -->
+        <record id="rule_paciente_cliente_portal" model="ir.rule">
+            <field name="name">Cliente Portal: Mis mascotas</field>
+            <field name="model_id" ref="model_veterinaria_paciente"/>
+            <field name="domain_force">[('propietario_id.user_ids', 'in', [user.id])]</field>
+            <field name="groups" eval="[(4, ref('group_veterinaria_cliente'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Historia clínica: solo de mascotas propias -->
+        <record id="rule_historia_cliente_portal" model="ir.rule">
+            <field name="name">Cliente Portal: Mi historia clínica</field>
+            <field name="model_id" ref="model_veterinaria_historia_clinica"/>
+            <field name="domain_force">[('paciente_id.propietario_id.user_ids', 'in', [user.id])]</field>
+            <field name="groups" eval="[(4, ref('group_veterinaria_cliente'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Citas: solo de mascotas propias -->
+        <record id="rule_cita_cliente_portal" model="ir.rule">
+            <field name="name">Cliente Portal: Mis citas</field>
+            <field name="model_id" ref="model_veterinaria_cita"/>
+            <field name="domain_force">[('paciente_id.propietario_id.user_ids', 'in', [user.id])]</field>
+            <field name="groups" eval="[(4, ref('group_veterinaria_cliente'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Vacunas aplicadas: solo de mascotas propias -->
+        <record id="rule_vacuna_aplicada_cliente_portal" model="ir.rule">
+            <field name="name">Cliente Portal: Vacunas de mis mascotas</field>
+            <field name="model_id" ref="model_veterinaria_vacuna_aplicada"/>
+            <field name="domain_force">[('paciente_id.propietario_id.user_ids', 'in', [user.id])]</field>
+            <field name="groups" eval="[(4, ref('group_veterinaria_cliente'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Recetas: solo de mascotas propias -->
+        <record id="rule_receta_cliente_portal" model="ir.rule">
+            <field name="name">Cliente Portal: Recetas de mis mascotas</field>
+            <field name="model_id" ref="model_veterinaria_receta"/>
+            <field name="domain_force">[('paciente_id.propietario_id.user_ids', 'in', [user.id])]</field>
+            <field name="groups" eval="[(4, ref('group_veterinaria_cliente'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Facturación veterinaria: solo donde el propietario es el usuario -->
+        <record id="rule_facturacion_cliente_portal" model="ir.rule">
+            <field name="name">Cliente Portal: Mis facturas</field>
+            <field name="model_id" ref="model_veterinaria_facturacion"/>
+            <field name="domain_force">[('propietario_id.user_ids', 'in', [user.id])]</field>
+            <field name="groups" eval="[(4, ref('group_veterinaria_cliente'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <record id="rule_facturacion_linea_cliente_portal" model="ir.rule">
+            <field name="name">Cliente Portal: Líneas de mis facturas</field>
+            <field name="model_id" ref="model_veterinaria_facturacion_linea"/>
+            <field name="domain_force">[('facturacion_id.propietario_id.user_ids', 'in', [user.id])]</field>
+            <field name="groups" eval="[(4, ref('group_veterinaria_cliente'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Ventas: solo donde el propietario es el usuario -->
+        <record id="rule_venta_cliente_portal" model="ir.rule">
+            <field name="name">Cliente Portal: Mis ventas</field>
+            <field name="model_id" ref="model_veterinaria_venta"/>
+            <field name="domain_force">[('propietario_id.user_ids', 'in', [user.id])]</field>
+            <field name="groups" eval="[(4, ref('group_veterinaria_cliente'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Catálogo de vacunas: solo lectura para el cliente -->
+        <record id="rule_vacuna_cliente_portal" model="ir.rule">
+            <field name="name">Cliente Portal: Lectura catálogo vacunas</field>
+            <field name="model_id" ref="model_veterinaria_vacuna"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_veterinaria_cliente'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Veterinarios: lectura para que el cliente vea quién atendió -->
+        <record id="rule_veterinario_cliente_portal" model="ir.rule">
+            <field name="name">Cliente Portal: Lectura veterinarios</field>
+            <field name="model_id" ref="model_veterinaria_veterinario"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_veterinaria_cliente'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Medicamentos: lectura para que el cliente vea sus recetas -->
+        <record id="rule_medicamento_cliente_portal" model="ir.rule">
+            <field name="name">Cliente Portal: Lectura medicamentos</field>
+            <field name="model_id" ref="model_veterinaria_medicamento"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_veterinaria_cliente'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Servicios: lectura para mostrar nombre del servicio en citas -->
+        <record id="rule_servicio_cliente_portal" model="ir.rule">
+            <field name="name">Cliente Portal: Lectura servicios</field>
+            <field name="model_id" ref="model_veterinaria_servicio"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_veterinaria_cliente'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+    </data>
+</odoo>
