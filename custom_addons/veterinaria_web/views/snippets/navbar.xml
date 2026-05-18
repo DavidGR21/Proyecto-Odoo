@@ -7,82 +7,82 @@
     -->
     <template id="vitalpet_navbar" name="VitalPet Navbar" inherit_id="website.layout">
         <xpath expr="//div[@id='wrapwrap']/main" position="before">
-
-            <!-- Topbar de informacion (solo escritorio) -->
-            <div class="vp-topbar d-none d-lg-block">
-                <div class="container">
-                    <div class="row align-items-center">
-                        <div class="col-auto">
-                            <span class="vp-topbar-item">
-                                <i class="fa fa-phone me-1"/> +593 99 123 4567
-                            </span>
-                            <span class="vp-topbar-item ms-3">
-                                <i class="fa fa-envelope me-1"/> info@vitalpet.com
-                            </span>
-                        </div>
-                        <div class="col text-end">
-                            <span class="vp-topbar-item">
-                                <i class="fa fa-clock-o me-1"/> Lun-Sab: 8:00-18:00
-                            </span>
-                            <a href="https://wa.me/593991234567" target="_blank"
-                               class="vp-topbar-social ms-2" aria-label="WhatsApp">
-                                <i class="fa fa-whatsapp"/>
-                            </a>
-                            <a href="#" class="vp-topbar-social ms-1" aria-label="Facebook">
-                                <i class="fa fa-facebook"/>
-                            </a>
-                            <a href="#" class="vp-topbar-social ms-1" aria-label="Instagram">
-                                <i class="fa fa-instagram"/>
-                            </a>
+            <t t-if="not no_header">
+                <!-- Topbar de informacion (solo escritorio) -->
+                <div class="vp-topbar d-none d-lg-block">
+                    <div class="container">
+                        <div class="row align-items-center">
+                            <div class="col-auto">
+                                <span class="vp-topbar-item">
+                                    <i class="fa fa-phone me-1"/> +593 99 123 4567
+                                </span>
+                                <span class="vp-topbar-item ms-3">
+                                    <i class="fa fa-envelope me-1"/> info@vitalpet.com
+                                </span>
+                            </div>
+                            <div class="col text-end">
+                                <span class="vp-topbar-item">
+                                    <i class="fa fa-clock-o me-1"/> Lun-Sab: 8:00-18:00
+                                </span>
+                                <a href="https://wa.me/593991234567" target="_blank"
+                                   class="vp-topbar-social ms-2" aria-label="WhatsApp">
+                                    <i class="fa fa-whatsapp"/>
+                                </a>
+                                <a href="#" class="vp-topbar-social ms-1" aria-label="Facebook">
+                                    <i class="fa fa-facebook"/>
+                                </a>
+                                <a href="#" class="vp-topbar-social ms-1" aria-label="Instagram">
+                                    <i class="fa fa-instagram"/>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Navbar principal VitalPet -->
-            <nav class="vp-navbar-main" id="vp-navbar"
-                 role="navigation" aria-label="Navegacion principal">
-                <div class="container">
-                    <div class="vp-nav-inner">
-                        <a href="/" class="vp-logo">
-                            <i class="fa fa-paw"/> Vital<span>Pet</span>
-                        </a>
-                        <ul class="vp-nav-links" id="vp-nav-links">
-                            <li>
-                                <a href="/"
-                                   t-att-class="'vp-nav-link' + (' vp-nav-active' if request.httprequest.path == '/' else '')">
-                                    Inicio
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/servicios"
-                                   t-att-class="'vp-nav-link' + (' vp-nav-active' if request.httprequest.path.startswith('/servicios') else '')">
-                                    Servicios
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/nosotros"
-                                   t-att-class="'vp-nav-link' + (' vp-nav-active' if request.httprequest.path.startswith('/nosotros') else '')">
-                                    Nosotros
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/contacto"
-                                   t-att-class="'vp-nav-cta' + (' vp-nav-cta-active' if request.httprequest.path.startswith('/contacto') else '')">
-                                    <i class="fa fa-calendar me-1"/> Agendar Cita
-                                </a>
-                            </li>
-                        </ul>
-                        <button class="vp-hamburger" id="vp-hamburger"
-                                aria-label="Abrir menu" aria-expanded="false">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </button>
+                <!-- Navbar principal VitalPet -->
+                <nav class="vp-navbar-main" id="vp-navbar"
+                     role="navigation" aria-label="Navegacion principal">
+                    <div class="container">
+                        <div class="vp-nav-inner">
+                            <a href="/" class="vp-logo">
+                                <i class="fa fa-paw"/> Vital<span>Pet</span>
+                            </a>
+                            <ul class="vp-nav-links" id="vp-nav-links">
+                                <li>
+                                    <a href="/"
+                                       t-att-class="'vp-nav-link' + (' vp-nav-active' if request.httprequest.path == '/' else '')">
+                                        Inicio
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/servicios"
+                                       t-att-class="'vp-nav-link' + (' vp-nav-active' if request.httprequest.path.startswith('/servicios') else '')">
+                                        Servicios
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/nosotros"
+                                       t-att-class="'vp-nav-link' + (' vp-nav-active' if request.httprequest.path.startswith('/nosotros') else '')">
+                                        Nosotros
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/contacto"
+                                       t-att-class="'vp-nav-cta' + (' vp-nav-cta-active' if request.httprequest.path.startswith('/contacto') else '')">
+                                        <i class="fa fa-calendar me-1"/> Agendar Cita
+                                    </a>
+                                </li>
+                            </ul>
+                            <button class="vp-hamburger" id="vp-hamburger"
+                                    aria-label="Abrir menu" aria-expanded="false">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </button>
+                        </div>
                     </div>
-                </div>
-            </nav>
-
+                </nav>
+            </t>
         </xpath>
     </template>
 </odoo>

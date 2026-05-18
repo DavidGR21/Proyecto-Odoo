@@ -146,5 +146,44 @@
 </div>
             </field>
         </record>
+
+        <!-- ============================================================ -->
+        <!-- PLANTILLA: Credenciales del Portal                           -->
+        <!-- Se envía al crear un nuevo propietario o asignarle acceso    -->
+        <!-- ============================================================ -->
+        <record id="mail_template_credenciales_portal" model="mail.template">
+            <field name="name">Veterinaria: Credenciales de Acceso</field>
+            <field name="model_id" ref="base.model_res_partner"/>
+            <field name="email_from">{{ (object.company_id.email or user.email_formatted) }}</field>
+            <field name="email_to">{{ object.email }}</field>
+            <field name="subject">Bienvenido a VitalPet - Tus Credenciales de Acceso</field>
+            <field name="body_html" type="html">
+<div style="margin: 0px; padding: 0px; font-family: Arial, Helvetica, sans-serif;">
+    <div style="background-color: #6C5B7B; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+        <h1 style="color: white; margin: 0;">¡Bienvenido a VitalPet!</h1>
+        <p style="color: #E8E8E8; margin: 5px 0 0 0;">Tu portal veterinario de confianza</p>
+    </div>
+    <div style="background-color: #f9f9f9; padding: 30px; border: 1px solid #ddd;">
+        <p>Estimado/a <strong><t t-out="object.name"/></strong>,</p>
+        <p>Hemos creado tu cuenta de acceso al portal de VitalPet. Aquí podrás ver la información de tus mascotas, su historia clínica, citas y recetas médicas.</p>
+        
+        <div style="background-color: white; border-left: 4px solid #6C5B7B; padding: 15px; margin: 20px 0;">
+            <p style="margin: 0 0 10px 0;">A continuación, tus credenciales temporales de acceso:</p>
+            <p style="margin: 5px 0;"><strong>👤 Usuario:</strong> <t t-out="object.email"/></p>
+            <p style="margin: 5px 0;"><strong>🔑 Contraseña:</strong> <t t-out="ctx.get('portal_password')"/></p>
+        </div>
+
+        <p>Te recomendamos cambiar tu contraseña una vez que ingreses al portal.</p>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <a t-att-href="object.get_base_url() + '/web/login'" style="background-color: #6C5B7B; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Acceder al Portal</a>
+        </div>
+    </div>
+    <div style="background-color: #6C5B7B; padding: 15px; text-align: center; border-radius: 0 0 8px 8px;">
+        <p style="color: white; margin: 0; font-size: 12px;">© VitalPet - Clínica Veterinaria</p>
+    </div>
+</div>
+            </field>
+        </record>
     </data>
 </odoo>

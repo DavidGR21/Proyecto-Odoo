@@ -60,6 +60,16 @@ class ResPartner(models.Model):
     # ==================================================================
     # Creación automática del usuario portal
     # ==================================================================
+    def _send_credentials_email(self, user, password):
+        self.ensure_one()
+        template = self.env.ref('veterinaria_core.mail_template_credenciales_portal', raise_if_not_found=False)
+        if template:
+            try:
+                template.with_context(portal_password=password).send_mail(self.id, force_send=True)
+                _logger.info('Email de credenciales enviado a %s', self.email)
+            except Exception as e:
+                _logger.warning('Error al enviar email de credenciales a %s: %s', self.email, e)
+
     def _create_portal_user(self):
         """Crea un res.users vinculado al partner con el grupo Cliente Veterinaria (Portal).
         Si el usuario ya existe, le añade los grupos y le resetea la contraseña.
@@ -151,6 +161,8 @@ class ResPartner(models.Model):
             if record.es_propietario and record.email and not record.user_ids:
                 try:
                     user, password = record._create_portal_user()
+                    if password:
+                        record._send_credentials_email(user, password)
                     # Dejamos la pass en el log del servidor para que el admin
                     # pueda recuperarla si no la copió a tiempo (entorno dev).
                     _logger.info(
@@ -171,6 +183,8 @@ class ResPartner(models.Model):
                 if record.es_propietario and record.email and not record.user_ids:
                     try:
                         user, password = record._create_portal_user()
+                        if password:
+                            record._send_credentials_email(user, password)
                         _logger.info(
                             "[PORTAL] Acceso creado para '%s': login=%s | password=%s",
                             record.name, user.login, password,
