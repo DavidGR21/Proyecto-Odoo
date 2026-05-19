@@ -201,6 +201,47 @@ class VeterinariaPortal(CustomerPortal):
         }
         return request.render('veterinaria_core.portal_my_vet_invoices', values)
 
+    def _check_invoice_access(self, factura_id):
+        """Devuelve la factura si pertenece al usuario, sino None."""
+        partner = request.env.user.partner_id
+        factura = request.env['veterinaria.facturacion'].search([
+            ('id', '=', int(factura_id)),
+            ('propietario_id', '=', partner.id),
+        ], limit=1)
+        return factura or None
+
+    @http.route(['/my/invoices_vet/<int:factura_id>'],
+                type='http', auth='user', website=True)
+    def portal_my_vet_invoice_detail(self, factura_id, **kw):
+        factura = self._check_invoice_access(factura_id)
+        if not factura:
+            return request.redirect('/my/invoices_vet')
+        values = {
+            'factura': factura,
+            'page_name': 'invoices_vet_detail',
+        }
+        return request.render(
+            'veterinaria_core.portal_my_vet_invoice_detail', values
+        )
+
+    @http.route(['/my/invoices_vet/<int:factura_id>/pdf'],
+                type='http', auth='user', website=True)
+    def portal_my_vet_invoice_pdf(self, factura_id, **kw):
+        """Descarga el PDF de la factura veterinaria."""
+        factura = self._check_invoice_access(factura_id)
+        if not factura:
+            return request.redirect('/my/invoices_vet')
+        pdf, _ct = request.env['ir.actions.report'].sudo()._render_qweb_pdf(
+            'veterinaria_core.action_report_factura_veterinaria',
+            [factura.id],
+        )
+        return request.make_response(pdf, headers=[
+            ('Content-Type', 'application/pdf'),
+            ('Content-Length', len(pdf)),
+            ('Content-Disposition',
+             'attachment; filename="Factura_%s.pdf"' % (factura.name or factura.id)),
+        ])
+
     # ------------------------------------------------------------------
     # /my/prescriptions — recetas
     # ------------------------------------------------------------------
