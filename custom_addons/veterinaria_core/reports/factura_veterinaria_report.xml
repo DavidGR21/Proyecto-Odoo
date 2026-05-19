@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Acción del reporte: factura veterinaria -->
+    <record id="action_report_factura_veterinaria" model="ir.actions.report">
+        <field name="name">Factura Veterinaria</field>
+        <field name="model">veterinaria.facturacion</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">veterinaria_core.report_factura_veterinaria_template</field>
+        <field name="report_file">veterinaria_core.report_factura_veterinaria_template</field>
+        <field name="print_report_name">'Factura_%s' % (object.name or object.id)</field>
+        <field name="binding_model_id" ref="model_veterinaria_facturacion"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Plantilla del documento -->
+    <template id="report_factura_veterinaria_document">
+        <t t-call="web.external_layout">
+            <div class="page">
+                <style>
+                    .fv-header { border-bottom: 3px solid #2E86AB; padding-bottom: 10px; margin-bottom: 20px; }
+                    .fv-header h2 { color: #2E86AB; margin: 0; }
+                    .fv-pill { display:inline-block; padding:3px 10px; border-radius:12px; font-size:11px; font-weight:bold; }
+                    .fv-pill-borrador { background:#fff3cd; color:#856404; }
+                    .fv-pill-validado { background:#d4edda; color:#155724; }
+                    .fv-pill-cancelado { background:#f8d7da; color:#721c24; }
+                    .fv-info-table th { background:#f0f8ff; padding:4px 8px; text-align:left; width:30%; }
+                    .fv-info-table td { padding:4px 8px; }
+                    .fv-line-table { width:100%; border-collapse:collapse; margin-top:14px; }
+                    .fv-line-table thead th { background:#2E86AB; color:#fff; padding:8px; font-size:12px; text-align:left; }
+                    .fv-line-table tbody td { border-bottom:1px solid #ddd; padding:6px 8px; font-size:12px; }
+                    .fv-totals { margin-top:20px; width:50%; margin-left:auto; }
+                    .fv-totals td { padding:4px 8px; font-size:13px; }
+                    .fv-totals .fv-total-row td { border-top:2px solid #2E86AB; font-weight:bold; font-size:15px; color:#2E86AB; }
+                </style>
+
+                <div class="fv-header row">
+                    <div class="col-8">
+                        <h2>🐾 Factura Veterinaria</h2>
+                        <div class="text-muted">VitalPet - Clínica Veterinaria</div>
+                    </div>
+                    <div class="col-4 text-end">
+                        <h3 style="margin:0;" t-out="doc.name"/>
+                        <span t-attf-class="fv-pill fv-pill-#{doc.estado}"
+                              t-out="dict(doc._fields['estado'].selection).get(doc.estado, '')"/>
+                    </div>
+                </div>
+
+                <table class="fv-info-table" style="width:100%">
+                    <tr>
+                        <th>Cliente</th><td t-out="doc.propietario_id.name or '-'"/>
+                        <th>Fecha</th><td t-out="doc.fecha_factura or '-'"/>
+                    </tr>
+                    <tr>
+                        <th>Email</th><td t-out="doc.propietario_id.email or '-'"/>
+                        <th>Teléfono</th><td t-out="doc.propietario_id.phone or doc.propietario_id.mobile or '-'"/>
+                    </tr>
+                    <tr t-if="doc.propietario_id.street">
+                        <th>Dirección</th>
+                        <td colspan="3" t-out="(doc.propietario_id.street or '') + ' ' + (doc.propietario_id.city or '')"/>
+                    </tr>
+                </table>
+
+                <table class="fv-line-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Concepto</th>
+                            <th>Tipo</th>
+                            <th class="text-end">Cant.</th>
+                            <th class="text-end">Precio</th>
+                            <th class="text-end">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="doc.linea_ids" t-as="l">
+                            <td t-out="l_index + 1"/>
+                            <td>
+                                <strong t-out="l.nombre_item or l.descripcion or '-'"/>
+                                <t t-if="l.cita_id and l.cita_id.paciente_id">
+                                    <br/><small class="text-muted">
+                                        Mascota: <t t-out="l.cita_id.paciente_id.name"/>
+                                    </small>
+                                </t>
+                            </td>
+                            <td t-out="dict(l._fields['tipo_linea'].selection).get(l.tipo_linea, '')"/>
+                            <td class="text-end" t-out="l.cantidad"/>
+                            <td class="text-end" t-out="'%.2f' % (l.precio_unitario or 0)"/>
+                            <td class="text-end" t-out="'%.2f' % (l.subtotal or 0)"/>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <table class="fv-totals">
+                    <tr>
+                        <td>Subtotal:</td>
+                        <td class="text-end" t-out="'%.2f' % (doc.subtotal or 0)"/>
+                    </tr>
+                    <tr>
+                        <td>Impuestos:</td>
+                        <td class="text-end" t-out="'%.2f' % (doc.impuesto_total or 0)"/>
+                    </tr>
+                    <tr class="fv-total-row">
+                        <td>TOTAL:</td>
+                        <td class="text-end" t-out="'%.2f' % (doc.total or 0)"/>
+                    </tr>
+                </table>
+
+                <div t-if="doc.observaciones" class="mt-4">
+                    <strong>Observaciones:</strong>
+                    <p t-out="doc.observaciones"/>
+                </div>
+
+                <div class="mt-5 text-center text-muted" style="font-size:10px;">
+                    Gracias por confiar en VitalPet - Documento generado automáticamente
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Template raíz -->
+    <template id="report_factura_veterinaria_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="veterinaria_core.report_factura_veterinaria_document"/>
+            </t>
+        </t>
+    </template>
+
+</odoo>
