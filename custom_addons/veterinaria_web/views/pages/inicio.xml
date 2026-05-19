@@ -179,90 +179,7 @@
                     </div>
                 </section>
 
-                <!-- ============================================= -->
-                <!-- APP MÓVIL CTA -->
-                <!-- ============================================= -->
-                <section class="vp-section vp-section-app">
-                    <div class="container">
-                        <div class="row align-items-center">
-                            <div class="col-lg-6" data-vp-animate="fade-right">
-                                <span class="vp-section-badge">Aplicación Móvil</span>
-                                <h2 class="vp-section-title text-start">
-                                    Tu mascota siempre
-                                    <span class="vp-gradient-text">en tus manos</span>
-                                </h2>
-                                <p class="vp-section-subtitle text-start">
-                                    Descarga nuestra app y lleva el control total
-                                    de la salud de tu mascota desde tu celular.
-                                </p>
-                                <ul class="vp-app-features">
-                                    <li>
-                                        <i class="fa fa-check-circle me-2"/>
-                                        Agenda citas en segundos
-                                    </li>
-                                    <li>
-                                        <i class="fa fa-check-circle me-2"/>
-                                        Historial clínico digital completo
-                                    </li>
-                                    <li>
-                                        <i class="fa fa-check-circle me-2"/>
-                                        Recordatorios de vacunación
-                                    </li>
-                                    <li>
-                                        <i class="fa fa-check-circle me-2"/>
-                                        Chat con veterinarios
-                                    </li>
-                                    <li>
-                                        <i class="fa fa-check-circle me-2"/>
-                                        Tienda de productos en línea
-                                    </li>
-                                </ul>
-                                <div class="vp-app-buttons mt-4">
-                                    <a href="#" class="vp-store-btn">
-                                        <i class="fa fa-apple me-2"/>
-                                        <div>
-                                            <small>Descargar en</small>
-                                            <strong>App Store</strong>
-                                        </div>
-                                    </a>
-                                    <a href="#" class="vp-store-btn ms-3">
-                                        <i class="fa fa-android me-2"/>
-                                        <div>
-                                            <small>Disponible en</small>
-                                            <strong>Google Play</strong>
-                                        </div>
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 text-center" data-vp-animate="fade-left">
-                                <div class="vp-app-mockup">
-                                    <div class="vp-phone-frame">
-                                        <div class="vp-phone-screen">
-                                            <div class="vp-phone-header">
-                                                <i class="fa fa-paw"/>
-                                                <span>VitalPet</span>
-                                            </div>
-                                            <div class="vp-phone-content">
-                                                <div class="vp-phone-card">
-                                                    <i class="fa fa-calendar"/>
-                                                    <span>Próxima cita: 15 Jun</span>
-                                                </div>
-                                                <div class="vp-phone-card">
-                                                    <i class="fa fa-syringe"/>
-                                                    <span>Vacuna pendiente</span>
-                                                </div>
-                                                <div class="vp-phone-card">
-                                                    <i class="fa fa-file-text"/>
-                                                    <span>Historial actualizado</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+
 
                 <!-- ============================================= -->
                 <!-- TESTIMONIOS -->
@@ -308,9 +225,9 @@
                                         <i class="fa fa-star"/>
                                     </div>
                                     <p class="vp-testimonial-text">
-                                        "La app es genial. Puedo ver todo el historial
-                                        de Max y recibo notificaciones de sus vacunas.
-                                        Muy profesionales."
+                                        "El trato a mi mascota fue increíble. Siempre están
+                                        pendientes de todo y el servicio es muy
+                                        profesional."
                                     </p>
                                     <div class="vp-testimonial-author">
                                         <div class="vp-testimonial-avatar" style="background: #9B7EBD;">

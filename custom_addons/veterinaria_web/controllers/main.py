@@ -68,13 +68,7 @@ class VitalPetWebsite(http.Controller):
                                'y suplementos para mascotas.',
                 'color': '#40C2D6',
             },
-            {
-                'icono': 'fa-mobile',
-                'titulo': 'App Móvil',
-                'descripcion': 'Agenda citas, revisa el historial clínico y recibe '
-                               'notificaciones desde tu celular.',
-                'color': '#9B7EBD',
-            },
+
             {
                 'icono': 'fa-calendar-check-o',
                 'titulo': 'Agenda de Citas',
