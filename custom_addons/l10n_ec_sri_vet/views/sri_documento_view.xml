@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ============================================================
+             VISTA FORMULARIO - Documento Electrónico SRI
+             ============================================================ -->
+        <record id="sri_documento_form_view" model="ir.ui.view">
+            <field name="name">sri.documento.electronico.form</field>
+            <field name="model">sri.documento.electronico</field>
+            <field name="arch" type="xml">
+                <form string="Documento Electrónico SRI">
+                    <header>
+                        <button name="action_generar_xml"
+                                string="1. Generar XML"
+                                type="object" class="btn btn-secondary"
+                                invisible="estado != 'borrador'"/>
+                        <button name="action_firmar_xml"
+                                string="2. Firmar XML"
+                                type="object" class="btn btn-secondary"
+                                invisible="estado != 'generado'"/>
+                        <button name="action_enviar_sri"
+                                string="3. Enviar al SRI"
+                                type="object" class="btn btn-secondary"
+                                invisible="estado != 'firmado'"/>
+                        <button name="action_consultar_autorizacion"
+                                string="Consultar Autorización"
+                                type="object" class="btn btn-secondary"
+                                invisible="estado != 'enviado'"/>
+                        <button name="action_proceso_completo"
+                                string="⚡ Proceso Completo"
+                                type="object" class="oe_highlight"
+                                invisible="estado not in ('borrador', 'rechazado')"/>
+                        <button name="action_descargar_ride"
+                                string="📄 Descargar RIDE PDF"
+                                type="object" class="btn btn-primary"
+                                invisible="estado != 'autorizado'"/>
+                        <button name="action_enviar_ride_email"
+                                string="📧 Enviar RIDE por Email"
+                                type="object" class="btn btn-success"
+                                invisible="estado != 'autorizado'"/>
+                        <field name="estado" widget="statusbar"
+                               statusbar_visible="borrador,generado,firmado,enviado,autorizado"/>
+                    </header>
+
+                    <sheet>
+                        <div class="oe_title">
+                            <h1><field name="name" readonly="1"/></h1>
+                        </div>
+
+                        <group>
+                            <group string="Datos del Comprobante">
+                                <field name="facturacion_id" readonly="1"/>
+                                <field name="tipo_comprobante" readonly="1"/>
+                                <field name="ambiente" readonly="1"/>
+                            </group>
+                            <group string="Autorización SRI">
+                                <field name="clave_acceso" readonly="1"/>
+                                <field name="numero_autorizacion" readonly="1"/>
+                                <field name="fecha_autorizacion" readonly="1"/>
+                            </group>
+                        </group>
+
+                        <group>
+                            <group string="Establecimiento">
+                                <field name="establecimiento" readonly="1"/>
+                                <field name="punto_emision" readonly="1"/>
+                                <field name="secuencial" readonly="1"/>
+                            </group>
+                        </group>
+
+                        <notebook>
+                            <page string="Archivos XML">
+                                <group>
+                                    <field name="xml_sin_firma"
+                                           filename="xml_sin_firma_filename"
+                                           readonly="1"/>
+                                    <field name="xml_sin_firma_filename"
+                                           invisible="1"/>
+                                    <field name="xml_firmado"
+                                           filename="xml_firmado_filename"
+                                           readonly="1"/>
+                                    <field name="xml_firmado_filename"
+                                           invisible="1"/>
+                                    <field name="xml_autorizado"
+                                           filename="xml_autorizado_filename"
+                                           readonly="1"/>
+                                    <field name="xml_autorizado_filename"
+                                           invisible="1"/>
+                                </group>
+                            </page>
+                            <page string="Mensajes del SRI">
+                                <field name="mensaje_sri" readonly="1"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- ============================================================
+             VISTA LISTA - Documento Electrónico SRI
+             ============================================================ -->
+        <record id="sri_documento_list_view" model="ir.ui.view">
+            <field name="name">sri.documento.electronico.list</field>
+            <field name="model">sri.documento.electronico</field>
+            <field name="arch" type="xml">
+                <list decoration-info="estado in ('borrador','generado','firmado')"
+                      decoration-warning="estado == 'enviado'"
+                      decoration-success="estado == 'autorizado'"
+                      decoration-danger="estado in ('rechazado','error')">
+                    <field name="name"/>
+                    <field name="facturacion_id"/>
+                    <field name="clave_acceso"/>
+                    <field name="tipo_comprobante"/>
+                    <field name="ambiente"/>
+                    <field name="numero_autorizacion"/>
+                    <field name="fecha_autorizacion"/>
+                    <field name="estado" widget="badge"
+                           decoration-info="estado in ('borrador','generado','firmado')"
+                           decoration-warning="estado == 'enviado'"
+                           decoration-success="estado == 'autorizado'"
+                           decoration-danger="estado in ('rechazado','error')"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- ============================================================
+             ACCIÓN y MENÚ
+             ============================================================ -->
+        <record id="sri_documento_action" model="ir.actions.act_window">
+            <field name="name">Documentos Electrónicos SRI</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sri.documento.electronico</field>
+            <field name="view_mode">list,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No hay documentos electrónicos aún
+                </p>
+                <p>
+                    Los documentos electrónicos se crean automáticamente
+                    al enviar una factura veterinaria al SRI.
+                </p>
+            </field>
+        </record>
+
+        <!-- Menú dentro de Veterinaria (al lado de Facturación y Ventas) -->
+        <menuitem id="menu_sri_documentos"
+                  name="Documentos Electrónicos SRI"
+                  parent="veterinaria_core.menu_veterinaria_root"
+                  action="sri_documento_action"
+                  sequence="45"
+                  groups="veterinaria_core.group_veterinaria_admin"/>
+
+    </data>
+</odoo>

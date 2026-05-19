@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ============================================================
+             EXTENSIÓN de la Vista FORMULARIO de Facturación
+             Agrega botones SRI y campos de identificación/forma de pago
+             SIN modificar ningún campo existente de veterinaria_core.
+             ============================================================ -->
+        <record id="facturacion_form_view_sri_inherit" model="ir.ui.view">
+            <field name="name">veterinaria.facturacion.form.sri</field>
+            <field name="model">veterinaria.facturacion</field>
+            <field name="inherit_id" ref="veterinaria_core.facturacion_form_view"/>
+            <field name="arch" type="xml">
+
+                <!-- Botones SRI en el header (después de Importar desde Receta) -->
+                <xpath expr="//button[@name='action_importar_receta']" position="after">
+                    <button name="action_enviar_sri"
+                            string="📤 Enviar al SRI"
+                            type="object"
+                            class="oe_highlight"
+                            invisible="estado != 'validado' or sri_estado == 'autorizado'"
+                            confirm="¿Está seguro de enviar esta factura al SRI? Se generará el XML, se firmará y se enviará al servicio de pruebas del SRI."/>
+                    <button name="action_consultar_sri"
+                            string="🔄 Consultar SRI"
+                            type="object"
+                            class="btn btn-warning"
+                            invisible="sri_estado != 'enviado'"/>
+                    <button name="action_descargar_ride"
+                            string="📄 Descargar RIDE PDF"
+                            type="object"
+                            class="btn btn-primary"
+                            invisible="sri_estado != 'autorizado'"/>
+                    <button name="action_enviar_ride_email"
+                            string="📧 Enviar RIDE por Email"
+                            type="object"
+                            class="btn btn-success"
+                            invisible="sri_estado != 'autorizado'"/>
+                </xpath>
+
+                <!-- Grupo de Datos SRI junto al grupo de Datos del Cliente -->
+                <xpath expr="//group[field[@name='propietario_id']]" position="after">
+                    <group string="Datos SRI">
+                        <field name="sri_forma_pago"
+                               readonly="estado != 'borrador'"/>
+                        <field name="tipo_identificacion_cliente"
+                               readonly="estado != 'borrador'"/>
+                        <field name="identificacion_cliente"
+                               readonly="estado != 'borrador'"/>
+                    </group>
+                </xpath>
+
+                <!-- Pestaña "Facturación Electrónica" en el notebook -->
+                <xpath expr="//notebook" position="inside">
+                    <page string="Facturación Electrónica SRI"
+                          invisible="not sri_documento_id">
+                        <group>
+                            <group string="Estado del Comprobante">
+                                <field name="sri_estado" widget="badge"
+                                       decoration-info="sri_estado in ('borrador','generado','firmado')"
+                                       decoration-warning="sri_estado == 'enviado'"
+                                       decoration-success="sri_estado == 'autorizado'"
+                                       decoration-danger="sri_estado in ('rechazado','error')"/>
+                                <field name="sri_documento_id" readonly="1"/>
+                            </group>
+                            <group string="Autorización">
+                                <field name="sri_clave_acceso" readonly="1"/>
+                                <field name="sri_numero_autorizacion" readonly="1"/>
+                                <field name="sri_fecha_autorizacion" readonly="1"/>
+                            </group>
+                        </group>
+                    </page>
+                </xpath>
+
+            </field>
+        </record>
+
+        <!-- ============================================================
+             EXTENSIÓN de la Vista LISTA de Facturación
+             Agrega columna de Estado SRI
+             ============================================================ -->
+        <record id="facturacion_list_view_sri_inherit" model="ir.ui.view">
+            <field name="name">veterinaria.facturacion.list.sri</field>
+            <field name="model">veterinaria.facturacion</field>
+            <field name="inherit_id" ref="veterinaria_core.facturacion_list_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='estado']" position="after">
+                    <field name="sri_estado" string="SRI" widget="badge" optional="show"
+                           decoration-info="sri_estado in ('borrador','generado','firmado')"
+                           decoration-warning="sri_estado == 'enviado'"
+                           decoration-success="sri_estado == 'autorizado'"
+                           decoration-danger="sri_estado in ('rechazado','error')"/>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>
