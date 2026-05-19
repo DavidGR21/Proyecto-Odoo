@@ -30,7 +30,7 @@ class FacturacionLineaWizard(models.TransientModel):
     inventario_id = fields.Many2one(
         'veterinaria.inventario',
         string='Item de Inventario',
-        domain="[('tipo_inventario', '=', tipo_linea), ('activo', '=', True)]"
+        domain="[('tipo_inventario', '=', tipo_linea), ('activo', '=', True), '|', ('tipo_inventario', '=', 'servicio'), ('cantidad_stock', '>', 0)]"
     )
 
     cantidad = fields.Float('Cantidad', required=True, default=1.0)
@@ -56,8 +56,36 @@ class FacturacionLineaWizard(models.TransientModel):
             self.precio_unitario = self.inventario_id.precio_venta or 0.0
             self.cantidad = 1.0
 
+    @api.onchange('precio_unitario')
+    def _onchange_precio_unitario(self):
+        if self.tipo_linea in ('medicamento', 'producto', 'servicio') and self.inventario_id:
+            self.precio_unitario = self.inventario_id.precio_venta or 0.0
+
+    @api.onchange('cantidad', 'inventario_id', 'tipo_linea')
+    def _onchange_cantidad(self):
+        if self.tipo_linea in ('medicamento', 'producto') and self.inventario_id:
+            if self.inventario_id.cantidad_stock < self.cantidad:
+                raise ValidationError(
+                    f"Stock insuficiente para '{self.inventario_id.name}': "
+                    f"disponible {self.inventario_id.cantidad_stock}, solicitado {self.cantidad}\n"
+                    "Actualice el stock en inventario antes de importar a factura."
+                )
+
     def action_agregar_linea(self):
         self.ensure_one()
+        if self.cantidad <= 0:
+            raise ValidationError('La cantidad debe ser mayor a 0')
+        if self.tipo_linea in ('medicamento', 'producto') and self.inventario_id:
+            if self.inventario_id.cantidad_stock < self.cantidad:
+                raise ValidationError(
+                    f"Stock insuficiente para '{self.inventario_id.name}': "
+                    f"disponible {self.inventario_id.cantidad_stock}, solicitado {self.cantidad}\n"
+                    "Actualice el stock en inventario antes de importar a factura."
+                )
+        if self.tipo_linea in ('medicamento', 'producto', 'servicio') and self.inventario_id:
+            expected_price = self.inventario_id.precio_venta or 0.0
+            if abs((self.precio_unitario or 0.0) - expected_price) > 0.000001:
+                raise ValidationError('El precio unitario debe coincidir con el precio de inventario')
         self.env['veterinaria.facturacion.linea'].create({
             'facturacion_id': self.facturacion_id.id,
             'tipo_linea': self.tipo_linea,
@@ -104,7 +132,7 @@ class FacturacionMultilineaWizard(models.TransientModel):
         'veterinaria.inventario',
         'facturacion_wiz_multi_inv_rel',
         string='Seleccionar Items',
-        domain="[('tipo_inventario', '=', tipo_documento), ('activo', '=', True)]"
+        domain="[('tipo_inventario', '=', tipo_documento), ('activo', '=', True), '|', ('tipo_inventario', '=', 'servicio'), ('cantidad_stock', '>', 0)]"
     )
 
     cantidad_default = fields.Float('Cantidad por Defecto', default=1.0)
@@ -209,6 +237,12 @@ class ImportarRecetaWizard(models.TransientModel):
             if linea.cantidad_a_facturar > 0 and linea.medicamento_id:
                 # Obtenemos el item de inventario para sacar el precio
                 item = linea.medicamento_id
+                if item.cantidad_stock < linea.cantidad_a_facturar:
+                    raise ValidationError(
+                        f"Stock insuficiente para '{item.name}': "
+                        f"disponible {item.cantidad_stock}, solicitado {linea.cantidad_a_facturar}\n"
+                        "Actualice el stock en inventario antes de importar a factura."
+                    )
                 self.env['veterinaria.facturacion.linea'].create({
                     'facturacion_id': self.facturacion_id.id,
                     'tipo_linea': 'medicamento',

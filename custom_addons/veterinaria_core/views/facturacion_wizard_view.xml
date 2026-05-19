@@ -19,7 +19,8 @@
                             </group>
                             <group>
                                 <field name="cantidad"/>
-                                <field name="precio_unitario"/>
+                                <field name="precio_unitario"
+                                       modifiers='{"readonly":[["tipo_linea","!=","cita"]]}'/>
                             </group>
                         </group>
                     </sheet>

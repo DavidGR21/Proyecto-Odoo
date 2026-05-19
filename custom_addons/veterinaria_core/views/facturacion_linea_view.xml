@@ -24,7 +24,7 @@
                             </group>
                             <group>
                                 <field name="cantidad"/>
-                                <field name="precio_unitario"/>
+                                <field name="precio_unitario" modifiers='{"readonly":[["tipo_linea","!=","cita"]]}'/>
                                 <field name="subtotal" readonly="1"/>
                             </group>
                         </group>
@@ -47,7 +47,7 @@
                     <field name="nombre_item" readonly="1"/>
                     <field name="descripcion" readonly="1"/>
                     <field name="cantidad"/>
-                    <field name="precio_unitario"/>
+                    <field name="precio_unitario" readonly="1"/>
                     <field name="subtotal" readonly="1"/>
                 </list>
             </field>
