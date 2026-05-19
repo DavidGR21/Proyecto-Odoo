@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
 
 
 class InventarioVeterinario(models.Model):
@@ -106,7 +107,16 @@ class InventarioVeterinario(models.Model):
 
     @api.constrains('tipo_inventario', 'categoria_servicio')
     def _check_categoria_servicio(self):
-        from odoo.exceptions import ValidationError
         for record in self:
             if record.tipo_inventario == 'servicio' and not record.categoria_servicio:
                 raise ValidationError('Debe seleccionar una Categoría del Servicio')
+
+    @api.constrains('precio_venta', 'precio_costo', 'cantidad_stock')
+    def _check_no_negative_values(self):
+        for record in self:
+            if record.precio_venta is not False and record.precio_venta < 0:
+                raise ValidationError('El precio de venta no puede ser menor a 0')
+            if record.precio_costo is not False and record.precio_costo < 0:
+                raise ValidationError('El precio de costo no puede ser menor a 0')
+            if record.cantidad_stock is not False and record.cantidad_stock < 0:
+                raise ValidationError('El stock no puede ser menor a 0')

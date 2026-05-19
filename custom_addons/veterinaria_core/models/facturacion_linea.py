@@ -30,7 +30,7 @@ class FacturacionLinea(models.Model):
     inventario_id = fields.Many2one(
         'veterinaria.inventario',
         string='Item de Inventario',
-        domain="[('tipo_inventario', '=', tipo_linea), ('activo', '=', True)]"
+        domain="[('tipo_inventario', '=', tipo_linea), ('activo', '=', True), '|', ('tipo_inventario', '=', 'servicio'), ('cantidad_stock', '>', 0)]"
     )
 
     # Columna unificada para seleccion (Reference)
@@ -124,10 +124,64 @@ class FacturacionLinea(models.Model):
             self.precio_unitario = self.inventario_id.precio_venta or 0.0
             self.cantidad = 1.0
 
+    @api.onchange('precio_unitario')
+    def _onchange_precio_unitario(self):
+        if self.tipo_linea in ('medicamento', 'producto', 'servicio') and self.inventario_id:
+            self.precio_unitario = self.inventario_id.precio_venta or 0.0
+
+    @api.onchange('cantidad', 'inventario_id', 'tipo_linea')
+    def _onchange_cantidad(self):
+        if self.tipo_linea in ('medicamento', 'producto') and self.inventario_id:
+            if self.inventario_id.cantidad_stock < self.cantidad:
+                raise ValidationError(
+                    f"Stock insuficiente para '{self.inventario_id.name}': "
+                    f"disponible {self.inventario_id.cantidad_stock}, solicitado {self.cantidad}\n"
+                    "Actualice el stock en inventario para continuar en la factura."
+                )
+
     # ── Constraints ───────────────────────────────────────────────────────────
+
+    def _validate_stock_vals(self, vals):
+        tipo_linea = vals.get('tipo_linea', self.tipo_linea)
+        inventario_id = vals.get('inventario_id', self.inventario_id.id if self.inventario_id else False)
+        cantidad = vals.get('cantidad', self.cantidad)
+        if tipo_linea in ('medicamento', 'producto') and inventario_id:
+            inventario = self.env['veterinaria.inventario'].browse(inventario_id)
+            if inventario and inventario.cantidad_stock < cantidad:
+                raise ValidationError(
+                    f"Stock insuficiente para '{inventario.name}': "
+                    f"disponible {inventario.cantidad_stock}, solicitado {cantidad}\n"
+                    "Actualice el stock en inventario antes de importar a factura."
+                )
+
+    def _check_stock_disponible(self):
+        for rec in self:
+            if rec.tipo_linea in ('medicamento', 'producto') and rec.inventario_id:
+                if rec.inventario_id.cantidad_stock < rec.cantidad:
+                    raise ValidationError(
+                        f"Stock insuficiente para '{rec.inventario_id.name}': "
+                        f"disponible {rec.inventario_id.cantidad_stock}, solicitado {rec.cantidad}\n"
+                        "Actualice el stock en inventario antes de importar a factura."
+                    )
 
     @api.constrains('tipo_linea', 'cita_id', 'inventario_id', 'cantidad', 'precio_unitario')
     def _check_linea(self):
         for rec in self:
             if rec.cantidad <= 0:
                 raise ValidationError("La cantidad debe ser mayor a 0")
+            rec._check_stock_disponible()
+            if rec.tipo_linea in ('medicamento', 'producto', 'servicio') and rec.inventario_id:
+                expected_price = rec.inventario_id.precio_venta or 0.0
+                if abs((rec.precio_unitario or 0.0) - expected_price) > 0.000001:
+                    raise ValidationError("El precio unitario debe coincidir con el precio de inventario")
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            self._validate_stock_vals(vals)
+        return super().create(vals_list)
+
+    def write(self, vals):
+        for rec in self:
+            rec._validate_stock_vals(vals)
+        return super().write(vals)

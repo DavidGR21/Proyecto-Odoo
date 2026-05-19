@@ -24,6 +24,7 @@
                             </group>
                         </group>
 
+
                         <group>
                             <group string="Descripción">
                                 <field name="descripcion" placeholder="Descripción..."/>
