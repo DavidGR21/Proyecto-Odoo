@@ -125,10 +125,13 @@ class Facturacion(models.Model):
             }
         }
 
+    def _get_allowed_fields_validado(self):
+        return {'estado'}
+
     def write(self, vals):
         for record in self:
             if record.estado != 'borrador':
-                allowed_fields = {'estado'}
+                allowed_fields = self._get_allowed_fields_validado()
                 if set(vals.keys()) - allowed_fields:
                     raise ValidationError('No se puede editar una factura validada o cancelada')
         return super().write(vals)
