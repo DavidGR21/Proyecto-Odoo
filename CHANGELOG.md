@@ -9,12 +9,14 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es/1.0.0/) y el p
 ## [18.0.1.6.0] — 2025-05-31
 
 ### Añadido
+
 - Control de ingreso de valores negativos en inventario de productos, medicamentos y servicios.
 - Validación de stock al seleccionar productos/medicamentos en la factura: solo se muestran ítems con stock mayor a 0.
 - Control de stock frente al total del pedido al momento de facturar.
 - Extensión del control de stock para importación desde recetas (medicamentos asignados desde la cita).
 
 ### Corregido
+
 - Error al intentar facturar productos sin stock suficiente.
 - Visualización incorrecta de cantidades disponibles en el wizard de importación de receta.
 
@@ -23,6 +25,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es/1.0.0/) y el p
 ## [18.0.1.5.0] — 2025-05-20
 
 ### Añadido
+
 - Módulo `l10n_ec_sri_vet`: integración completa de facturación electrónica con el SRI de Ecuador.
   - Generación de XML según XSD 2.1.0 del SRI.
   - Firma digital XAdES-BES con certificado .p12 usando `cryptography`.
@@ -35,6 +38,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es/1.0.0/) y el p
 - Reportes QWeb para el RIDE.
 
 ### Cambiado
+
 - `veterinaria.facturacion` extendida con campos SRI: forma de pago, tipo de identificación, estado del documento electrónico.
 
 ---
@@ -42,6 +46,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es/1.0.0/) y el p
 ## [18.0.1.4.0] — 2025-05-10
 
 ### Añadido
+
 - Gestión completa de facturas veterinarias en el portal del cliente (`/my/invoices_vet`).
   - Listado de facturas del propietario.
   - Detalle de factura con líneas, subtotal, impuestos y total.
@@ -49,6 +54,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es/1.0.0/) y el p
 - Contador de facturas en el dashboard del portal (`/my`).
 
 ### Corregido
+
 - Record rules del portal para facturas: el cliente solo ve sus propias facturas.
 
 ---
@@ -56,6 +62,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es/1.0.0/) y el p
 ## [18.0.1.3.0] — 2025-04-25
 
 ### Añadido
+
 - Módulo `veterinaria_web`: sitio web público de la clínica VitalPet.
   - Página de inicio (landing page).
   - Página de servicios con 7 servicios listados.
@@ -66,6 +73,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es/1.0.0/) y el p
 - Icono SVG de pata para la interfaz del módulo.
 
 ### Cambiado
+
 - Se eliminó la sección de planes de precios de la página web.
 - Se eliminó la sección de app store de la página web.
 
@@ -74,6 +82,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es/1.0.0/) y el p
 ## [18.0.1.2.0] — 2025-04-10
 
 ### Añadido
+
 - Portal del cliente (`veterinaria_core/controllers/portal.py`):
   - `/my/pets` — Listado de mascotas del propietario.
   - `/my/pets/<id>` — Detalle de mascota.
@@ -90,6 +99,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es/1.0.0/) y el p
 - Foto de perfil del paciente en el reporte del carnet de vacunas.
 
 ### Cambiado
+
 - Historia clínica creada automáticamente al crear una cita (método `_sync_historia`).
 
 ---
@@ -97,6 +107,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es/1.0.0/) y el p
 ## [18.0.1.1.0] — 2025-03-20
 
 ### Añadido
+
 - Modelo `veterinaria.inventario`: inventario unificado para productos, servicios y medicamentos.
 - Modelo `veterinaria.receta` y `veterinaria.receta.linea`: recetas médicas con cálculo automático de cantidad total.
 - Modelo `veterinaria.vacuna.aplicada`: carnet de vacunación con cálculo de próxima dosis.
@@ -110,6 +121,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es/1.0.0/) y el p
 - Wizard `veterinaria.credential.wizard` para mostrar credenciales generadas.
 
 ### Cambiado
+
 - `res.partner` extendido con campos `es_propietario`, `paciente_ids`, `tiene_acceso_portal`.
 - Validación de disponibilidad de veterinario mejorada (conflictos de horario).
 
@@ -118,6 +130,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es/1.0.0/) y el p
 ## [18.0.1.0.0] — 2025-03-01
 
 ### Añadido
+
 - Inicio del proyecto **VitalPet** sobre Odoo 18.
 - Módulo `veterinaria_core` versión inicial:
   - Modelo `veterinaria.paciente` (mascotas): especie, raza, peso, microchip, propietario.
@@ -149,4 +162,4 @@ El proyecto sigue el esquema `<odoo_version>.<major>.<minor>.<patch>`:
 
 ---
 
-*Para ver el historial completo de commits, consulta el [repositorio en GitHub](https://github.com/DavidGR21/Proyecto-Odoo/commits/main).*
+_Para ver el historial completo de commits, consulta el [repositorio en GitHub](https://github.com/DavidGR21/Proyecto-Odoo/commits/main)._

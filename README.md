@@ -42,48 +42,51 @@ Desarrollar una aplicación de gestión integral para clínicas veterinarias que
 ## ✨ Funcionalidades Principales
 
 ### 🏥 Módulo Core (`veterinaria_core`)
-| Funcionalidad | Descripción |
-|---|---|
-| **Gestión de Propietarios** | Registro de clientes (res.partner extendido), creación automática de usuario portal con credenciales por email |
-| **Gestión de Pacientes** | Registro de mascotas con foto, especie, raza, peso, microchip, alergias y estado de vacunación |
-| **Gestión de Veterinarios** | Catálogo de profesionales con especialidad, horarios y disponibilidad |
-| **Agendamiento de Citas** | Citas con validación de disponibilidad, detección de conflictos horarios y vista calendario |
-| **Historia Clínica** | Generada automáticamente al crear una cita, con seguimiento de alergias, peso, tipo de sangre y condiciones crónicas |
-| **Carnet de Vacunación** | Registro de vacunas aplicadas con próxima dosis calculada automáticamente; descargable como PDF |
-| **Recetas Médicas** | Prescripciones con medicamentos del inventario o externos, cálculo automático de cantidad total |
-| **Inventario Unificado** | Gestión de productos, servicios y medicamentos con control de stock, precios y márgenes |
-| **Facturación Multiservicio** | Facturación de citas, medicamentos, productos y servicios con importación desde recetas |
-| **Ventas** | Integración con `sale.order` de Odoo para ventas directas de productos |
-| **Notificaciones por Email** | Confirmación de citas, recordatorios 24h antes (cron), resumen post-consulta y credenciales de acceso |
-| **Portal del Cliente** | Mis mascotas, citas, historial médico, facturas (con PDF), recetas y carnet de vacunas |
+
+| Funcionalidad                 | Descripción                                                                                                          |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| **Gestión de Propietarios**   | Registro de clientes (res.partner extendido), creación automática de usuario portal con credenciales por email       |
+| **Gestión de Pacientes**      | Registro de mascotas con foto, especie, raza, peso, microchip, alergias y estado de vacunación                       |
+| **Gestión de Veterinarios**   | Catálogo de profesionales con especialidad, horarios y disponibilidad                                                |
+| **Agendamiento de Citas**     | Citas con validación de disponibilidad, detección de conflictos horarios y vista calendario                          |
+| **Historia Clínica**          | Generada automáticamente al crear una cita, con seguimiento de alergias, peso, tipo de sangre y condiciones crónicas |
+| **Carnet de Vacunación**      | Registro de vacunas aplicadas con próxima dosis calculada automáticamente; descargable como PDF                      |
+| **Recetas Médicas**           | Prescripciones con medicamentos del inventario o externos, cálculo automático de cantidad total                      |
+| **Inventario Unificado**      | Gestión de productos, servicios y medicamentos con control de stock, precios y márgenes                              |
+| **Facturación Multiservicio** | Facturación de citas, medicamentos, productos y servicios con importación desde recetas                              |
+| **Ventas**                    | Integración con `sale.order` de Odoo para ventas directas de productos                                               |
+| **Notificaciones por Email**  | Confirmación de citas, recordatorios 24h antes (cron), resumen post-consulta y credenciales de acceso                |
+| **Portal del Cliente**        | Mis mascotas, citas, historial médico, facturas (con PDF), recetas y carnet de vacunas                               |
 
 ### 🌐 Módulo Web (`veterinaria_web`)
-| Funcionalidad | Descripción |
-|---|---|
-| **Sitio Web Público** | Landing page profesional con páginas de Inicio, Servicios, Nosotros y Contacto |
-| **Formulario de Contacto** | Recepción de consultas de potenciales clientes |
-| **Diseño Responsivo** | CSS personalizado con animaciones, variables CSS y Bootstrap de Odoo |
+
+| Funcionalidad              | Descripción                                                                    |
+| -------------------------- | ------------------------------------------------------------------------------ |
+| **Sitio Web Público**      | Landing page profesional con páginas de Inicio, Servicios, Nosotros y Contacto |
+| **Formulario de Contacto** | Recepción de consultas de potenciales clientes                                 |
+| **Diseño Responsivo**      | CSS personalizado con animaciones, variables CSS y Bootstrap de Odoo           |
 
 ### 🧾 Módulo SRI (`l10n_ec_sri_vet`)
-| Funcionalidad | Descripción |
-|---|---|
-| **Generación XML** | XML según XSD 2.1.0 del SRI con clave de acceso Módulo 11 |
-| **Firma Electrónica** | XAdES-BES con certificado .p12 usando `cryptography` nativo |
-| **Envío SOAP** | Envío al Web Service de Recepción y consulta de Autorización del SRI |
-| **RIDE** | Generación del RIDE (PDF) con código de barras Code128 |
-| **Envío por Email** | Envío automático del RIDE y XML autorizado al cliente |
+
+| Funcionalidad         | Descripción                                                          |
+| --------------------- | -------------------------------------------------------------------- |
+| **Generación XML**    | XML según XSD 2.1.0 del SRI con clave de acceso Módulo 11            |
+| **Firma Electrónica** | XAdES-BES con certificado .p12 usando `cryptography` nativo          |
+| **Envío SOAP**        | Envío al Web Service de Recepción y consulta de Autorización del SRI |
+| **RIDE**              | Generación del RIDE (PDF) con código de barras Code128               |
+| **Envío por Email**   | Envío automático del RIDE y XML autorizado al cliente                |
 
 ---
 
 ## 📋 Requisitos Previos
 
-| Requisito | Versión Mínima | Descripción |
-|---|---|---|
-| **Docker** | 20.10+ | Motor de contenedores |
-| **Docker Compose** | 2.0+ | Orquestación de servicios |
-| **Git** | 2.30+ | Control de versiones |
-| **Navegador Web** | Moderno | Chrome, Firefox, Edge (últimas versiones) |
-| **Puerto 8069** | Disponible | Puerto por defecto de Odoo |
+| Requisito          | Versión Mínima | Descripción                               |
+| ------------------ | -------------- | ----------------------------------------- |
+| **Docker**         | 20.10+         | Motor de contenedores                     |
+| **Docker Compose** | 2.0+           | Orquestación de servicios                 |
+| **Git**            | 2.30+          | Control de versiones                      |
+| **Navegador Web**  | Moderno        | Chrome, Firefox, Edge (últimas versiones) |
+| **Puerto 8069**    | Disponible     | Puerto por defecto de Odoo                |
 
 > **Nota:** No se requiere instalar Python, PostgreSQL ni Odoo localmente. Todo corre dentro de Docker.
 
@@ -134,6 +137,7 @@ docker-compose up -d --build
 ```
 
 Esto construye la imagen de Odoo con las dependencias adicionales (`zeep`, `python-barcode`, `python-stdnum`) y levanta:
+
 - **vitalpet-db**: PostgreSQL 15
 - **vitalpet-odoo**: Odoo 18 con los módulos personalizados
 
@@ -183,18 +187,18 @@ smtp_port = 1025
 
 El archivo `docker-compose.yml` orquesta dos servicios:
 
-| Servicio | Imagen | Puerto | Descripción |
-|---|---|---|---|
-| `db` | `postgres:15` | 5432 (interno) | Base de datos PostgreSQL |
-| `odoo` | Build desde `Dockerfile` | 8069 → host | Servidor Odoo 18 |
+| Servicio | Imagen                   | Puerto         | Descripción              |
+| -------- | ------------------------ | -------------- | ------------------------ |
+| `db`     | `postgres:15`            | 5432 (interno) | Base de datos PostgreSQL |
+| `odoo`   | Build desde `Dockerfile` | 8069 → host    | Servidor Odoo 18         |
 
 ### Volúmenes Persistentes
 
-| Volumen | Ruta en contenedor | Descripción |
-|---|---|---|
-| `vitalpet-db-data` | `/var/lib/postgresql/data` | Datos de PostgreSQL |
-| `vitalpet-web-data` | `/var/lib/odoo` | Datos de Odoo (filestore) |
-| `./custom_addons` | `/mnt/extra-addons` | Módulos personalizados (bind mount) |
+| Volumen             | Ruta en contenedor         | Descripción                         |
+| ------------------- | -------------------------- | ----------------------------------- |
+| `vitalpet-db-data`  | `/var/lib/postgresql/data` | Datos de PostgreSQL                 |
+| `vitalpet-web-data` | `/var/lib/odoo`            | Datos de Odoo (filestore)           |
+| `./custom_addons`   | `/mnt/extra-addons`        | Módulos personalizados (bind mount) |
 
 ---
 
@@ -202,27 +206,27 @@ El archivo `docker-compose.yml` orquesta dos servicios:
 
 ### Dependencias de Odoo (módulos base)
 
-| Módulo | Uso en VitalPet |
-|---|---|
-| `base` | Funcionalidades base de Odoo (res.partner, res.users) |
-| `mail` | Sistema de mensajería, plantillas de email, chatter |
-| `web` | Framework web de Odoo |
-| `portal` | Portal de cliente autenticado |
-| `auth_signup` | Invitaciones por email y registro de usuarios portal |
-| `sale` | Órdenes de venta para integración de ventas |
-| `account` | Facturación y contabilidad, impuestos |
-| `calendar` | Vista calendario para citas |
-| `stock` | Control de inventario y movimientos de stock |
-| `crm` | Gestión de relaciones con clientes |
-| `website` | Motor del sitio web público (para `veterinaria_web`) |
+| Módulo        | Uso en VitalPet                                       |
+| ------------- | ----------------------------------------------------- |
+| `base`        | Funcionalidades base de Odoo (res.partner, res.users) |
+| `mail`        | Sistema de mensajería, plantillas de email, chatter   |
+| `web`         | Framework web de Odoo                                 |
+| `portal`      | Portal de cliente autenticado                         |
+| `auth_signup` | Invitaciones por email y registro de usuarios portal  |
+| `sale`        | Órdenes de venta para integración de ventas           |
+| `account`     | Facturación y contabilidad, impuestos                 |
+| `calendar`    | Vista calendario para citas                           |
+| `stock`       | Control de inventario y movimientos de stock          |
+| `crm`         | Gestión de relaciones con clientes                    |
+| `website`     | Motor del sitio web público (para `veterinaria_web`)  |
 
 ### Dependencias Python Externas (instaladas en Dockerfile)
 
-| Librería | Versión | Uso |
-|---|---|---|
-| `zeep` | Última | Cliente SOAP para Web Services del SRI |
-| `python-barcode[images]` | Última | Generación de códigos de barras Code128 para RIDE |
-| `python-stdnum` | Última | Validación de números de identificación (RUC, cédula) |
+| Librería                 | Versión | Uso                                                   |
+| ------------------------ | ------- | ----------------------------------------------------- |
+| `zeep`                   | Última  | Cliente SOAP para Web Services del SRI                |
+| `python-barcode[images]` | Última  | Generación de códigos de barras Code128 para RIDE     |
+| `python-stdnum`          | Última  | Validación de números de identificación (RUC, cédula) |
 
 ---
 
@@ -366,12 +370,12 @@ docker-compose restart odoo
 
 El sistema implementa **4 grupos jerárquicos de seguridad**:
 
-| Grupo | Hereda de | Permisos |
-|---|---|---|
-| **Recepcionista** | — | Gestión de citas, pacientes y propietarios. Lectura de medicamentos |
-| **Veterinario** | Recepcionista | + Historia clínica, recetas, vacunas |
-| **Administrador Veterinaria** | Veterinario | + Facturación, ventas, inventario completo, eliminación |
-| **Cliente Veterinaria (Portal)** | Portal Odoo | Solo sus propias mascotas, citas, facturas, recetas, carnet |
+| Grupo                            | Hereda de     | Permisos                                                            |
+| -------------------------------- | ------------- | ------------------------------------------------------------------- |
+| **Recepcionista**                | —             | Gestión de citas, pacientes y propietarios. Lectura de medicamentos |
+| **Veterinario**                  | Recepcionista | + Historia clínica, recetas, vacunas                                |
+| **Administrador Veterinaria**    | Veterinario   | + Facturación, ventas, inventario completo, eliminación             |
+| **Cliente Veterinaria (Portal)** | Portal Odoo   | Solo sus propias mascotas, citas, facturas, recetas, carnet         |
 
 Las **Record Rules** aseguran aislamiento de datos: cada cliente portal solo ve registros vinculados a su `partner_id`.
 
@@ -379,14 +383,14 @@ Las **Record Rules** aseguran aislamiento de datos: cada cliente portal solo ve 
 
 ## 🐛 Solución de Problemas
 
-| Problema | Solución |
-|---|---|
-| Contenedores no inician | `docker-compose logs -f` para ver errores |
-| "Modelo no encontrado" | `docker-compose restart odoo` y actualizar módulo |
-| "Permiso denegado" | Verificar `security/ir.model.access.csv` y grupos |
-| Cambios no aparecen | Limpiar caché del navegador (Ctrl+Shift+Del) + `docker-compose restart odoo` |
-| BD corrupta | `docker-compose down -v && docker-compose up -d --build` |
-| Emails no se envían | Verificar configuración SMTP en `.env` y en Odoo → Ajustes → Correo |
+| Problema                | Solución                                                                     |
+| ----------------------- | ---------------------------------------------------------------------------- |
+| Contenedores no inician | `docker-compose logs -f` para ver errores                                    |
+| "Modelo no encontrado"  | `docker-compose restart odoo` y actualizar módulo                            |
+| "Permiso denegado"      | Verificar `security/ir.model.access.csv` y grupos                            |
+| Cambios no aparecen     | Limpiar caché del navegador (Ctrl+Shift+Del) + `docker-compose restart odoo` |
+| BD corrupta             | `docker-compose down -v && docker-compose up -d --build`                     |
+| Emails no se envían     | Verificar configuración SMTP en `.env` y en Odoo → Ajustes → Correo          |
 
 ---
 
@@ -404,14 +408,14 @@ Las **Record Rules** aseguran aislamiento de datos: cada cliente portal solo ve 
 
 ## 📚 Documentación Adicional
 
-| Documento | Descripción |
-|---|---|
-| [docs/API.md](docs/API.md) | Documentación completa de API: controladores, endpoints, modelos y servicios internos |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Guía para contribuir al proyecto |
-| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Código de conducta del equipo |
-| [CHANGELOG.md](CHANGELOG.md) | Historial de cambios del proyecto |
-| [SECURITY.md](SECURITY.md) | Política de seguridad y reporte de vulnerabilidades |
-| [LICENSE](LICENSE) | Licencia LGPL-3 |
+| Documento                                | Descripción                                                                           |
+| ---------------------------------------- | ------------------------------------------------------------------------------------- |
+| [docs/API.md](docs/API.md)               | Documentación completa de API: controladores, endpoints, modelos y servicios internos |
+| [CONTRIBUTING.md](CONTRIBUTING.md)       | Guía para contribuir al proyecto                                                      |
+| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Código de conducta del equipo                                                         |
+| [CHANGELOG.md](CHANGELOG.md)             | Historial de cambios del proyecto                                                     |
+| [SECURITY.md](SECURITY.md)               | Política de seguridad y reporte de vulnerabilidades                                   |
+| [LICENSE](LICENSE)                       | Licencia LGPL-3                                                                       |
 
 ---
 

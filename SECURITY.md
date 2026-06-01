@@ -2,11 +2,11 @@
 
 ## Versiones Soportadas
 
-| Versión | Soporte de seguridad |
-|---|---|
-| 18.0.1.6.x (actual) | Activo |
-| 18.0.1.x anteriores | Solo bugs críticos |
-| < 18.0.1.0 | Sin soporte |
+| Versión             | Soporte de seguridad |
+| ------------------- | -------------------- |
+| 18.0.1.6.x (actual) | Activo               |
+| 18.0.1.x anteriores | Solo bugs críticos   |
+| < 18.0.1.0          | Sin soporte          |
 
 ---
 
@@ -41,12 +41,12 @@ VitalPet delega la autenticación completamente en **Odoo 18**, que provee:
 
 El sistema implementa **4 grupos de seguridad** jerárquicos:
 
-| Grupo | Acceso |
-|---|---|
-| `group_veterinaria_recepcionista` | Citas, pacientes, propietarios (sin eliminación) |
-| `group_veterinaria_veterinario` | + Historia clínica, recetas, vacunas |
-| `group_veterinaria_admin` | Acceso total incluyendo facturación y eliminación |
-| `group_veterinaria_cliente` | Solo sus propios registros vía record rules |
+| Grupo                             | Acceso                                            |
+| --------------------------------- | ------------------------------------------------- |
+| `group_veterinaria_recepcionista` | Citas, pacientes, propietarios (sin eliminación)  |
+| `group_veterinaria_veterinario`   | + Historia clínica, recetas, vacunas              |
+| `group_veterinaria_admin`         | Acceso total incluyendo facturación y eliminación |
+| `group_veterinaria_cliente`       | Solo sus propios registros vía record rules       |
 
 ### Aislamiento de Datos del Portal
 
@@ -103,11 +103,11 @@ records = request.env['veterinaria.facturacion'].sudo().search([])  # Expone TOD
 
 Las dependencias Python externas del proyecto son:
 
-| Librería | Versión | Propósito | Última revisión de seguridad |
-|---|---|---|---|
-| `zeep` | Última estable | Cliente SOAP para SRI | Al instalar |
-| `python-barcode` | Última estable | Generación de códigos de barras | Al instalar |
-| `python-stdnum` | Última estable | Validación RUC/Cédula | Al instalar |
+| Librería         | Versión        | Propósito                       | Última revisión de seguridad |
+| ---------------- | -------------- | ------------------------------- | ---------------------------- |
+| `zeep`           | Última estable | Cliente SOAP para SRI           | Al instalar                  |
+| `python-barcode` | Última estable | Generación de códigos de barras | Al instalar                  |
+| `python-stdnum`  | Última estable | Validación RUC/Cédula           | Al instalar                  |
 
 Mantener estas dependencias actualizadas para recibir parches de seguridad.
 

@@ -23,7 +23,7 @@ Nos comprometemos a actuar e interactuar de maneras que contribuyan a una comuni
 ### Comportamientos inaceptables
 
 - El uso de lenguaje o imágenes sexualizadas, y la atención o insinuaciones sexuales de cualquier tipo.
-- Comentarios insultantes o despectivos (*trolling*), ataques personales o políticos.
+- Comentarios insultantes o despectivos (_trolling_), ataques personales o políticos.
 - Acoso público o privado de cualquier tipo.
 - Publicar información privada de otros, como direcciones físicas o de correo electrónico, sin su permiso explícito.
 - Otras conductas que razonablemente podrían considerarse inapropiadas en un entorno profesional o académico.
@@ -99,4 +99,4 @@ Este Código de Conducta está adaptado del [Contributor Covenant](https://www.c
 
 ---
 
-*Al contribuir a este repositorio, aceptas cumplir con este Código de Conducta.*
+_Al contribuir a este repositorio, aceptas cumplir con este Código de Conducta._

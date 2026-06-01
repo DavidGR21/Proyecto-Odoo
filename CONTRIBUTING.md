@@ -66,15 +66,15 @@ git config user.email "tu_email@ejemplo.com"
 
 El proyecto usa una adaptación de **Git Flow** con las siguientes ramas:
 
-| Rama | Propósito | Merges desde |
-|---|---|---|
-| `main` | Código estable en producción. Nunca se hace push directo. | `develop` vía PR |
-| `develop` | Rama de integración. Siempre debe estar lista para release. | Feature branches vía PR |
-| `feature/<nombre>` | Nuevas funcionalidades. | Propia |
-| `fix/<nombre>` | Corrección de bugs. | Propia |
-| `hotfix/<nombre>` | Correcciones urgentes en producción. | `main` |
-| `docs/<nombre>` | Solo documentación. | Propia |
-| `refactor/<nombre>` | Refactorizaciones sin cambio de funcionalidad. | Propia |
+| Rama                | Propósito                                                   | Merges desde            |
+| ------------------- | ----------------------------------------------------------- | ----------------------- |
+| `main`              | Código estable en producción. Nunca se hace push directo.   | `develop` vía PR        |
+| `develop`           | Rama de integración. Siempre debe estar lista para release. | Feature branches vía PR |
+| `feature/<nombre>`  | Nuevas funcionalidades.                                     | Propia                  |
+| `fix/<nombre>`      | Corrección de bugs.                                         | Propia                  |
+| `hotfix/<nombre>`   | Correcciones urgentes en producción.                        | `main`                  |
+| `docs/<nombre>`     | Solo documentación.                                         | Propia                  |
+| `refactor/<nombre>` | Refactorizaciones sin cambio de funcionalidad.              | Propia                  |
 
 ### Reglas de ramas
 
@@ -148,17 +148,17 @@ Seguimos la especificación **[Conventional Commits](https://www.conventionalcom
 
 ### Tipos permitidos
 
-| Tipo | Uso |
-|---|---|
-| `feat` | Nueva funcionalidad |
-| `fix` | Corrección de bug |
-| `docs` | Solo documentación |
-| `style` | Formato, espacios, punto y coma (sin cambio de lógica) |
-| `refactor` | Refactorización sin cambio de comportamiento |
-| `test` | Añadir o modificar tests |
-| `chore` | Tareas de mantenimiento (dependencias, CI, etc.) |
-| `perf` | Mejora de rendimiento |
-| `revert` | Revertir un commit anterior |
+| Tipo       | Uso                                                    |
+| ---------- | ------------------------------------------------------ |
+| `feat`     | Nueva funcionalidad                                    |
+| `fix`      | Corrección de bug                                      |
+| `docs`     | Solo documentación                                     |
+| `style`    | Formato, espacios, punto y coma (sin cambio de lógica) |
+| `refactor` | Refactorización sin cambio de comportamiento           |
+| `test`     | Añadir o modificar tests                               |
+| `chore`    | Tareas de mantenimiento (dependencias, CI, etc.)       |
+| `perf`     | Mejora de rendimiento                                  |
+| `revert`   | Revertir un commit anterior                            |
 
 ### Ámbitos sugeridos
 
@@ -203,22 +203,27 @@ fix(portal): redirigir correctamente cuando factura no pertenece al usuario
 
 ```markdown
 ## Descripción
+
 Breve explicación de qué hace este PR y por qué es necesario.
 
 ## Cambios realizados
+
 - [ ] Nuevo modelo `veterinaria.X` con campos Y, Z
 - [ ] Vista de lista y formulario para X
 - [ ] Seguridad: ACL para grupos Veterinario y Admin
 
 ## Cómo probar
+
 1. Instalar/actualizar el módulo `veterinaria_core`
 2. Ir a Veterinaria → X
 3. Verificar que ...
 
 ## Screenshots (si aplica)
+
 [Insertar capturas de pantalla]
 
 ## Issues relacionados
+
 Closes #XX
 ```
 
