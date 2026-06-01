@@ -1,585 +1,429 @@
-# VitalPet 🐾 - Sistema Integral de Gestión Veterinaria en Odoo 18
+# 🐾 VitalPet — Sistema Integral de Gestión Veterinaria
 
-**Descripción**: Sistema profesional para la gestión integral de clínicas veterinarias, incluyendo:
-- 📅 Agendar citas y visualización en calendario
-- 📋 Gestión de historiales clínicos de mascotas
-- 💊 Control de medicamentos e inventario
-- 🛒 Integración con ventas e inventario de Odoo
-- 💰 Facturación automática de servicios
-- 👥 CRM para gestión de propietarios/clientes
+<p align="center">
+  <img src="custom_addons/veterinaria_core/static/description/icon.png" alt="VitalPet Logo" width="120"/>
+</p>
 
-**Stack Tecnológico**: Odoo 18.0 + PostgreSQL 15 + Docker Compose
+<p align="center">
+  <strong>Sistema profesional para la gestión integral de clínicas veterinarias</strong><br/>
+  Desarrollado sobre <a href="https://www.odoo.com/">Odoo 18</a> · PostgreSQL 15 · Docker
+</p>
 
-## 📋 Estructura del Proyecto
+<p align="center">
+  <img src="https://img.shields.io/badge/Odoo-18.0-875A7B?style=flat-square&logo=odoo" alt="Odoo 18"/>
+  <img src="https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python"/>
+  <img src="https://img.shields.io/badge/PostgreSQL-15-336791?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL"/>
+  <img src="https://img.shields.io/badge/Docker-Compose-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker"/>
+  <img src="https://img.shields.io/badge/Licencia-LGPL--3-green?style=flat-square" alt="Licencia"/>
+</p>
 
-```
-Proyecto Odoo/
-├── 🐳 INFRAESTRUCTURA
-│   ├── docker-compose.yml          # Orquestación de servicios (Odoo + PostgreSQL)
-│   ├── .devcontainer/              # Configuración VS Code dev container
-│   │   └── devcontainer.json
-│   ├── odoo.conf                   # Configuración de servidor Odoo
-│   ├── .env                        # Variables de entorno (PostgreSQL, puertos)
-│   ├── .env.example                # Template de variables de entorno
-│   └── .gitignore                  # Exclusiones de versionado
-│
-├── 📚 DOCUMENTACIÓN
-│   ├── README.md                   # Este archivo
-│   ├── INTEGRACION_MODULOS.md      # Guía de integración con módulos Odoo
-│   └── ExplicacionModeloOdoo.txt   # Notas de modelo de datos
-│
-└── 📦 MÓDULO PERSONALIZADO
-    └── custom_addons/
-        └── veterinaria_core/       # Módulo base: Gestión Veterinaria
-            ├── __init__.py         # Inicializador del paquete
-            ├── __manifest__.py     # Metadatos del módulo (dependencias, vistas, etc.)
-            │
-            ├── models/             # Modelos de datos ORM
-            │   ├── __init__.py
-            │   ├── paciente.py             # Mascotas/Pacientes
-            │   ├── historia_clinica.py     # Registros de consultas
-            │   ├── medicamento.py          # Catálogo de medicamentos
-            │   ├── cita.py                 # Citas/Calendario
-            │   └── producto.py             # Productos veterinarios
-            │
-            ├── views/              # Vistas XML (Forms, Lists, Calendars, etc.)
-            │   ├── menu.xml                # Estructura de menú y acciones
-            │   ├── paciente_view_new.xml   # Formulario profesional de pacientes
-            │   ├── historia_clinica_view_new.xml  # Formulario de historiales
-            │   ├── cita_view_new.xml       # Formulario de citas (con calendario)
-            │   ├── medicamento_view_new.xml # Formulario de medicamentos
-            │   ├── producto_view_new.xml   # Formulario de productos
-            │   └── [archivos _view.xml]    # Vistas originales (legacy)
-            │
-            ├── security/           # Control de acceso
-            │   └── ir.model.access.csv     # Permisos por grupo de usuarios
-            │
-            └── static/             # Recursos estáticos (CSS, JS, imágenes)
-                └── description/
-                    └── icon.png
-```
+---
 
-## 🚀 Inicio Rápido
+## 📖 Descripción General
 
-### Requisitos
-- **Docker** 20.10+
-- **Docker Compose** 2.0+
-- **Git** (para versionado)
+**VitalPet** es un sistema ERP veterinario completo construido como un conjunto de módulos personalizados para Odoo 18. Permite a clínicas veterinarias gestionar de forma integral todos los procesos operativos: desde la recepción de pacientes y el agendamiento de citas, hasta la facturación electrónica con el SRI de Ecuador, pasando por la gestión de historial médico, inventario, recetas y un portal web para los clientes.
 
-### Levantar el Proyecto
+El sistema está completamente contenedorizado con Docker, lo que garantiza un despliegue rápido y reproducible en cualquier entorno.
+
+---
+
+## 🎯 Objetivo del Proyecto
+
+Desarrollar una aplicación de gestión integral para clínicas veterinarias que:
+
+- **Centralice** la información de pacientes (mascotas), propietarios, veterinarios y servicios en un solo sistema.
+- **Automatice** procesos administrativos como facturación, control de inventario, recordatorios de citas y envío de credenciales de acceso.
+- **Ofrezca** un portal web para que los clientes consulten sus mascotas, citas, historiales médicos, recetas y descarguen carnets de vacunación en PDF.
+- **Integre** la facturación electrónica con el SRI (Servicio de Rentas Internas) de Ecuador, cumpliendo con los estándares de XML XSD 2.1.0 y firma electrónica XAdES-BES.
+- **Facilite** la escalabilidad y el mantenimiento mediante buenas prácticas de desarrollo en Odoo, Docker y control de versiones.
+
+---
+
+## ✨ Funcionalidades Principales
+
+### 🏥 Módulo Core (`veterinaria_core`)
+
+| Funcionalidad                 | Descripción                                                                                                          |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| **Gestión de Propietarios**   | Registro de clientes (res.partner extendido), creación automática de usuario portal con credenciales por email       |
+| **Gestión de Pacientes**      | Registro de mascotas con foto, especie, raza, peso, microchip, alergias y estado de vacunación                       |
+| **Gestión de Veterinarios**   | Catálogo de profesionales con especialidad, horarios y disponibilidad                                                |
+| **Agendamiento de Citas**     | Citas con validación de disponibilidad, detección de conflictos horarios y vista calendario                          |
+| **Historia Clínica**          | Generada automáticamente al crear una cita, con seguimiento de alergias, peso, tipo de sangre y condiciones crónicas |
+| **Carnet de Vacunación**      | Registro de vacunas aplicadas con próxima dosis calculada automáticamente; descargable como PDF                      |
+| **Recetas Médicas**           | Prescripciones con medicamentos del inventario o externos, cálculo automático de cantidad total                      |
+| **Inventario Unificado**      | Gestión de productos, servicios y medicamentos con control de stock, precios y márgenes                              |
+| **Facturación Multiservicio** | Facturación de citas, medicamentos, productos y servicios con importación desde recetas                              |
+| **Ventas**                    | Integración con `sale.order` de Odoo para ventas directas de productos                                               |
+| **Notificaciones por Email**  | Confirmación de citas, recordatorios 24h antes (cron), resumen post-consulta y credenciales de acceso                |
+| **Portal del Cliente**        | Mis mascotas, citas, historial médico, facturas (con PDF), recetas y carnet de vacunas                               |
+
+### 🌐 Módulo Web (`veterinaria_web`)
+
+| Funcionalidad              | Descripción                                                                    |
+| -------------------------- | ------------------------------------------------------------------------------ |
+| **Sitio Web Público**      | Landing page profesional con páginas de Inicio, Servicios, Nosotros y Contacto |
+| **Formulario de Contacto** | Recepción de consultas de potenciales clientes                                 |
+| **Diseño Responsivo**      | CSS personalizado con animaciones, variables CSS y Bootstrap de Odoo           |
+
+### 🧾 Módulo SRI (`l10n_ec_sri_vet`)
+
+| Funcionalidad         | Descripción                                                          |
+| --------------------- | -------------------------------------------------------------------- |
+| **Generación XML**    | XML según XSD 2.1.0 del SRI con clave de acceso Módulo 11            |
+| **Firma Electrónica** | XAdES-BES con certificado .p12 usando `cryptography` nativo          |
+| **Envío SOAP**        | Envío al Web Service de Recepción y consulta de Autorización del SRI |
+| **RIDE**              | Generación del RIDE (PDF) con código de barras Code128               |
+| **Envío por Email**   | Envío automático del RIDE y XML autorizado al cliente                |
+
+---
+
+## 📋 Requisitos Previos
+
+| Requisito          | Versión Mínima | Descripción                               |
+| ------------------ | -------------- | ----------------------------------------- |
+| **Docker**         | 20.10+         | Motor de contenedores                     |
+| **Docker Compose** | 2.0+           | Orquestación de servicios                 |
+| **Git**            | 2.30+          | Control de versiones                      |
+| **Navegador Web**  | Moderno        | Chrome, Firefox, Edge (últimas versiones) |
+| **Puerto 8069**    | Disponible     | Puerto por defecto de Odoo                |
+
+> **Nota:** No se requiere instalar Python, PostgreSQL ni Odoo localmente. Todo corre dentro de Docker.
+
+---
+
+## 🚀 Pasos de Instalación
+
+### 1. Clonar el Repositorio
 
 ```bash
-# Clonar o descargar el proyecto
-cd "Proyecto Odoo"
+git clone https://github.com/DavidGR21/Proyecto-Odoo.git
+cd Proyecto-Odoo
+```
 
-# Levantar contenedores (PostgreSQL + Odoo)
-docker-compose up -d
+### 2. Configurar Variables de Entorno
 
-# Ver logs en tiempo real
+```bash
+cp .env.example .env
+```
+
+Editar el archivo `.env` con los valores deseados:
+
+```env
+# Base de Datos
+POSTGRES_DB=postgres
+POSTGRES_USER=odoo
+POSTGRES_PASSWORD=odoo
+DB_HOST=db
+DB_PORT=5432
+
+# Odoo
+ODOO_PORT=8069
+ODOO_LOG_LEVEL=info
+ODOO_WORKERS=0
+ODOO_ADMIN_PASSWD=admin
+
+# SMTP (opcional — para notificaciones por email)
+SMTP_SERVER=smtp.gmail.com
+SMTP_PORT=465
+SMTP_USER=tu_email@gmail.com
+SMTP_PASSWORD=tu_app_password
+```
+
+### 3. Levantar los Contenedores
+
+```bash
+docker-compose up -d --build
+```
+
+Esto construye la imagen de Odoo con las dependencias adicionales (`zeep`, `python-barcode`, `python-stdnum`) y levanta:
+
+- **vitalpet-db**: PostgreSQL 15
+- **vitalpet-odoo**: Odoo 18 con los módulos personalizados
+
+### 4. Verificar que los Servicios Están Corriendo
+
+```bash
+docker-compose ps
 docker-compose logs -f odoo
 ```
 
-**Acceso a Odoo**:
-- 🌐 URL: `http://localhost:8070`
-- 👤 Usuario: `admin`
-- 🔐 Contraseña: `admin`
+### 5. Acceder a Odoo
 
-### Instalar el Módulo Veterinaria
+- **URL:** `http://localhost:8069`
+- **Usuario:** `admin`
+- **Contraseña:** `admin`
 
-1. Ir a **Aplicaciones** en Odoo
-2. Buscar "Veterinaria" o "veterinaria_core"
-3. Hacer clic en **Instalar**
-4. El menú "Veterinaria" aparecerá en la barra lateral
+### 6. Instalar los Módulos
 
-### Detener el Proyecto
+1. Ir a **Aplicaciones** → **Actualizar lista de aplicaciones**
+2. Buscar e instalar en este orden:
+   - `Veterinaria Core` (instala dependencias base, mail, portal, sale, account, calendar, stock, crm)
+   - `VitalPet - Sitio Web Veterinaria` (requiere módulo website)
+   - `Facturación Electrónica SRI Ecuador` (requiere veterinaria_core + certificado .p12)
+
+---
+
+## ⚙️ Configuración del Entorno
+
+### Archivo `odoo.conf`
+
+```ini
+[options]
+db_host = db
+db_port = 5432
+db_user = odoo
+db_password = odoo
+db_name = postgres
+http_port = 8069
+workers = 0
+addons_path = /mnt/extra-addons,/usr/lib/python3/dist-packages/odoo/addons
+admin_passwd = admin
+smtp_server = mailhog
+smtp_port = 1025
+```
+
+### Docker Compose
+
+El archivo `docker-compose.yml` orquesta dos servicios:
+
+| Servicio | Imagen                   | Puerto         | Descripción              |
+| -------- | ------------------------ | -------------- | ------------------------ |
+| `db`     | `postgres:15`            | 5432 (interno) | Base de datos PostgreSQL |
+| `odoo`   | Build desde `Dockerfile` | 8069 → host    | Servidor Odoo 18         |
+
+### Volúmenes Persistentes
+
+| Volumen             | Ruta en contenedor         | Descripción                         |
+| ------------------- | -------------------------- | ----------------------------------- |
+| `vitalpet-db-data`  | `/var/lib/postgresql/data` | Datos de PostgreSQL                 |
+| `vitalpet-web-data` | `/var/lib/odoo`            | Datos de Odoo (filestore)           |
+| `./custom_addons`   | `/mnt/extra-addons`        | Módulos personalizados (bind mount) |
+
+---
+
+## 📂 Dependencias
+
+### Dependencias de Odoo (módulos base)
+
+| Módulo        | Uso en VitalPet                                       |
+| ------------- | ----------------------------------------------------- |
+| `base`        | Funcionalidades base de Odoo (res.partner, res.users) |
+| `mail`        | Sistema de mensajería, plantillas de email, chatter   |
+| `web`         | Framework web de Odoo                                 |
+| `portal`      | Portal de cliente autenticado                         |
+| `auth_signup` | Invitaciones por email y registro de usuarios portal  |
+| `sale`        | Órdenes de venta para integración de ventas           |
+| `account`     | Facturación y contabilidad, impuestos                 |
+| `calendar`    | Vista calendario para citas                           |
+| `stock`       | Control de inventario y movimientos de stock          |
+| `crm`         | Gestión de relaciones con clientes                    |
+| `website`     | Motor del sitio web público (para `veterinaria_web`)  |
+
+### Dependencias Python Externas (instaladas en Dockerfile)
+
+| Librería                 | Versión | Uso                                                   |
+| ------------------------ | ------- | ----------------------------------------------------- |
+| `zeep`                   | Última  | Cliente SOAP para Web Services del SRI                |
+| `python-barcode[images]` | Última  | Generación de códigos de barras Code128 para RIDE     |
+| `python-stdnum`          | Última  | Validación de números de identificación (RUC, cédula) |
+
+---
+
+## 🗂️ Estructura General del Repositorio
+
+```
+Proyecto-Odoo/
+├── 📄 README.md                          # Documentación principal del proyecto
+├── 📄 CONTRIBUTING.md                    # Guía de contribución al proyecto
+├── 📄 CODE_OF_CONDUCT.md                # Código de conducta del equipo
+├── 📄 LICENSE                            # Licencia LGPL-3
+├── 📄 CHANGELOG.md                       # Historial de cambios
+├── 📄 SECURITY.md                        # Política de seguridad
+│
+├── 🐳 docker-compose.yml                # Orquestación Docker (Odoo + PostgreSQL)
+├── 🐳 Dockerfile                         # Imagen personalizada de Odoo 18
+├── ⚙️ odoo.conf                          # Configuración del servidor Odoo
+├── 📄 .env.example                       # Template de variables de entorno
+├── 📄 .gitignore                         # Exclusiones de versionado
+│
+├── 📁 docs/                              # Documentación técnica extendida
+│   └── API.md                            # Documentación de API, controladores y servicios
+│
+├── 📁 .devcontainer/                     # Configuración VS Code Dev Container
+│
+└── 📁 custom_addons/                     # Módulos personalizados de Odoo
+    │
+    ├── 📦 veterinaria_core/              # Módulo principal de gestión veterinaria
+    │   ├── __init__.py
+    │   ├── __manifest__.py               # v18.0.1.6.0 — metadatos y dependencias
+    │   ├── controllers/                  # Controladores HTTP (portal del cliente)
+    │   │   ├── __init__.py
+    │   │   └── portal.py                 # Rutas /my/pets, /my/appointments, etc.
+    │   ├── models/                       # 18 modelos ORM
+    │   │   ├── propietario.py            # res.partner extendido (propietarios)
+    │   │   ├── paciente.py               # Mascotas/Pacientes
+    │   │   ├── veterinario.py            # Profesionales veterinarios
+    │   │   ├── especialidad.py           # Especialidades veterinarias
+    │   │   ├── cita.py                   # Citas con validación de disponibilidad
+    │   │   ├── historia_clinica.py       # Historia clínica (auto-generada)
+    │   │   ├── medicamento.py            # Catálogo de medicamentos
+    │   │   ├── servicio.py               # Servicios veterinarios
+    │   │   ├── producto.py               # Productos veterinarios
+    │   │   ├── inventario.py             # Inventario unificado
+    │   │   ├── vacuna.py                 # Catálogo + vacunas aplicadas
+    │   │   ├── receta.py                 # Recetas médicas + líneas
+    │   │   ├── facturacion.py            # Facturación multiservicio
+    │   │   ├── facturacion_linea.py      # Líneas de facturación
+    │   │   ├── facturacion_wizard.py     # Wizards de facturación
+    │   │   ├── venta.py                  # Ventas + líneas de venta
+    │   │   ├── documento_venta.py        # Documento de venta unificado
+    │   │   └── credential_wizard.py      # Wizard de credenciales portal
+    │   ├── views/                        # Vistas XML (formularios, listas, menús)
+    │   ├── data/                         # Datos iniciales (secuencias, cron, templates email)
+    │   ├── security/                     # Grupos, reglas de registro, ACLs
+    │   ├── reports/                      # Reportes QWeb-PDF (carnet vacunas, factura)
+    │   └── static/                       # Recursos estáticos
+    │
+    ├── 📦 veterinaria_web/               # Sitio web público de la clínica
+    │   ├── __init__.py
+    │   ├── __manifest__.py               # v18.0.1.0.0
+    │   ├── controllers/
+    │   │   ├── __init__.py
+    │   │   ├── main.py                   # Rutas públicas (/, /servicios, /nosotros, /contacto)
+    │   │   └── controllers.py            # Archivo placeholder (no activo)
+    │   ├── models/
+    │   ├── views/                        # Templates QWeb (layout, pages, snippets)
+    │   ├── static/src/                   # CSS, JS e imágenes
+    │   └── demo/                         # Datos demo
+    │
+    └── 📦 l10n_ec_sri_vet/               # Facturación electrónica SRI Ecuador
+        ├── __init__.py
+        ├── __manifest__.py               # v18.0.1.0.0
+        ├── models/
+        │   ├── facturacion_inherit.py     # Herencia sobre veterinaria.facturacion
+        │   ├── res_company.py            # Configuración SRI en res.company
+        │   ├── sri_documento.py          # Documento electrónico SRI
+        │   ├── sri_xml_generator.py      # Generador XML XSD 2.1.0
+        │   ├── sri_firma.py              # Firma XAdES-BES con certificado .p12
+        │   └── sri_ws_client.py          # Cliente SOAP para Web Services del SRI
+        ├── views/                        # Vistas de configuración SRI
+        ├── data/                         # Catálogos del SRI
+        ├── report/                       # RIDE template
+        └── security/                     # ACLs del módulo SRI
+```
+
+---
+
+## ▶️ Instrucciones para Ejecutar el Proyecto
+
+### Desarrollo Local
 
 ```bash
-# Pausar servicios (mantiene datos)
+# 1. Levantar contenedores
+docker-compose up -d --build
+
+# 2. Ver logs en tiempo real
+docker-compose logs -f odoo
+
+# 3. Acceder a http://localhost:8069
+
+# 4. Tras cambios en el código, reiniciar Odoo
+docker-compose restart odoo
+
+# 5. Actualizar módulo desde la interfaz
+#    Aplicaciones → Buscar módulo → ⚙️ Actualizar
+```
+
+### Comandos Útiles
+
+```bash
+# Ver estado de contenedores
+docker-compose ps
+
+# Acceder a la shell del contenedor Odoo
+docker exec -it vitalpet-odoo bash
+
+# Acceder a la consola PostgreSQL
+docker exec -it vitalpet-db psql -U odoo -d postgres
+
+# Parar servicios (mantiene datos)
 docker-compose stop
 
-# Parar y eliminar contenedores (mantiene datos en volúmenes)
+# Parar y eliminar contenedores (mantiene volúmenes)
 docker-compose down
 
-# Parar y BORRAR todo (base de datos, volúmenes)
+# Parar y BORRAR TODO (base de datos, filestore)
 docker-compose down -v
 ```
 
-### Reiniciar o Actualizar el Módulo
+### Actualización de Módulos por Línea de Comandos
 
 ```bash
-# Reiniciar Odoo (cuando cambies código)
+docker exec -it vitalpet-odoo odoo -c /etc/odoo/odoo.conf -u veterinaria_core --stop-after-init
 docker-compose restart odoo
-
-# Ver logs después de reinicio
-docker-compose logs -f odoo | grep -i veterinaria
-```
-
-## 📝 Configuración
-
-### Variables de Entorno (`.env`)
-
-El archivo `.env` controla la configuración de servicios:
-
-```env
-# PostgreSQL (Base de Datos)
-POSTGRES_DB=odoo              # Nombre de la base de datos
-POSTGRES_USER=odoo            # Usuario de PostgreSQL
-POSTGRES_PASSWORD=odoo        # Contraseña de PostgreSQL
-DB_HOST=db                    # Host del contenedor DB
-DB_PORT=5432                  # Puerto PostgreSQL
-POSTGRES_DATA_PATH=./postgres_data  # Ruta de datos persistentes
-
-# Odoo Server
-ODOO_PORT=8070                # Puerto expuesto (localhost:8070)
-ODOO_LOG_LEVEL=info           # Nivel de logging (debug, info, warning, error)
-ODOO_WORKERS=4                # Número de worker processes
-ODOO_ADMIN_PASSWD=admin       # Contraseña de master (para crear/eliminar BDs)
-```
-
-**Crear el archivo `.env`**:
-```bash
-cp .env.example .env
-# Editar si necesitas cambiar valores por defecto
-```
-
-### Configuración de Odoo (`odoo.conf`)
-
-Archivo de configuración del servidor Odoo:
-- `db_host`, `db_port`, `db_user`, `db_password`: Conexión a PostgreSQL
-- `db_name`: Nombre de la base de datos
-- `addons_path`: Rutas donde buscar módulos
-- `log_level`: Verbosidad de logs
-- `workers`: Procesos simultáneos
-
-**Editar solo si es necesario** - Valores por defecto incluídos.
-
-### Volúmenes Docker
-
-Los datos persistentes se almacenan en:
-- `./postgres_data/`: Base de datos PostgreSQL
-- `./custom_addons/`: Módulos personalizados
-- Ambos están en `.gitignore` para no versionar datos
-
-## 📦 Módulo: veterinaria_core
-
-### Modelos de Datos
-
-#### 1️⃣ Paciente (`veterinaria.paciente`)
-Representa una mascota/animal bajo cuidado veterinario.
-
-**Campos principales**:
-| Campo | Tipo | Descripción |
-|-------|------|-------------|
-| `name` | Char | Nombre de la mascota |
-| `especie` | Selection | Perro, Gato, Conejo, Loro, etc. |
-| `raza` | Char | Raza de la mascota |
-| `fecha_nacimiento` | Date | Fecha de nacimiento |
-| `peso` | Float | Peso en kg |
-| `foto` | Binary | Imagen/foto de la mascota |
-| `propietario_id` | Many2one | Vínculo con contacto (res.partner) |
-| `alergias` | Text | Alergias conocidas |
-| `estado_vacunacion` | Selection | Al día / Atrasado / Sin vacunas |
-| `microchip` | Char | Número de microchip (opcional) |
-| `estado` | Selection | Activo / Inactivo / Fallecido |
-| `historia_clinica_ids` | One2many | Listado de consultas realizadas |
-
-#### 2️⃣ Cita (`veterinaria.cita`)
-Gestiona las citas veterinarias programadas.
-
-**Campos principales**:
-| Campo | Tipo | Descripción |
-|-------|------|-------------|
-| `name` | Char | Nombre/ID de la cita |
-| `paciente_id` | Many2one | Mascota a atender |
-| `veterinario_id` | Many2one | Profesional veterinario (hr.employee) |
-| `fecha_inicio` | Datetime | Fecha y hora de inicio |
-| `fecha_fin` | Datetime | Fecha y hora de finalización |
-| `motivo` | Text | Motivo de la cita |
-| `estado` | Selection | Pendiente / Confirmada / Completada / Cancelada |
-| `notas` | Text | Observaciones adicionales |
-
-**Vista especial**: Aparece en **Calendario** con colores por veterinario
-
-#### 3️⃣ Historia Clínica (`veterinaria.historia_clinica`)
-Registro de cada consulta/tratamiento realizado.
-
-**Campos principales**:
-| Campo | Tipo | Descripción |
-|-------|------|-------------|
-| `paciente_id` | Many2one | Mascota consultada |
-| `veterinario_id` | Many2one | Veterinario que atendió |
-| `fecha` | Datetime | Fecha y hora de la consulta |
-| `motivo_consulta` | Text | Razón de la consulta |
-| `diagnostico` | Text | Diagnóstico realizado |
-| `tratamiento` | Html | Tratamiento prescrito |
-| `medicamento_ids` | Many2many | Medicamentos recetados |
-| `proxima_cita` | Datetime | Fecha de seguimiento |
-| `temperatura` | Float | Temp. corporal en °C |
-| `frecuencia_cardiaca` | Float | Pulsaciones por minuto |
-| `peso_consulta` | Float | Peso en kg al momento |
-| `estado` | Selection | Pendiente / Completada / Cancelada |
-
-#### 4️⃣ Medicamento (`veterinaria.medicamento`)
-Catálogo de medicamentos disponibles.
-
-**Campos principales**:
-| Campo | Tipo | Descripción |
-|-------|------|-------------|
-| `name` | Char | Nombre del medicamento |
-| `principio_activo` | Char | Compuesto activo |
-| `tipo` | Char | Tipo (Antibiótico, Analgésico, etc.) |
-| `via_administracion` | Selection | Oral / Inyectable / Tópico / Otro |
-| `dosis_recomendada` | Char | Dosis sugerida |
-| `descripcion` | Html | Descripción detallada |
-| `contraindicaciones` | Html | Cuándo NO usar |
-| `efectos_secundarios` | Html | Efectos adversos posibles |
-| `proveedor_id` | Many2one | Proveedor (res.partner) |
-| `activo` | Boolean | ¿Disponible en catálogo? |
-
-#### 5️⃣ Producto Veterinario (`veterinaria.producto`)
-Productos para venta (alimentos, accesorios, equipos, etc.).
-
-**Campos principales**:
-| Campo | Tipo | Descripción |
-|-------|------|-------------|
-| `name` | Char | Nombre del producto |
-| `tipo` | Selection | Medicamento / Alimento / Accesorio / Equipo / Servicio |
-| `precio` | Float | Precio de venta |
-| `cantidad` | Integer | Stock disponible |
-| `descripcion` | Html | Descripción del producto |
-| `proveedor_id` | Many2one | Proveedor (res.partner) |
-| `activo` | Boolean | ¿Disponible para venta? |
-
----
-
-### Relaciones entre Modelos
-
-```
-┌──────────────┐
-│ res.partner  │ (Contactos/CRM)
-│ (Clientes)   │
-└──────┬───────┘
-       │ 1:N
-       │ propietario_id
-       │
-       ↓
-┌──────────────┐      1:N       ┌─────────────────┐
-│  Paciente    ├──────────────→ │ Historia Clínica│
-│  (Mascotas)  │ historia_ids   │  (Consultas)    │
-└──────────────┘                └────────┬────────┘
-                                         │ N:N
-                                         ↓
-                                  ┌──────────────┐
-                                  │ Medicamento  │
-                                  │  (Catálogo)  │
-                                  └──────────────┘
-
-┌──────────────┐
-│  Paciente    │
-└──────┬───────┘
-       │ 1:N
-       │ paciente_id
-       ↓
-┌──────────────┐
-│  Cita        │
-│ (Calendario) │
-└──────────────┘
-
-┌──────────────┐
-│  Producto    │ ← Vínculo con Inventario de Odoo
-│  (Almacén)   │
-└──────────────┘
 ```
 
 ---
 
-### Dependencias de Módulos Odoo
+## 🔐 Sistema de Seguridad y Roles
 
-El módulo `veterinaria_core` requiere:
-- **base**: Funcionalidades básicas de Odoo
-- **sale_management**: Gestión de ventas (cotizaciones, órdenes)
-- **account**: Facturación y contabilidad
-- **stock**: Gestión de inventario
-- **crm**: Gestión de relaciones con clientes
-- **calendar**: Vistas de calendario para citas
+El sistema implementa **4 grupos jerárquicos de seguridad**:
 
-**Módulos relacionados disponibles en Odoo**:
-- ✅ **Contactos** (res.partner): Para propietarios y proveedores
-- ✅ **Recursos Humanos** (hr): Para veterinarios (hr.employee)
-- ✅ **Inventario**: Stock de medicamentos y productos
+| Grupo                            | Hereda de     | Permisos                                                            |
+| -------------------------------- | ------------- | ------------------------------------------------------------------- |
+| **Recepcionista**                | —             | Gestión de citas, pacientes y propietarios. Lectura de medicamentos |
+| **Veterinario**                  | Recepcionista | + Historia clínica, recetas, vacunas                                |
+| **Administrador Veterinaria**    | Veterinario   | + Facturación, ventas, inventario completo, eliminación             |
+| **Cliente Veterinaria (Portal)** | Portal Odoo   | Solo sus propias mascotas, citas, facturas, recetas, carnet         |
 
-## 🔧 Desarrollo
-
-### Crear un Nuevo Modelo
-
-En `custom_addons/veterinaria_core/models/`:
-
-**Paso 1**: Crear archivo `mi_modelo.py`:
-```python
-from odoo import models, fields
-
-class MiModelo(models.Model):
-    _name = 'veterinaria.mi_modelo'
-    _description = 'Descripción del modelo'
-    _inherit = ['mail.thread']  # Opcional: para comentarios
-
-    name = fields.Char('Nombre', required=True)
-    descripcion = fields.Text('Descripción')
-    fecha = fields.Datetime('Fecha', default=fields.Datetime.now)
-    activo = fields.Boolean('Activo?', default=True)
-    
-    # Relación con otro modelo
-    paciente_id = fields.Many2one('veterinaria.paciente', 'Paciente')
-```
-
-**Paso 2**: Registrarlo en `models/__init__.py`:
-```python
-from . import paciente
-from . import historia_clinica
-from . import medicamento
-from . import cita
-from . import producto
-from . import mi_modelo  # ← AGREGAR ESTA LÍNEA
-```
-
-**Paso 3**: Actualizar `__manifest__.py`:
-```python
-{
-    'name': 'Veterinaria Core',
-    'version': '18.0.1.0.0',
-    'depends': ['base', 'sale_management', 'account', 'stock', 'crm', 'calendar', 'mail'],
-    'data': [
-        'security/ir.model.access.csv',
-        'views/menu.xml',
-        'views/paciente_view_new.xml',
-        # ... más vistas
-    ],
-    'installable': True,
-    'auto_install': False,
-}
-```
-
-### Crear una Vista XML
-
-En `custom_addons/veterinaria_core/views/`:
-
-**Paso 1**: Crear archivo `mi_modelo_view.xml`:
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
-    <data>
-        <!-- VISTA LISTA (Tree) -->
-        <record id="mi_modelo_view_list" model="ir.ui.view">
-            <field name="name">Modelo - Lista</field>
-            <field name="model">veterinaria.mi_modelo</field>
-            <field name="arch" type="xml">
-                <list>
-                    <field name="name"/>
-                    <field name="fecha"/>
-                    <field name="activo"/>
-                </list>
-            </field>
-        </record>
-
-        <!-- VISTA FORMULARIO -->
-        <record id="mi_modelo_view_form" model="ir.ui.view">
-            <field name="name">Modelo - Formulario</field>
-            <field name="model">veterinaria.mi_modelo</field>
-            <field name="arch" type="xml">
-                <form>
-                    <sheet>
-                        <h1><field name="name"/></h1>
-                        <group>
-                            <field name="fecha"/>
-                            <field name="paciente_id"/>
-                        </group>
-                        <notebook>
-                            <page string="Detalles">
-                                <field name="descripcion"/>
-                            </page>
-                        </notebook>
-                    </sheet>
-                </form>
-            </field>
-        </record>
-
-        <!-- ACCIÓN (Menú) -->
-        <record id="mi_modelo_action" model="ir.actions.act_window">
-            <field name="name">Mi Modelo</field>
-            <field name="res_model">veterinaria.mi_modelo</field>
-            <field name="view_mode">list,form</field>
-        </record>
-    </data>
-</odoo>
-```
-
-### Agregar a Menú
-
-En `views/menu.xml`, agregar dentro de `<menuitem id="veterinaria_menu_item_manage">`:
-```xml
-<menuitem id="veterinaria_submenu_mi_modelo"
-    name="Mi Modelo"
-    action="veterinaria_core.mi_modelo_action"
-    parent="veterinaria_menu_item_manage"/>
-```
-
-### Agregar Acceso de Seguridad
-
-En `security/ir.model.access.csv`, agregar línea:
-```csv
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_mi_modelo_all,Access veterinaria.mi_modelo,model_veterinaria_mi_modelo,base.group_user,1,1,1,1
-```
-
-### Recargar Módulo
-
-```bash
-# Reiniciar Odoo
-docker-compose restart odoo
-
-# Ver logs
-docker-compose logs -f odoo | head -100
-```
-
-Luego en Odoo:
-1. Ir a **Aplicaciones**
-2. Buscar "Veterinaria Core"
-3. Hacer clic en **⚙️ Actualizar** (o Desinstalar → Reinstalar)
-
----
-
-## 📊 Flujo de Datos Típico
-
-```
-1. CREAR PACIENTE
-   └─ Ingresar nombre, especie, propietario (desde Contactos)
-
-2. AGENDAR CITA
-   └─ Seleccionar paciente, fecha, veterinario
-   └─ Aparece en CALENDARIO
-
-3. REALIZAR CONSULTA
-   └─ Crear Historia Clínica
-   └─ Seleccionar medicamentos del catálogo
-   └─ Registrar diagnóstico y vitales
-
-4. VENDER PRODUCTOS
-   └─ Ir a Ventas (módulo Odoo estándar)
-   └─ Crear orden de venta
-   └─ Agregar Productos Veterinarios
-   └─ Confirmar y Facturar
-
-5. CONTABILIDAD
-   └─ Factura se registra automáticamente
-   └─ Reportes de ingresos disponibles en Contabilidad
-```
+Las **Record Rules** aseguran aislamiento de datos: cada cliente portal solo ve registros vinculados a su `partner_id`.
 
 ---
 
 ## 🐛 Solución de Problemas
 
-### Problema: "Modelo no encontrado"
-**Solución**: 
-```bash
-docker-compose restart odoo
-# O reinstalar el módulo en Aplicaciones
-```
+| Problema                | Solución                                                                     |
+| ----------------------- | ---------------------------------------------------------------------------- |
+| Contenedores no inician | `docker-compose logs -f` para ver errores                                    |
+| "Modelo no encontrado"  | `docker-compose restart odoo` y actualizar módulo                            |
+| "Permiso denegado"      | Verificar `security/ir.model.access.csv` y grupos                            |
+| Cambios no aparecen     | Limpiar caché del navegador (Ctrl+Shift+Del) + `docker-compose restart odoo` |
+| BD corrupta             | `docker-compose down -v && docker-compose up -d --build`                     |
+| Emails no se envían     | Verificar configuración SMTP en `.env` y en Odoo → Ajustes → Correo          |
 
-### Problema: "Permiso denegado"
-**Solución**: 
-- Ir a **Configuración → Seguridad → Control de Acceso**
-- Verificar permisos en `security/ir.model.access.csv`
+---
 
-### Problema: "Cambios no aparecen"
-**Solución**:
-- Limpiar caché del navegador (Ctrl+Shift+Del)
-- Reiniciar Odoo: `docker-compose restart odoo`
+## 🔧 Recomendaciones de Mantenimiento
 
-### Problema: Base de datos corrupta
-**Solución**:
-```bash
-# ADVERTENCIA: ELIMINA TODOS LOS DATOS
-docker-compose down -v
-docker-compose up -d
-# Ir a http://localhost:8070 e instalar módulo nuevamente
-```
+1. **Backups regulares**: Realizar respaldos de la base de datos PostgreSQL (`pg_dump`) y del filestore de Odoo.
+2. **Actualizar módulos**: Tras cada cambio de código, actualizar el módulo desde Aplicaciones o por CLI.
+3. **Monitorear logs**: Revisar periódicamente `docker-compose logs odoo` para detectar errores.
+4. **Variables de entorno**: Nunca versionar el archivo `.env` con credenciales reales.
+5. **Certificado SRI**: Renovar el certificado de firma electrónica .p12 antes de su vencimiento.
+6. **Actualizaciones de seguridad**: Mantener la imagen Docker de Odoo y PostgreSQL actualizadas.
+7. **Pruebas antes de deploy**: Siempre probar cambios en ambiente local antes de pasar a producción.
 
 ---
 
 ## 📚 Documentación Adicional
 
-VitalPet incluye documentación completa para desarrollo, deployment y troubleshooting:
-
-### 📖 Guías Esenciales
-
-| Documento | Descripción | Audiencia |
-|-----------|-----------|-----------|
-| **[PRIMEROS_PASOS.md](PRIMEROS_PASOS.md)** | Guía paso a paso para iniciarse con el sistema | Usuarios nuevos, QA |
-| **[INTEGRACION_MODULOS.md](INTEGRACION_MODULOS.md)** | Cómo integran los módulos Odoo (Ventas, Inventario, CRM) | Product Owner, Desarrolladores |
-| **[ESPECIFICACIONES_TECNICAS.md](ESPECIFICACIONES_TECNICAS.md)** | Arquitectura, BD, modelos ORM, seguridad | Arquitectos, Desarrolladores, DevOps |
-| **[DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md)** | Lista de verificación para go-live | DevOps, QA Lead |
-| **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** | Solución de problemas comunes con FAQ | Soporte, Desarrolladores |
-
-### 🚀 Flujo Recomendado de Lecturas
-
-1. **Primer día**: 
-   - Leer este README
-   - Ejecutar [PRIMEROS_PASOS.md](PRIMEROS_PASOS.md)
-   - Crear 2-3 pacientes de prueba
-
-2. **Primera semana**:
-   - Estudiar [INTEGRACION_MODULOS.md](INTEGRACION_MODULOS.md)
-   - Revisar [ESPECIFICACIONES_TECNICAS.md](ESPECIFICACIONES_TECNICAS.md)
-
-3. **Antes de producción**:
-   - Completar [DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md)
-   - Revisar [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
+| Documento                                | Descripción                                                                           |
+| ---------------------------------------- | ------------------------------------------------------------------------------------- |
+| [docs/API.md](docs/API.md)               | Documentación completa de API: controladores, endpoints, modelos y servicios internos |
+| [CONTRIBUTING.md](CONTRIBUTING.md)       | Guía para contribuir al proyecto                                                      |
+| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Código de conducta del equipo                                                         |
+| [CHANGELOG.md](CHANGELOG.md)             | Historial de cambios del proyecto                                                     |
+| [SECURITY.md](SECURITY.md)               | Política de seguridad y reporte de vulnerabilidades                                   |
+| [LICENSE](LICENSE)                       | Licencia LGPL-3                                                                       |
 
 ---
 
-## 📚 Documentación Oficial
-        <record id="view_model_list" model="ir.ui.view">
-            <field name="name">veterinaria.modelo.list</field>
-            <field name="model">veterinaria.modelo</field>
-            <field name="arch" type="xml">
-                <tree>
-                    <field name="name"/>
-                </tree>
-            </field>
-        </record>
-    </data>
-</odoo>
-```
+## 👥 Equipo — VitalPet Team
 
-## 🐛 Solución de Problemas
-
-### Los contenedores no inician
-```bash
-docker-compose logs -f
-```
-
-### Necesito reinstalar el módulo
-```bash
-# Eliminar contenedores y volúmenes
-docker-compose down -v
-
-# Levantar nuevamente
-docker-compose up -d
-```
-
-### Cambios en el código no se reflejan
-- Reinicia el servicio de Odoo: `docker-compose restart odoo`
-- O actualiza el módulo desde la interfaz de Odoo
-
-## 📚 Recursos
-
-- [Documentación oficial de Odoo 18](https://www.odoo.com/documentation/18.0/)
-- [Guía de desarrollo de módulos](https://www.odoo.com/documentation/18.0/developer/tutorials.html)
-
-## 👥 Equipo
-
-VitalPet Team
+Proyecto desarrollado como parte del curso de Desarrollo de Aplicaciones y Servicios (DAS), Octavo Semestre.
 
 ## 📄 Licencia
 
-LGPL-3
+Este proyecto está licenciado bajo **LGPL-3** (GNU Lesser General Public License v3).
+Consulta el archivo [LICENSE](LICENSE) para más detalles.

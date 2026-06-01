@@ -1,0 +1,974 @@
+openapi: 3.0.3
+info:
+  title: Documentación de Módulos - Odoo VitalPet
+  version: 1.0.0
+  description: |
+    Documento OpenAPI solo para documentación interna.
+    No representa una API REST real; se usa para visualizar módulos, rutas web
+    y estructura del proyecto en Scalar.
+servers:
+  - url: http://localhost:8069
+    description: Odoo local
+  - url: https://<odoo-host>
+    description: Odoo remoto
+
+tags:
+  - name: module_docs
+    description: Rutas documentales para describir módulos que se ha desarrollado dentro del proyecto .
+  - name: veterinaria_core
+    description: Módulo principal con lógica de negocio, modelos, controladores y reportes.
+  - name: veterinaria_web
+    description: Módulo web y portal publico.
+  - name: l10n_ec_sri_vet
+    description: Localización Ecuador y facturación electrónica SRI.
+  - name: portal
+    description: Rutas del portal del cliente (HTML/PDF).
+  - name: web_public
+    description: Sitio web público (HTML) que representa a la empresa o es una parte informativa.
+
+components:
+  securitySchemes:
+    sessionAuth:
+      type: apiKey
+      in: cookie
+      name: session_id
+      description: Cookie de sesión de Odoo.
+  schemas:
+    ModuloVeterinariaCore:
+      type: object
+      description: |
+        Módulo principal para VitalPet.
+        Incluye gestión de mascotas, historia clínica, recetas, facturas y portal.
+      properties:
+        depends:
+          type: array
+          items:
+            type: string
+          example: ["base", "mail", "portal", "sale", "account", "stock"]
+        controllers:
+          type: array
+          items:
+            type: string
+          example: ["controllers/portal.py"]
+        data:
+          type: array
+          items:
+            type: string
+          example: ["data/sequences.xml", "data/mail_templates.xml", "data/cron_recordatorio.xml"]
+        models:
+          type: array
+          items:
+            type: string
+          example: [
+            "cita.py", "credential_wizard.py", "documento_venta.py",
+            "especialidad.py", "facturacion.py", "facturacion_linea.py",
+            "facturacion_wizard.py", "historia_clinica.py", "inventario.py",
+            "medicamento.py", "paciente.py", "producto.py", "propietario.py",
+            "receta.py", "servicio.py", "vacuna.py", "venta.py", "veterinario.py"
+          ]
+        reports:
+          type: array
+          items:
+            type: string
+          example: ["reports/carnet_vacunas_report.xml", "reports/factura_veterinaria_report.xml"]
+        security:
+          type: array
+          items:
+            type: string
+          example: ["security/veterinaria_security.xml", "security/portal_security.xml", "security/ir.model.access.csv"]
+        views:
+          type: array
+          items:
+            type: string
+          example: [
+            "views/cita_view.xml", "views/receta_view.xml",
+            "views/facturacion_view.xml", "views/portal_templates.xml"
+          ]
+    ModuloL10nSri:
+      type: object
+      description: |
+        Integración SRI Ecuador (SOAP) y facturación electrónica.
+      properties:
+        depends:
+          type: array
+          items:
+            type: string
+          example: ["base", "mail", "account", "veterinaria_core"]
+        external_dependencies:
+          type: array
+          items:
+            type: string
+          example: ["zeep", "barcode", "stdnum"]
+        models:
+          type: array
+          items:
+            type: string
+          example: ["sri_documento.py", "sri_firma.py", "sri_ws_client.py", "sri_xml_generator.py"]
+        data:
+          type: array
+          items:
+            type: string
+          example: ["data/sri_catalogo_data.xml"]
+        report:
+          type: array
+          items:
+            type: string
+          example: ["report/ride_report.xml", "report/ride_template.xml"]
+        views:
+          type: array
+          items:
+            type: string
+          example: ["views/res_company_view.xml", "views/sri_documento_view.xml", "views/facturacion_view_inherit.xml"]
+    ModuloVeterinariaWeb:
+      type: object
+      description: |
+        Sitio web público con QWeb y assets frontend.
+      properties:
+        depends:
+          type: array
+          items:
+            type: string
+          example: ["website"]
+        controllers:
+          type: array
+          items:
+            type: string
+          example: ["controllers/main.py"]
+        views:
+          type: array
+          items:
+            type: string
+          example: [
+            "views/layout.xml", "views/pages/inicio.xml",
+            "views/pages/servicios.xml", "views/pages/contacto.xml"
+          ]
+        assets:
+          type: array
+          items:
+            type: string
+          example: [
+            "static/src/css/layout.css", "static/src/css/inicio.css",
+            "static/src/js/main.js"
+          ]
+
+    VeterinariaCita:
+      type: object
+      description: |
+        Agenda de citas veterinarias con validaciones de disponibilidad,
+        sincronización de historia clínica y notificaciones por correo.
+      properties:
+        key_fields:
+          type: array
+          items:
+            type: string
+          example: ["paciente_id", "propietario_id", "veterinario_id", "fecha_hora", "estado"]
+        methods:
+          type: array
+          items:
+            type: string
+          example: [
+            "_compute_receta_count", "_compute_duracion_horas",
+            "_onchange_fecha_hora_disponibilidad", "_onchange_propietario_id",
+            "_compute_name", "_check_required_fields", "_map_estado_historia",
+            "_prepare_historia_vals", "_onchange_paciente_id", "_sync_historia",
+            "_send_confirmacion_email", "_send_completada_email",
+            "_cron_enviar_recordatorios", "default_get", "onchange",
+            "create", "write", "action_completar_cita", "action_cancelar_cita",
+            "action_crear_receta"
+          ]
+
+    VeterinariaFacturacion:
+      type: object
+      description: |
+        Facturación multiservicio con lineas de cita, inventario y servicios.
+        Controla estado, impuestos y bloqueos de edicion en validado/cancelado.
+      properties:
+        key_fields:
+          type: array
+          items:
+            type: string
+          example: ["propietario_id", "linea_ids", "impuesto_id", "estado", "fecha_factura"]
+        methods:
+          type: array
+          items:
+            type: string
+          example: [
+            "_compute_totales", "action_validar_factura", "action_cancelar_factura",
+            "action_importar_receta", "_get_allowed_fields_validado", "write", "create"
+          ]
+
+    VeterinariaFacturacionLinea:
+      type: object
+      description: |
+        Linea de facturación con item unificado (cita o inventario),
+        calcula subtotal y valida stock/precio.
+      properties:
+        key_fields:
+          type: array
+          items:
+            type: string
+          example: ["facturacion_id", "tipo_linea", "item_ref", "cantidad", "precio_unitario"]
+        methods:
+          type: array
+          items:
+            type: string
+          example: [
+            "_compute_nombre_item", "_compute_subtotal", "_compute_descripcion",
+            "_onchange_item_ref", "_onchange_tipo_linea", "_onchange_cita_id",
+            "_onchange_inventario_id", "_onchange_precio_unitario",
+            "_onchange_cantidad", "_validate_stock_vals", "_check_stock_disponible",
+            "_check_linea", "create", "write"
+          ]
+
+    VeterinariaFacturacionLineaWizard:
+      type: object
+      description: |
+        Wizard para agregar una línea rápida a la factura.
+      properties:
+        methods:
+          type: array
+          items:
+            type: string
+          example: [
+            "_onchange_tipo_linea", "_onchange_cita_id", "_onchange_inventario_id",
+            "_onchange_precio_unitario", "_onchange_cantidad", "action_agregar_linea"
+          ]
+
+    VeterinariaFacturacionMultilineaWizard:
+      type: object
+      description: |
+        Wizard para importar multiples citas o items a una factura.
+      properties:
+        methods:
+          type: array
+          items:
+            type: string
+          example: ["action_agregar_multiples_lineas"]
+
+    VeterinariaImportarRecetaWizard:
+      type: object
+      description: |
+        Wizard para importar medicamentos de una receta a la factura.
+      properties:
+        methods:
+          type: array
+          items:
+            type: string
+          example: ["_onchange_propietario_id", "_onchange_cita_id", "action_confirmar_importacion"]
+
+    VeterinariaHistoriaClinica:
+      type: object
+      description: |
+        Historia clínica por paciente con bloqueo de creación manual.
+      properties:
+        key_fields:
+          type: array
+          items:
+            type: string
+          example: ["paciente_id", "fecha_apertura", "activa", "tipo_sangre"]
+        methods:
+          type: array
+          items:
+            type: string
+          example: ["_compute_cita_count", "create"]
+
+    VeterinariaInventario:
+      type: object
+      description: |
+        Inventario unificado de productos, servicios y medicamentos.
+      properties:
+        key_fields:
+          type: array
+          items:
+            type: string
+          example: ["tipo_inventario", "precio_venta", "cantidad_stock", "activo"]
+        methods:
+          type: array
+          items:
+            type: string
+          example: [
+            "_compute_margen", "_onchange_precios", "_check_categoria_servicio",
+            "_check_no_negative_values"
+          ]
+
+    VeterinariaMedicamento:
+      type: object
+      description: |
+        Catálogo de medicamentos legacy (no contiene métodos personalizados).
+      properties:
+        key_fields:
+          type: array
+          items:
+            type: string
+          example: ["name", "tipo", "precio_venta", "cantidad_stock"]
+
+    VeterinariaPaciente:
+      type: object
+      description: |
+        Paciente (mascota) con acciones de navegación a historia clínica y citas.
+      properties:
+        key_fields:
+          type: array
+          items:
+            type: string
+          example: ["name", "especie", "propietario_id", "estado"]
+        methods:
+          type: array
+          items:
+            type: string
+          example: [
+            "_compute_historia_clinica_count", "_compute_cita_count",
+            "action_view_historia_clinica", "action_view_citas", "action_agendar_cita"
+          ]
+
+    VeterinariaProducto:
+      type: object
+      description: |
+        Producto veterinario con sincronización opcional con product.product.
+      properties:
+        key_fields:
+          type: array
+          items:
+            type: string
+          example: ["name", "categoria", "precio_venta", "cantidad_stock"]
+        methods:
+          type: array
+          items:
+            type: string
+          example: ["_compute_margen", "_onchange_product_id"]
+
+    VeterinariaPropietario:
+      type: object
+      description: |
+        Extension de res.partner para propietarios, con creación de usuarios portal
+        y envio de credenciales.
+      properties:
+        key_fields:
+          type: array
+          items:
+            type: string
+          example: ["es_propietario", "paciente_ids", "tiene_acceso_portal"]
+        methods:
+          type: array
+          items:
+            type: string
+          example: [
+            "_compute_cantidad_mascotas", "_compute_cita_count",
+            "_compute_tiene_acceso_portal", "_send_credentials_email",
+            "_create_portal_user", "action_crear_acceso_portal",
+            "create", "write", "action_view_mascotas", "action_view_citas",
+            "action_agendar_cita"
+          ]
+
+    VeterinariaReceta:
+      type: object
+      description: |
+        Receta medica vinculada a una cita e historia clínica.
+      properties:
+        key_fields:
+          type: array
+          items:
+            type: string
+          example: ["cita_id", "paciente_id", "fecha_emision", "facturada"]
+        methods:
+          type: array
+          items:
+            type: string
+          example: [
+            "_compute_display_name", "_check_cita_unica",
+            "_check_cita_tiene_historia", "write", "unlink"
+          ]
+
+    VeterinariaRecetaLinea:
+      type: object
+      description: |
+        Linea de receta con dosis, frecuencia y validaciones post-facturación.
+      properties:
+        key_fields:
+          type: array
+          items:
+            type: string
+          example: ["receta_id", "tipo_origen", "dosis", "frecuencia_horas", "duracion_dias"]
+        methods:
+          type: array
+          items:
+            type: string
+          example: [
+            "_compute_nombre_medicamento_display", "_compute_cantidad_total",
+            "_check_medicamento_identificado", "create", "write", "unlink"
+          ]
+
+    VeterinariaServicio:
+      type: object
+      description: |
+        Catálogo de servicios veterinarios (sin métodos personalizados).
+      properties:
+        key_fields:
+          type: array
+          items:
+            type: string
+          example: ["name", "precio", "activo"]
+
+    VeterinariaVacuna:
+      type: object
+      description: |
+        Catálogo de vacunas de la clínica.
+      properties:
+        key_fields:
+          type: array
+          items:
+            type: string
+          example: ["name", "especie_sugerida", "frecuencia_meses", "activo"]
+
+    VeterinariaVacunaAplicada:
+      type: object
+      description: |
+        Registro histórico de vacunas aplicadas y próxima dosis sugerida.
+      properties:
+        key_fields:
+          type: array
+          items:
+            type: string
+          example: ["paciente_id", "vacuna_id", "fecha_aplicacion", "proxima_dosis"]
+        methods:
+          type: array
+          items:
+            type: string
+          example: ["_compute_proxima_dosis"]
+
+    VeterinariaVenta:
+      type: object
+      description: |
+        Venta de productos/medicamentos con generación de sale.order.
+      properties:
+        key_fields:
+          type: array
+          items:
+            type: string
+          example: ["propietario_id", "linea_venta_ids", "estado", "fecha_venta"]
+        methods:
+          type: array
+          items:
+            type: string
+          example: ["_compute_totales", "_compute_name", "action_validar_venta", "action_cancelar_venta"]
+
+    VeterinariaVentaLinea:
+      type: object
+      description: |
+        Linea de venta con cálculo de impuestos y validación de item único.
+      properties:
+        key_fields:
+          type: array
+          items:
+            type: string
+          example: ["venta_id", "producto_id", "medicamento_id", "cantidad", "precio_unitario"]
+        methods:
+          type: array
+          items:
+            type: string
+          example: [
+            "_compute_subtotal", "_compute_impuesto", "_compute_total_linea",
+            "_check_item_selected", "_onchange_item"
+          ]
+
+    VeterinariaVeterinario:
+      type: object
+      description: |
+        Veterinario con agenda por dias y horarios.
+      properties:
+        key_fields:
+          type: array
+          items:
+            type: string
+          example: ["name", "especialidad_id", "horario_inicio", "horario_fin"]
+        methods:
+          type: array
+          items:
+            type: string
+          example: ["_compute_cantidad_citas"]
+
+    VeterinariaEspecialidad:
+      type: object
+      description: |
+        Catálogo de especialidades veterinarias (sin métodos personalizados).
+      properties:
+        key_fields:
+          type: array
+          items:
+            type: string
+          example: ["name", "descripcion"]
+
+    VeterinariaDocumentoVenta:
+      type: object
+      description: |
+        Documento de venta unificado para facturas por cita y ventas directas.
+      properties:
+        key_fields:
+          type: array
+          items:
+            type: string
+          example: ["tipo_documento", "cita_id", "propietario_id", "fecha_documento", "estado"]
+        methods:
+          type: array
+          items:
+            type: string
+          example: [
+            "_compute_name", "_compute_propietario_id", "_compute_paciente_id",
+            "_compute_veterinario_id", "_compute_fecha_cita", "_compute_motivo_cita",
+            "_compute_totales", "_onchange_tipo_documento",
+            "_check_required_fields", "_onchange_propietario_id_mascota",
+            "action_validar_factura", "action_cancelar_factura"
+          ]
+
+    VeterinariaCredentialWizard:
+      type: object
+      description: |
+        Wizard transitorio para mostrar credenciales de portal (solo campos).
+      properties:
+        key_fields:
+          type: array
+          items:
+            type: string
+          example: ["partner_name", "login", "password"]
+
+    SriResCompany:
+      type: object
+      description: |
+        Campos SRI en la compania (certificado, ambiente y secuencial).
+      properties:
+        key_fields:
+          type: array
+          items:
+            type: string
+          example: ["sri_ambiente", "sri_certificado_p12", "sri_establecimiento", "sri_secuencial"]
+        methods:
+          type: array
+          items:
+            type: string
+          example: ["sri_get_next_secuencial", "_check_vat_sri", "_check_sri_establecimiento"]
+
+    SriFacturacionInherit:
+      type: object
+      description: |
+        Extensión SRI sobre facturacion con envio y consulta de autorización.
+      properties:
+        key_fields:
+          type: array
+          items:
+            type: string
+          example: ["sri_documento_id", "tipo_identificacion_cliente", "identificacion_cliente"]
+        methods:
+          type: array
+          items:
+            type: string
+          example: [
+            "_onchange_propietario_sri", "_get_allowed_fields_validado",
+            "action_enviar_sri", "action_consultar_sri", "action_descargar_ride",
+            "action_enviar_ride_email"
+          ]
+
+    SriDocumentoElectronico:
+      type: object
+      description: |
+        Documento electronico SRI con flujo generar/firmar/enviar/autorizar.
+      properties:
+        key_fields:
+          type: array
+          items:
+            type: string
+          example: ["facturacion_id", "clave_acceso", "estado", "xml_firmado"]
+        methods:
+          type: array
+          items:
+            type: string
+          example: [
+            "_compute_name", "action_generar_xml", "action_firmar_xml",
+            "action_enviar_sri", "action_consultar_autorizacion",
+            "action_proceso_completo", "action_descargar_ride",
+            "action_enviar_ride_email"
+          ]
+
+    SriFirmaElectronica:
+      type: object
+      description: |
+        Servicio de firma XAdES-BES para comprobantes SRI.
+      properties:
+        methods:
+          type: array
+          items:
+            type: string
+          example: ["firmar_xml"]
+
+    SriWsClient:
+      type: object
+      description: |
+        Cliente SOAP para recepción y autorización del SRI.
+      properties:
+        methods:
+          type: array
+          items:
+            type: string
+          example: ["_get_client", "enviar_comprobante", "consultar_autorizacion"]
+
+    SriXmlGenerator:
+      type: object
+      description: |
+        Generador de XML SRI y clave de acceso (XSD 2.1.0).
+      properties:
+        methods:
+          type: array
+          items:
+            type: string
+          example: [
+            "_calcular_digito_modulo11", "_generar_clave_acceso",
+            "generar_factura_xml", "_add_element"
+          ]
+
+paths:
+  /docs/modules/veterinaria_core:
+    get:
+      tags: [module_docs, veterinaria_core]
+      summary: Estructura del módulo veterinaria_core
+      description: |
+        Módulo principal del sistema VitalPet. Centraliza la lógica de negocio
+        de la clinica veterinaria: gestión de pacientes y propietarios,
+        agenda de citas, historia clínica, recetas, facturación y ventas.
+        Incluye controladores de portal para clientes, reportes QWeb
+        (factura y carnet de vacunas), seguridad por grupos y reglas,
+        y datos base como secuencias, plantillas de correo y cron de recordatorios.
+      responses:
+        "200":
+          description: Informacion documental del módulo.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ModuloVeterinariaCore"
+
+  /docs/modules/l10n_ec_sri_vet:
+    get:
+      tags: [module_docs, l10n_ec_sri_vet]
+      summary: Estructura del módulo l10n_ec_sri_vet
+      description: |
+        Módulo de localización Ecuador y facturacion electronica SRI.
+        Extiende la facturacion del sistema con campos tributarios,
+        genera XML segun XSD 2.1.0, firma XAdES-BES con certificado .p12,
+        envia comprobantes al SRI via SOAP y gestiona la autorización.
+        Incluye generación de RIDE en PDF y envio por email al cliente.
+      responses:
+        "200":
+          description: Informacion documental del módulo.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ModuloL10nSri"
+
+  /docs/modules/veterinaria_web:
+    get:
+      tags: [module_docs, veterinaria_web]
+      summary: Estructura del módulo veterinaria_web
+      description: |
+        Módulo de sitio web publico. Define el layout, paginas y
+        recursos estaticos para la presencia institucional de la clínica.
+        Contiene rutas publicas (inicio, servicios, nosotros, contacto)
+        y assets CSS/JS para estilos y animaciones del frontend.
+      responses:
+        "200":
+          description: Informacion documental del módulo.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ModuloVeterinariaWeb"
+
+  /my/account:
+    get:
+      tags: [portal]
+      summary: Perfil del portal
+      description: |
+        Vista principal del perfil del cliente autenticado en el portal.
+        Permite revisar datos básicos del propietario y acceder al formulario
+        donde se actualiza la foto del perfil.
+      security:
+        - sessionAuth: []
+      responses:
+        "200":
+          description: HTML
+    post:
+      tags: [portal]
+      summary: Actualizar foto de perfil
+      description: |
+        Procesa el formulario de perfil para actualizar la imagen del usuario
+        (campo image_1920). Solo acepta archivos enviados en el formulario
+        y reemplaza la foto actual del partner asociado.
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image_1920:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: HTML
+
+  /my/security:
+    get:
+      tags: [portal]
+      summary: Seguridad del portal
+      description: |
+        Vista de seguridad para clientes de la veterinaria. Muestra
+        un formulario simplificado para cambio de contraseña y opciones
+        basicas de cuenta, usando el layout de portal de Odoo.
+      security:
+        - sessionAuth: []
+      responses:
+        "200":
+          description: HTML
+    post:
+      tags: [portal]
+      summary: Cambiar contraseña
+      description: |
+        Recibe las credenciales actuales y la nueva contraseña para
+        actualizar el acceso del usuario portal. Requiere validación
+        de la contraseña previa y confirmación.
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                old:
+                  type: string
+                new1:
+                  type: string
+                new2:
+                  type: string
+      responses:
+        "200":
+          description: HTML
+
+  /my/pets:
+    get:
+      tags: [portal]
+      summary: Lista de mascotas
+      description: |
+        Lista todas las mascotas asociadas al propietario autenticado.
+        Se usa para acceder al detalle de cada paciente.
+      security:
+        - sessionAuth: []
+      responses:
+        "200":
+          description: HTML
+
+  /my/pets/{pet_id}:
+    get:
+      tags: [portal]
+      summary: Detalle de mascota
+      description: |
+        Muestra el detalle clinico basico de la mascota seleccionada.
+        Valida que la mascota pertenezca al propietario logueado y
+        redirige si no hay permiso.
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: pet_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: HTML
+        "302":
+          description: Redirección si no pertenece al usuario
+
+  /my/appointments:
+    get:
+      tags: [portal]
+      summary: Lista de citas
+      description: |
+        Presenta citas futuras y pasadas del propietario con su estado
+        y fechas. Sirve como historial y agenda desde el portal.
+      security:
+        - sessionAuth: []
+      responses:
+        "200":
+          description: HTML
+
+  /my/medical_records:
+    get:
+      tags: [portal]
+      summary: Lista de historias clínicas
+      description: |
+        Muestra las historias clínicas del propietario, ordenadas por
+        fecha de apertura, para consulta rápida en el portal.
+      security:
+        - sessionAuth: []
+      responses:
+        "200":
+          description: HTML
+
+  /my/invoices_vet:
+    get:
+      tags: [portal]
+      summary: Lista de facturas veterinarias
+      description: |
+        Lista las facturas veterinarias asociadas al propietario.
+        Permite acceder al detalle de cada factura y su PDF.
+      security:
+        - sessionAuth: []
+      responses:
+        "200":
+          description: HTML
+
+  /my/invoices_vet/{factura_id}:
+    get:
+      tags: [portal]
+      summary: Detalle de factura veterinaria
+      description: |
+        Detalle de una factura veterinaria especifica. Se valida que
+        la factura pertenezca al propietario autenticado.
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: factura_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: HTML
+        "302":
+          description: Redirección si no pertenece al usuario
+
+  /my/invoices_vet/{factura_id}/pdf:
+    get:
+      tags: [portal]
+      summary: PDF de factura veterinaria
+      description: |
+        Descarga el PDF generado por QWeb de la factura veterinaria.
+        Solo disponible si la factura pertenece al propietario.
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: factura_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: PDF
+
+  /my/prescriptions:
+    get:
+      tags: [portal]
+      summary: Lista de recetas
+      description: |
+        Lista las recetas medicas emitidas para el propietario.
+        Se usa como historial de tratamientos.
+      security:
+        - sessionAuth: []
+      responses:
+        "200":
+          description: HTML
+
+  /my/vaccination_card/{pet_id}:
+    get:
+      tags: [portal]
+      summary: Carnet de vacunas (PDF)
+      description: |
+        Descarga el carnet de vacunación en PDF para una mascota.
+        Valida pertenencia de la mascota al propietario logueado.
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: pet_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: PDF
+
+  /:
+    get:
+      tags: [web_public]
+      summary: Landing page
+      description: |
+        Página principal del sitio VitalPet. Presenta la propuesta de valor,
+        accesos rapidos a servicios y llamados a acción para contacto o agenda.
+      responses:
+        "200":
+          description: HTML
+
+  /servicios:
+    get:
+      tags: [web_public]
+      summary: Servicios
+      description: |
+        Catálogo público de servicios de la clínica. Muestra categorias
+        y beneficios clave para orientar a los clientes.
+      responses: 
+        "200":
+          description: HTML
+
+  /nosotros:
+    get:
+      tags: [web_public]
+      summary: Nosotros
+      description: |
+        Página institucional con historia, equipo y valores.
+        Refuerza confianza y credibilidad de la clínica.
+      responses: 
+        "200":
+          description: HTML
+
+  /contacto:
+    get:
+      tags: [web_public]
+      summary: Contacto
+      description: |
+        Formulario de contacto con datos básicos del cliente.
+        Usado para consultas generales o solicitud de servicios.
+      responses:
+        "200":
+          description: HTML
+    
+
+  /contacto/enviar:
+    post:
+      tags: [web_public]
+      summary: Envio de formulario de contacto
+      description: |
+        Recibe los datos del formulario y registra la solicitud.
+        En producción puede integrarse con correo o CRM.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                email:
+                  type: string
+                telefono:
+                  type: string
+                asunto:
+                  type: string
+                mensaje:
+                  type: string
+      responses:
+        "200":
+          description: HTML de confirmación de envio de correo electrónico. 
