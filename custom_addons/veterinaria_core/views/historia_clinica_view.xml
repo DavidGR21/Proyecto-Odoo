@@ -51,6 +51,69 @@
                                         <field name="motivo"/>
                                         <field name="estado"/>
                                     </list>
+                                    <form string="Detalle de Cita">
+                                        <sheet>
+                                            <group>
+                                                <group string="Datos de la Cita">
+                                                    <field name="name" readonly="1"/>
+                                                    <field name="fecha_hora" readonly="1"/>
+                                                    <field name="veterinario_id" readonly="1"/>
+                                                    <field name="servicio_id" readonly="1"/>
+                                                </group>
+                                                <group string="Estado y Motivo">
+                                                    <field name="estado" readonly="1"/>
+                                                    <field name="motivo" readonly="1"/>
+                                                </group>
+                                            </group>
+                                            <group string="Observaciones">
+                                                <field name="observaciones" readonly="1"/>
+                                            </group>
+                                            
+                                            <!-- Sección de Receta Médica integrada en la Cita -->
+                                            <group string="Receta Médica / Tratamiento" invisible="not receta_ids">
+                                                <field name="receta_ids" readonly="1" nolabel="1">
+                                                    <list create="false" edit="false" delete="false">
+                                                        <field name="name" string="Referencia"/>
+                                                        <field name="fecha_emision" string="Fecha"/>
+                                                        <field name="diagnostico" string="Diagnóstico"/>
+                                                    </list>
+                                                    <form create="false" edit="false" delete="false">
+                                                        <sheet>
+                                                            <group>
+                                                                <group string="Datos de Receta">
+                                                                    <field name="name" string="Referencia" readonly="1"/>
+                                                                    <field name="fecha_emision" string="Fecha" readonly="1"/>
+                                                                </group>
+                                                                <group string="Clínico">
+                                                                    <field name="diagnostico" string="Diagnóstico" readonly="1"/>
+                                                                </group>
+                                                            </group>
+                                                            <notebook>
+                                                                <page string="Medicamentos Recetados">
+                                                                    <field name="linea_ids" readonly="1">
+                                                                        <list>
+                                                                            <field name="tipo_origen" string="Origen"/>
+                                                                            <field name="nombre_medicamento_display" string="Medicamento"/>
+                                                                            <field name="dosis"/>
+                                                                            <field name="frecuencia_horas" string="Cada (horas)"/>
+                                                                            <field name="duracion_dias" string="Días"/>
+                                                                            <field name="cantidad_total" string="Cantidad Total"/>
+                                                                        </list>
+                                                                    </field>
+                                                                </page>
+                                                                <page string="Indicaciones Adicionales">
+                                                                    <group>
+                                                                        <field name="instrucciones_generales" readonly="1"/>
+                                                                        <field name="observaciones_adicionales" readonly="1"/>
+                                                                    </group>
+                                                                </page>
+                                                            </notebook>
+                                                        </sheet>
+                                                    </form>
+                                                </field>
+                                            </group>
+                                        </sheet>
+                                    </form>
                                 </field>
                             </page>
                         </notebook>
