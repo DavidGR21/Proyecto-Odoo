@@ -24,7 +24,7 @@ class FacturacionLineaWizard(models.TransientModel):
     cita_id = fields.Many2one(
         'veterinaria.cita',
         string='Cita Veterinaria',
-        domain=[('estado', '=', 'completada')]
+        domain=[('estado', '=', 'completada'), ('facturada', '=', False)]
     )
 
     inventario_id = fields.Many2one(
@@ -86,6 +86,13 @@ class FacturacionLineaWizard(models.TransientModel):
             expected_price = self.inventario_id.precio_venta or 0.0
             if abs((self.precio_unitario or 0.0) - expected_price) > 0.000001:
                 raise ValidationError('El precio unitario debe coincidir con el precio de inventario')
+        taxes = []
+        if self.tipo_linea == 'cita':
+            tax_15 = self.env['account.tax'].search([('type_tax_use', '=', 'sale'), ('amount', '=', 15.0)], limit=1)
+            taxes = tax_15.ids if tax_15 else []
+        elif self.tipo_linea != 'cita' and self.inventario_id:
+            taxes = self.inventario_id.impuesto_id.ids
+
         self.env['veterinaria.facturacion.linea'].create({
             'facturacion_id': self.facturacion_id.id,
             'tipo_linea': self.tipo_linea,
@@ -93,6 +100,7 @@ class FacturacionLineaWizard(models.TransientModel):
             'inventario_id': self.inventario_id.id if self.tipo_linea != 'cita' else False,
             'cantidad': self.cantidad,
             'precio_unitario': self.precio_unitario,
+            'impuesto_ids': [(6, 0, taxes)],
         })
         return {
             'type': 'ir.actions.act_window',
@@ -125,7 +133,7 @@ class FacturacionMultilineaWizard(models.TransientModel):
         'veterinaria.cita',
         'facturacion_wiz_multi_cita_rel',
         string='Seleccionar Citas',
-        domain=[('estado', '=', 'completada')]
+        domain=[('estado', '=', 'completada'), ('facturada', '=', False)]
     )
 
     inventario_ids = fields.Many2many(
@@ -145,12 +153,15 @@ class FacturacionMultilineaWizard(models.TransientModel):
                 raise ValidationError('Debe seleccionar al menos una cita.')
             for cita in self.cita_ids:
                 precio = getattr(cita.servicio_id, 'precio', 0.0) if cita.servicio_id else 0.0
+                tax_15 = self.env['account.tax'].search([('type_tax_use', '=', 'sale'), ('amount', '=', 15.0)], limit=1)
+                taxes = tax_15.ids if tax_15 else []
                 self.env['veterinaria.facturacion.linea'].create({
                     'facturacion_id': self.facturacion_id.id,
                     'tipo_linea': 'cita',
                     'cita_id': cita.id,
                     'cantidad': self.cantidad_default,
                     'precio_unitario': precio,
+                    'impuesto_ids': [(6, 0, taxes)],
                 })
         else:
             if not self.inventario_ids:
@@ -162,6 +173,7 @@ class FacturacionMultilineaWizard(models.TransientModel):
                     'inventario_id': item.id,
                     'cantidad': self.cantidad_default,
                     'precio_unitario': item.precio_venta or 0.0,
+                    'impuesto_ids': [(6, 0, item.impuesto_id.ids)],
                 })
 
         return {
@@ -198,9 +210,9 @@ class ImportarRecetaWizard(models.TransientModel):
 
     @api.onchange('propietario_id')
     def _onchange_propietario_id(self):
-        """Filtra cita_id para mostrar todas las citas con receta del propietario."""
+        """Filtra cita_id para mostrar todas las citas con receta no facturadas del propietario."""
         if self.propietario_id:
-            return {'domain': {'cita_id': [('propietario_id', '=', self.propietario_id.id), ('receta_ids', '!=', False)]}}
+            return {'domain': {'cita_id': [('propietario_id', '=', self.propietario_id.id), ('receta_ids', '!=', False), ('receta_ids.facturada', '=', False)]}}
 
     linea_ids = fields.One2many(
         'veterinaria.importar.receta.wizard.linea',
@@ -250,15 +262,13 @@ class ImportarRecetaWizard(models.TransientModel):
                     'inventario_id': item.id,
                     'cantidad': linea.cantidad_a_facturar,
                     'precio_unitario': item.precio_venta or 0.0,
+                    'impuesto_ids': [(6, 0, item.impuesto_id.ids)],
+                    'cita_id': self.cita_id.id,  # Link to appointment/recipe
                 })
                 lineas_creadas += 1
         
         if lineas_creadas == 0:
             raise ValidationError("No se pudo importar ninguna línea. Asegúrese de que las cantidades sean mayores a cero.")
-        
-        # Marcar la receta como facturada para bloquear edición
-        if self.cita_id:
-            self.cita_id.receta_ids.write({'facturada': True})
             
         return {
             'type': 'ir.actions.client',

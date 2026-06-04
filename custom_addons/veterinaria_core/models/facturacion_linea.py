@@ -128,13 +128,8 @@ class FacturacionLinea(models.Model):
                 self.tipo_linea = 'cita'
                 if self.item_ref.servicio_id:
                     self.precio_unitario = self.item_ref.servicio_id.precio or 0.0
-                if self.item_ref.impuesto_ids:
-                    self.impuesto_ids = [(6, 0, self.item_ref.impuesto_ids.ids)]
-                elif self.item_ref.servicio_id and self.item_ref.servicio_id.impuesto_ids:
-                    self.impuesto_ids = [(6, 0, self.item_ref.servicio_id.impuesto_ids.ids)]
-                else:
-                    tax_15 = self.env['account.tax'].search([('type_tax_use', '=', 'sale'), ('amount', '=', 15.0)], limit=1)
-                    self.impuesto_ids = [(6, 0, tax_15.ids)] if tax_15 else [(5, 0, 0)]
+                tax_15 = self.env['account.tax'].search([('type_tax_use', '=', 'sale'), ('amount', '=', 15.0)], limit=1)
+                self.impuesto_ids = [(6, 0, tax_15.ids)] if tax_15 else [(5, 0, 0)]
 
     @api.onchange('tipo_linea')
     def _onchange_tipo_linea(self):
@@ -150,13 +145,8 @@ class FacturacionLinea(models.Model):
             servicio = self.cita_id.servicio_id
             self.precio_unitario = servicio.precio if servicio else 0.0
             self.cantidad = 1.0
-            if self.cita_id.impuesto_ids:
-                self.impuesto_ids = [(6, 0, self.cita_id.impuesto_ids.ids)]
-            elif servicio and servicio.impuesto_ids:
-                self.impuesto_ids = [(6, 0, servicio.impuesto_ids.ids)]
-            else:
-                tax_15 = self.env['account.tax'].search([('type_tax_use', '=', 'sale'), ('amount', '=', 15.0)], limit=1)
-                self.impuesto_ids = [(6, 0, tax_15.ids)] if tax_15 else [(5, 0, 0)]
+            tax_15 = self.env['account.tax'].search([('type_tax_use', '=', 'sale'), ('amount', '=', 15.0)], limit=1)
+            self.impuesto_ids = [(6, 0, tax_15.ids)] if tax_15 else [(5, 0, 0)]
 
     @api.onchange('inventario_id')
     def _onchange_inventario_id(self):
