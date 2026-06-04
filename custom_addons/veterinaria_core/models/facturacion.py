@@ -29,16 +29,13 @@ class Facturacion(models.Model):
     )
 
     subtotal = fields.Float('Subtotal', compute='_compute_totales', store=True)
-    
-    impuesto_id = fields.Many2one(
-        'account.tax',
-        string='Impuesto',
-        domain=[('type_tax_use', '=', 'sale')],
-        tracking=True
-    )
-    
     impuesto_total = fields.Float('Total Impuestos', compute='_compute_totales', store=True)
     total = fields.Float('Total', compute='_compute_totales', store=True)
+
+    detalles_impuestos_html = fields.Html(
+        string='Detalle de Impuestos',
+        compute='_compute_detalles_impuestos_html'
+    )
 
     estado = fields.Selection([
         ('borrador', 'Borrador'),
@@ -53,23 +50,74 @@ class Facturacion(models.Model):
         states={'validado': [('readonly', True)], 'cancelado': [('readonly', True)]}
     )
 
-    @api.depends('linea_ids.subtotal', 'impuesto_id')
+    @api.depends('linea_ids.subtotal', 'linea_ids.impuesto_linea')
     def _compute_totales(self):
         for record in self:
             subtotal = sum(line.subtotal for line in record.linea_ids)
+            impuesto_total = sum(line.impuesto_linea for line in record.linea_ids)
             record.subtotal = subtotal
+            record.impuesto_total = impuesto_total
+            record.total = subtotal + impuesto_total
+
+    @api.depends('linea_ids.subtotal', 'linea_ids.impuesto_ids', 'linea_ids.impuesto_linea')
+    def _compute_detalles_impuestos_html(self):
+        for record in self:
+            impuestos = record._get_impuestos_agrupados()
+            if not impuestos:
+                record.detalles_impuestos_html = ""
+                continue
             
-            if record.impuesto_id:
-                if record.impuesto_id.amount_type == 'percent':
-                    record.impuesto_total = subtotal * (record.impuesto_id.amount / 100.0)
-                elif record.impuesto_id.amount_type == 'fixed':
-                    record.impuesto_total = record.impuesto_id.amount
-                else:
-                    record.impuesto_total = 0.0
+            html = '<div style="width: 100%; display: flex; justify-content: flex-end; margin-top: 5px; margin-bottom: 5px;">'
+            html += '<table style="width: 100%; max-width: 300px; font-size: 13px; color: #4b5563;">'
+            for name, data in impuestos.items():
+                html += f'<tr>' \
+                        f'<td style="text-align: right; padding: 2px 10px 2px 0; font-weight: bold;">Subtotal {name}:</td>' \
+                        f'<td style="text-align: right; padding: 2px 0; width: 120px;">${data["base"]:.2f}</td>' \
+                        f'</tr>' \
+                        f'<tr>' \
+                        f'<td style="text-align: right; padding: 2px 10px 2px 0; font-weight: normal; color: #9ca3af;">{name}:</td>' \
+                        f'<td style="text-align: right; padding: 2px 0; font-weight: normal; color: #9ca3af; width: 120px;">${data["monto"]:.2f}</td>' \
+                        f'</tr>'
+            html += '</table></div>'
+            record.detalles_impuestos_html = html
+
+    def _get_impuestos_agrupados(self):
+        """
+        Retorna un diccionario agrupado por impuesto (su porcentaje/nombre)
+        con la base imponible y el monto del impuesto.
+        """
+        res = {}
+        for line in self.linea_ids:
+            taxes = line.impuesto_ids
+            if not taxes:
+                tax_name = "IVA 0%"
+                tax_amount = 0.0
+                codigo_porcentaje = '0'
             else:
-                record.impuesto_total = 0.0
-                
-            record.total = subtotal + record.impuesto_total
+                tax = taxes[0]
+                tax_name = tax.name or f"IVA {tax.amount:.0f}%"
+                tax_amount = tax.amount
+                if tax_amount == 15:
+                    codigo_porcentaje = '4'
+                elif tax_amount == 12:
+                    codigo_porcentaje = '2'
+                elif tax_amount == 14:
+                    codigo_porcentaje = '3'
+                else:
+                    codigo_porcentaje = '0' if tax_amount == 0 else '4'
+            
+            if tax_name not in res:
+                res[tax_name] = {
+                    'name': tax_name,
+                    'base': 0.0,
+                    'monto': 0.0,
+                    'tax_amount': tax_amount,
+                    'codigo_porcentaje': codigo_porcentaje
+                }
+            res[tax_name]['base'] += line.subtotal
+            res[tax_name]['monto'] += line.impuesto_linea
+            
+        return res
 
     def action_validar_factura(self):
         """Valida la factura y descuenta stock donde aplica."""
@@ -91,23 +139,27 @@ class Facturacion(models.Model):
                             f"Stock insuficiente para '{inv.name}': "
                             f"disponible {inv.cantidad_stock}, solicitado {line.cantidad}"
                         )
-            # Descontar stock y marcar citas como facturadas
+            # Descontar stock y marcar citas/recetas como facturadas
             for line in lineas_con_item:
                 if line.tipo_linea in ('medicamento', 'producto') and line.inventario_id:
                     inv = line.inventario_id
                     inv.cantidad_stock -= line.cantidad
-                if line.tipo_linea == 'cita' and line.cita_id:
+                if line.cita_id:
                     line.cita_id.facturada = True
+                    if line.cita_id.receta_ids:
+                        line.cita_id.receta_ids.write({'facturada': True})
 
             record.estado = 'validado'
 
     def action_cancelar_factura(self):
-        """Cancela la factura y libera citas."""
+        """Cancela la factura y libera citas y recetas."""
         for record in self:
-            # Liberar citas
+            # Liberar citas y recetas
             for line in record.linea_ids:
-                if line.tipo_linea == 'cita' and line.cita_id:
+                if line.cita_id:
                     line.cita_id.facturada = False
+                    if line.cita_id.receta_ids:
+                        line.cita_id.receta_ids.write({'facturada': False})
             record.estado = 'cancelado'
 
     def action_importar_receta(self):

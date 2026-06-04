@@ -28,7 +28,7 @@
                             <group string="Establecimiento">
                                 <field name="sri_establecimiento"/>
                                 <field name="sri_punto_emision"/>
-                                <field name="sri_secuencial" readonly="1"/>
+                                <field name="sri_secuencial"/>
                             </group>
                         </group>
                         <group>

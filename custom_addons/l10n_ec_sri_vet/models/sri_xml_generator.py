@@ -175,26 +175,23 @@ class SriXmlGenerator(models.AbstractModel):
 
         # totalConImpuestos
         total_con_impuestos = etree.SubElement(info_factura, 'totalConImpuestos')
-        total_impuesto_elem = etree.SubElement(total_con_impuestos, 'totalImpuesto')
-
-        # Determinar código de porcentaje IVA
-        codigo_porcentaje = '0'  # IVA 0% por defecto
-        tarifa_iva = 0
-        if factura.impuesto_id and factura.impuesto_id.amount > 0:
-            tarifa_iva = factura.impuesto_id.amount
-            if tarifa_iva == 15:
-                codigo_porcentaje = '4'  # IVA 15%
-            elif tarifa_iva == 12:
-                codigo_porcentaje = '2'  # IVA 12%
-            elif tarifa_iva == 14:
-                codigo_porcentaje = '3'  # IVA 14%
-            else:
-                codigo_porcentaje = '4'  # Otros porcentajes -> 4
-
-        self._add_element(total_impuesto_elem, 'codigo', '2')  # IVA
-        self._add_element(total_impuesto_elem, 'codigoPorcentaje', codigo_porcentaje)
-        self._add_element(total_impuesto_elem, 'baseImponible', f'{subtotal:.2f}')
-        self._add_element(total_impuesto_elem, 'valor', f'{impuesto_total:.2f}')
+        
+        impuestos_agrupados = factura._get_impuestos_agrupados()
+        if not impuestos_agrupados:
+            impuestos_agrupados = {
+                'IVA 0%': {
+                    'base': subtotal,
+                    'monto': 0.0,
+                    'codigo_porcentaje': '0'
+                }
+            }
+            
+        for tax_info in impuestos_agrupados.values():
+            total_impuesto_elem = etree.SubElement(total_con_impuestos, 'totalImpuesto')
+            self._add_element(total_impuesto_elem, 'codigo', '2')  # IVA
+            self._add_element(total_impuesto_elem, 'codigoPorcentaje', tax_info['codigo_porcentaje'])
+            self._add_element(total_impuesto_elem, 'baseImponible', f"{tax_info['base']:.2f}")
+            self._add_element(total_impuesto_elem, 'valor', f"{tax_info['monto']:.2f}")
 
         self._add_element(info_factura, 'importeTotal', f'{total:.2f}')
         self._add_element(info_factura, 'moneda', 'DOLAR')
@@ -232,16 +229,31 @@ class SriXmlGenerator(models.AbstractModel):
                               f'{linea.subtotal:.2f}')
 
             # Impuestos por línea
+            linea_taxes = linea.impuesto_ids
+            if not linea_taxes:
+                l_tarifa = 0.0
+                l_codigo_porcentaje = '0'
+            else:
+                tax = linea_taxes[0]
+                l_tarifa = tax.amount
+                if l_tarifa == 15:
+                    l_codigo_porcentaje = '4'
+                elif l_tarifa == 12:
+                    l_codigo_porcentaje = '2'
+                elif l_tarifa == 14:
+                    l_codigo_porcentaje = '3'
+                else:
+                    l_codigo_porcentaje = '0' if l_tarifa == 0 else '4'
+
             impuestos_det = etree.SubElement(detalle, 'impuestos')
             impuesto_det = etree.SubElement(impuestos_det, 'impuesto')
             self._add_element(impuesto_det, 'codigo', '2')  # IVA
-            self._add_element(impuesto_det, 'codigoPorcentaje', codigo_porcentaje)
-            self._add_element(impuesto_det, 'tarifa', f'{tarifa_iva:.0f}')
+            self._add_element(impuesto_det, 'codigoPorcentaje', l_codigo_porcentaje)
+            self._add_element(impuesto_det, 'tarifa', f'{l_tarifa:.0f}')
             self._add_element(impuesto_det, 'baseImponible',
                               f'{linea.subtotal:.2f}')
-            valor_impuesto_linea = linea.subtotal * (tarifa_iva / 100.0)
             self._add_element(impuesto_det, 'valor',
-                              f'{valor_impuesto_linea:.2f}')
+                              f'{linea.impuesto_linea:.2f}')
 
         # Serializar
         xml_bytes = etree.tostring(

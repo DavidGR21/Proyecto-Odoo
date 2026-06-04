@@ -22,11 +22,14 @@
                                        domain="[('estado', '=', 'completada'), ('facturada', '=', False), ('propietario_id', '=', parent.propietario_id)]"/>
                                 <field name="inventario_id" string="Item" invisible="tipo_linea == 'cita'"/>
                             </group>
-                            <group>
-                                <field name="cantidad"/>
-                                <field name="precio_unitario" modifiers='{"readonly":[["tipo_linea","!=","cita"]]}'/>
-                                <field name="subtotal" readonly="1"/>
-                            </group>
+                             <group>
+                                 <field name="cantidad"/>
+                                 <field name="precio_unitario" modifiers='{"readonly":[["tipo_linea","!=","cita"]]}'/>
+                                 <field name="impuesto_ids" widget="many2many_tags" readonly="parent.estado != 'borrador'" force_save="1"/>
+                                 <field name="impuesto_linea" readonly="1"/>
+                                 <field name="subtotal" readonly="1"/>
+                                 <field name="total_linea" readonly="1"/>
+                             </group>
                         </group>
 
                         <group>
@@ -48,6 +51,8 @@
                     <field name="descripcion" readonly="1"/>
                     <field name="cantidad"/>
                     <field name="precio_unitario" readonly="1"/>
+                    <field name="impuesto_ids" widget="many2many_tags" readonly="parent.estado != 'borrador'" force_save="1"/>
+                    <field name="impuesto_linea" string="IVA" readonly="1"/>
                     <field name="subtotal" readonly="1"/>
                 </list>
             </field>

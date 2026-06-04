@@ -16,3 +16,13 @@ class ServicioVeterinario(models.Model):
     
     # Estado
     activo = fields.Boolean('Activo', default=True)
+
+    # Impuestos
+    impuesto_ids = fields.Many2many(
+        'account.tax',
+        'veterinaria_servicio_tax_rel',
+        'servicio_id',
+        'tax_id',
+        string='Impuestos',
+        domain=[('type_tax_use', '=', 'sale')]
+    )

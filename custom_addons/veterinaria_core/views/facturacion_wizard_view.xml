@@ -109,7 +109,7 @@
                         <field name="propietario_id" invisible="1"/>
                         <field name="cita_id" string="Cita / Receta a Importar" 
                                options="{'no_create': True}"
-                               domain="[('propietario_id', '=', propietario_id), ('receta_ids', '!=', False)]"/>
+                               domain="[('propietario_id', '=', propietario_id), ('receta_ids', '!=', False), ('receta_ids.facturada', '=', False)]"/>
                     </group>
                     <separator string="Medicamentos Encontrados en Inventario"/>
                     <p class="text-muted">

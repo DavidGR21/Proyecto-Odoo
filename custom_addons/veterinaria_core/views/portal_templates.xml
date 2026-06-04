@@ -96,12 +96,14 @@
                     </style>
 
                     <!-- Hero -->
-                    <div class="vet-hero d-flex justify-content-between align-items-center">
+                    <div class="vet-hero d-flex justify-content-between align-items-center flex-wrap gap-3">
                         <div>
                             <h2>Hola, <t t-out="request.env.user.partner_id.name"/> 🐾</h2>
                             <p>Bienvenido al portal de VitalPet. Aquí puedes gestionar la salud de tus mascotas.</p>
                         </div>
-                        <i class="fa fa-paw" style="font-size:64px;opacity:.25;"/>
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="fa fa-paw d-none d-sm-inline" style="font-size:48px;opacity:.25;"/>
+                        </div>
                     </div>
 
                     <!-- Atención clínica -->
@@ -742,63 +744,243 @@
          ===================================================== -->
     <template id="portal_my_prescriptions" name="Recetas Médicas">
         <t t-call="portal.portal_layout">
-            <h3 class="mt-3">Recetas Médicas</h3>
+            <style>
+                .vet-portal-header {
+                    background: linear-gradient(135deg, #2E86AB 0%, #1c526a 100%);
+                    color: white;
+                    border-radius: 12px;
+                    padding: 24px;
+                    box-shadow: 0 4px 15px rgba(46, 134, 171, 0.15);
+                    margin-bottom: 25px;
+                }
+                .vet-portal-title {
+                    font-family: 'Outfit', 'Inter', sans-serif;
+                    font-weight: 700;
+                    margin: 0;
+                }
+                .vet-recipe-card {
+                    border: 1px solid #e2e8f0;
+                    border-left: 6px solid #2E86AB;
+                    border-radius: 12px;
+                    background: white;
+                    transition: all 0.3s ease;
+                    overflow: hidden;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+                }
+                .vet-recipe-card:hover {
+                    transform: translateY(-4px);
+                    box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+                    border-color: #cbd5e1;
+                }
+                .vet-badge-pet {
+                    background-color: #e3f2fd;
+                    color: #0d47a1;
+                    font-weight: 600;
+                    padding: 6px 12px;
+                    border-radius: 20px;
+                    font-size: 0.85rem;
+                }
+                .vet-badge-vet {
+                    background-color: #f3e5f5;
+                    color: #4a148c;
+                    font-weight: 600;
+                    padding: 6px 12px;
+                    border-radius: 20px;
+                    font-size: 0.85rem;
+                }
+                .vet-badge-status {
+                    font-weight: 600;
+                    padding: 6px 12px;
+                    border-radius: 20px;
+                    font-size: 0.85rem;
+                }
+                .vet-badge-status.active {
+                    background-color: #fff3e0;
+                    color: #e65100;
+                }
+                .vet-badge-status.billed {
+                    background-color: #e8f5e9;
+                    color: #1b5e20;
+                }
+                .vet-diagnostico-box {
+                    background-color: #f8fafc;
+                    border-radius: 8px;
+                    padding: 15px;
+                    border-left: 4px solid #64748b;
+                    margin-bottom: 15px;
+                }
+                .vet-instructions-box {
+                    background-color: #fffbeb;
+                    border-radius: 8px;
+                    padding: 15px;
+                    border-left: 4px solid #f59e0b;
+                    margin-top: 15px;
+                }
+                .vet-table {
+                    margin-bottom: 0;
+                    border-radius: 8px;
+                    overflow: hidden;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+                }
+                .vet-table th {
+                    background-color: #f1f5f9;
+                    color: #475569;
+                    font-weight: 600;
+                    border-bottom: 2px solid #e2e8f0;
+                    text-transform: uppercase;
+                    font-size: 0.75rem;
+                    letter-spacing: 0.05em;
+                }
+                .vet-table td {
+                    vertical-align: middle;
+                    font-size: 0.9rem;
+                    color: #334155;
+                }
+                .empty-state {
+                    text-align: center;
+                    padding: 50px 20px;
+                    background: #f8fafc;
+                    border-radius: 12px;
+                    border: 2px dashed #cbd5e1;
+                    margin-top: 20px;
+                }
+            </style>
+
+            <!-- Header de Sección -->
+            <div class="vet-portal-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div>
+                    <h3 class="vet-portal-title d-flex align-items-center gap-2">
+                        <i class="fa fa-prescription-bottle-alt text-warning"/>
+                        Recetas Médicas
+                    </h3>
+                    <p class="m-0 text-white-50 small">Consulta el historial de tratamientos y recetas emitidas para tus mascotas.</p>
+                </div>
+                <div>
+                    <span class="badge bg-white text-dark rounded-pill py-2 px-3 fw-bold shadow-sm">
+                        <i class="fa fa-file-text-o text-primary me-1"/>
+                        <t t-out="len(recetas)"/> Recetas
+                    </span>
+                </div>
+            </div>
+
+            <!-- Listado de Recetas -->
             <t t-if="not recetas">
-                <div class="alert alert-light">No tiene recetas registradas.</div>
+                <div class="empty-state">
+                    <i class="fa fa-file-medical-alt fa-3x text-muted mb-3 d-block"/>
+                    <h5 class="text-secondary fw-bold">No tienes recetas registradas</h5>
+                    <p class="text-muted small mb-0">Cuando tu veterinario emita una receta durante una cita, aparecerá aquí.</p>
+                </div>
             </t>
+
             <t t-if="recetas">
-                <t t-foreach="recetas" t-as="r">
-                    <div class="card mb-3 shadow-sm">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <div>
-                                <strong t-out="r.name"/>
-                                <span class="text-muted ms-2" t-out="r.fecha_emision"/>
+                <div class="d-flex flex-column gap-4 mb-5">
+                    <t t-foreach="recetas" t-as="r">
+                        <div class="card vet-recipe-card shadow-sm border-0" t-att-style="'border-left-color: ' + ('#06A77D' if r.facturada else '#F8961E')">
+                            <!-- Card Header -->
+                            <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
+                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                    <h5 class="text-primary fw-bold m-0" t-out="r.name"/>
+                                    <span class="text-muted small">
+                                        <i class="fa fa-calendar-o me-1"/>
+                                        <span t-field="r.fecha_emision" t-options="{'widget': 'datetime', 'format': 'dd/MM/yyyy HH:mm'}"/>
+                                    </span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                    <!-- Badge Mascota -->
+                                    <span class="vet-badge-pet">
+                                        <i class="fa fa-paw me-1"/>
+                                        <t t-out="r.paciente_id.name"/>
+                                    </span>
+                                    <!-- Badge Veterinario -->
+                                    <span class="vet-badge-vet">
+                                        <i class="fa fa-user-md me-1"/>
+                                        <t t-out="r.veterinario_id.name or 'Sin veterinario'"/>
+                                    </span>
+                                    <!-- Badge Estado Facturación -->
+                                    <t t-if="r.facturada">
+                                        <span class="vet-badge-status billed">
+                                            <i class="fa fa-check-circle me-1"/> Facturada
+                                        </span>
+                                    </t>
+                                    <t t-else="">
+                                        <span class="vet-badge-status active">
+                                            <i class="fa fa-clock-o me-1"/> Activa / Pendiente
+                                        </span>
+                                    </t>
+                                </div>
                             </div>
-                            <div>
-                                <span class="badge bg-info me-1">
-                                    <i class="fa fa-paw"/> <t t-out="r.paciente_id.name"/>
-                                </span>
-                                <span class="badge bg-secondary">
-                                    <t t-out="r.veterinario_id.name or 'Sin veterinario'"/>
-                                </span>
+
+                            <!-- Card Body -->
+                            <div class="card-body px-4 pb-4 pt-2">
+                                <!-- Diagnóstico -->
+                                <t t-if="r.diagnostico">
+                                    <div class="vet-diagnostico-box">
+                                        <h6 class="fw-bold text-secondary mb-2">
+                                            <i class="fa fa-stethoscope me-1 text-primary"/> Diagnóstico
+                                        </h6>
+                                        <p class="m-0 text-dark" t-out="r.diagnostico"/>
+                                    </div>
+                                </t>
+
+                                <!-- Medicamentos/Tratamiento -->
+                                <t t-if="r.linea_ids">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover vet-table border">
+                                            <thead>
+                                                <tr>
+                                                    <th>Medicamento</th>
+                                                    <th class="text-center">Dosis</th>
+                                                    <th class="text-center">Frecuencia</th>
+                                                    <th class="text-center">Duración</th>
+                                                    <th class="text-center bg-light fw-bold text-primary">Total a Entregar</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr t-foreach="r.linea_ids" t-as="l">
+                                                    <td>
+                                                        <div class="d-flex align-items-center gap-2">
+                                                            <i class="fa fa-capsules text-info" t-if="l.tipo_origen == 'inventario'"/>
+                                                            <i class="fa fa-pills text-warning" t-else=""/>
+                                                            <strong t-out="l.nombre_medicamento_display"/>
+                                                            <span class="badge bg-light text-muted border font-monospace ms-1" style="font-size: 0.7rem;" t-if="l.tipo_origen == 'inventario'">Inventario</span>
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-center font-weight-bold" t-out="l.dosis"/>
+                                                    <td class="text-center">
+                                                        Cada <t t-out="l.frecuencia_horas"/> horas
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <t t-out="l.duracion_dias"/> días
+                                                    </td>
+                                                    <td class="text-center bg-light fw-bold text-primary" t-out="l.cantidad_total"/>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </t>
+
+                                <!-- Indicaciones de cuidado -->
+                                <t t-if="r.observaciones_adicionales or r.instrucciones_generales">
+                                    <div class="vet-instructions-box">
+                                        <h6 class="fw-bold text-warning-dark mb-2">
+                                            <i class="fa fa-info-circle me-1 text-warning"/> Indicaciones de Cuidado y Uso
+                                        </h6>
+                                        <t t-if="r.instrucciones_generales">
+                                            <p class="mb-2 text-dark">
+                                                <strong>Instrucciones generales:</strong> <t t-out="r.instrucciones_generales"/>
+                                            </p>
+                                        </t>
+                                        <t t-if="r.observaciones_adicionales">
+                                            <p class="m-0 text-dark">
+                                                <strong>Observaciones adicionales:</strong> <t t-out="r.observaciones_adicionales"/>
+                                            </p>
+                                        </t>
+                                    </div>
+                                </t>
                             </div>
                         </div>
-                        <div class="card-body">
-                            <t t-if="r.diagnostico">
-                                <p class="mb-2"><strong>Diagnóstico:</strong>
-                                    <t t-out="r.diagnostico"/></p>
-                            </t>
-                            <t t-if="r.linea_ids">
-                                <table class="table table-sm mb-2">
-                                    <thead>
-                                        <tr>
-                                            <th>Medicamento</th>
-                                            <th>Dosis</th>
-                                            <th>Cada (h)</th>
-                                            <th>Días</th>
-                                            <th>Total</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr t-foreach="r.linea_ids" t-as="l">
-                                            <td t-out="l.nombre_medicamento_display"/>
-                                            <td t-out="l.dosis"/>
-                                            <td t-out="l.frecuencia_horas"/>
-                                            <td t-out="l.duracion_dias"/>
-                                            <td t-out="l.cantidad_total"/>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </t>
-                            <t t-if="r.observaciones_adicionales">
-                                <p class="small text-muted mb-0">
-                                    <strong>Indicaciones:</strong>
-                                    <t t-out="r.observaciones_adicionales"/>
-                                </p>
-                            </t>
-                        </div>
-                    </div>
-                </t>
+                    </t>
+                </div>
             </t>
         </t>
     </template>
