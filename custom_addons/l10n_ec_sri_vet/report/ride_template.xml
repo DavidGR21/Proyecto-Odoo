@@ -226,45 +226,27 @@
                                                 <t t-esc="'%.2f' % doc.facturacion_id.subtotal"/>
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td><strong>SUBTOTAL 0%</strong></td>
-                                            <td style="text-align: right;">
-                                                <t t-if="not doc.facturacion_id.impuesto_id or doc.facturacion_id.impuesto_id.amount == 0">
-                                                    <t t-esc="'%.2f' % doc.facturacion_id.subtotal"/>
-                                                </t>
-                                                <t t-else="">0.00</t>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <strong>SUBTOTAL IVA
-                                                    <t t-if="doc.facturacion_id.impuesto_id">
-                                                        <t t-esc="'%.0f' % doc.facturacion_id.impuesto_id.amount"/>%
-                                                    </t>
-                                                </strong>
-                                            </td>
-                                            <td style="text-align: right;">
-                                                <t t-if="doc.facturacion_id.impuesto_id and doc.facturacion_id.impuesto_id.amount > 0">
-                                                    <t t-esc="'%.2f' % doc.facturacion_id.subtotal"/>
-                                                </t>
-                                                <t t-else="">0.00</t>
-                                            </td>
-                                        </tr>
+                                        <t t-foreach="doc.facturacion_id._get_impuestos_agrupados().values()" t-as="tax_info">
+                                            <tr>
+                                                <td>
+                                                    <strong>SUBTOTAL <t t-esc="tax_info['name']"/></strong>
+                                                </td>
+                                                <td style="text-align: right;">
+                                                    <t t-esc="'%.2f' % tax_info['base']"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <strong>VALOR <t t-esc="tax_info['name']"/></strong>
+                                                </td>
+                                                <td style="text-align: right;">
+                                                    <t t-esc="'%.2f' % tax_info['monto']"/>
+                                                </td>
+                                            </tr>
+                                        </t>
                                         <tr>
                                             <td><strong>DESCUENTO</strong></td>
                                             <td style="text-align: right;">0.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <strong>IVA
-                                                    <t t-if="doc.facturacion_id.impuesto_id">
-                                                        <t t-esc="'%.0f' % doc.facturacion_id.impuesto_id.amount"/>%
-                                                    </t>
-                                                </strong>
-                                            </td>
-                                            <td style="text-align: right;">
-                                                <t t-esc="'%.2f' % doc.facturacion_id.impuesto_total"/>
-                                            </td>
                                         </tr>
                                         <tr style="border-top: 2px solid #333; font-size: 12px;">
                                             <td><strong>VALOR TOTAL</strong></td>
