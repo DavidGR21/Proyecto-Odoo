@@ -24,7 +24,7 @@ class FacturacionLinea(models.Model):
     cita_id = fields.Many2one(
         'veterinaria.cita',
         string='Cita Veterinaria',
-        domain=[('estado', '=', 'completada')]
+        domain=[('estado', '=', 'completada'), ('facturada', '=', False)]
     )
 
     inventario_id = fields.Many2one(
@@ -51,6 +51,33 @@ class FacturacionLinea(models.Model):
 
     subtotal = fields.Float('Subtotal', compute='_compute_subtotal', store=True)
     descripcion = fields.Char('Descripcion', compute='_compute_descripcion', store=True)
+
+    impuesto_ids = fields.Many2many(
+        'account.tax',
+        string='Impuestos',
+        domain=[('type_tax_use', '=', 'sale')]
+    )
+    impuesto_linea = fields.Float('Monto Impuesto', compute='_compute_linea_totales', store=True)
+    total_linea = fields.Float('Total Línea', compute='_compute_linea_totales', store=True)
+
+    @api.depends('subtotal', 'impuesto_ids', 'cantidad', 'precio_unitario')
+    def _compute_linea_totales(self):
+        for rec in self:
+            subtotal = rec.cantidad * rec.precio_unitario
+            impuesto_total = 0.0
+            if rec.impuesto_ids:
+                # Usar la función estándar de Odoo para calcular impuestos de forma robusta
+                currency = rec.env.company.currency_id
+                taxes_res = rec.impuesto_ids.compute_all(
+                    rec.precio_unitario,
+                    quantity=rec.cantidad,
+                    currency=currency,
+                    product=None,
+                    partner=rec.facturacion_id.propietario_id if rec.facturacion_id else None
+                )
+                impuesto_total = sum(t['amount'] for t in taxes_res['taxes'])
+            rec.impuesto_linea = impuesto_total
+            rec.total_linea = subtotal + impuesto_total
 
     # ── Computes ──────────────────────────────────────────────────────────────
 
@@ -95,11 +122,19 @@ class FacturacionLinea(models.Model):
                 self.precio_unitario = self.item_ref.precio_venta or 0.0
                 self.inventario_id = self.item_ref.id
                 self.tipo_linea = self.item_ref.tipo_inventario
+                self.impuesto_ids = [(6, 0, self.item_ref.impuesto_id.ids)]
             elif self.item_ref._name == 'veterinaria.cita':
                 self.cita_id = self.item_ref.id
                 self.tipo_linea = 'cita'
                 if self.item_ref.servicio_id:
                     self.precio_unitario = self.item_ref.servicio_id.precio or 0.0
+                if self.item_ref.impuesto_ids:
+                    self.impuesto_ids = [(6, 0, self.item_ref.impuesto_ids.ids)]
+                elif self.item_ref.servicio_id and self.item_ref.servicio_id.impuesto_ids:
+                    self.impuesto_ids = [(6, 0, self.item_ref.servicio_id.impuesto_ids.ids)]
+                else:
+                    tax_15 = self.env['account.tax'].search([('type_tax_use', '=', 'sale'), ('amount', '=', 15.0)], limit=1)
+                    self.impuesto_ids = [(6, 0, tax_15.ids)] if tax_15 else [(5, 0, 0)]
 
     @api.onchange('tipo_linea')
     def _onchange_tipo_linea(self):
@@ -107,6 +142,7 @@ class FacturacionLinea(models.Model):
         self.inventario_id = False
         self.precio_unitario = 0.0
         self.cantidad = 1.0
+        self.impuesto_ids = [(5, 0, 0)]
 
     @api.onchange('cita_id')
     def _onchange_cita_id(self):
@@ -114,15 +150,20 @@ class FacturacionLinea(models.Model):
             servicio = self.cita_id.servicio_id
             self.precio_unitario = servicio.precio if servicio else 0.0
             self.cantidad = 1.0
+            if self.cita_id.impuesto_ids:
+                self.impuesto_ids = [(6, 0, self.cita_id.impuesto_ids.ids)]
+            elif servicio and servicio.impuesto_ids:
+                self.impuesto_ids = [(6, 0, servicio.impuesto_ids.ids)]
+            else:
+                tax_15 = self.env['account.tax'].search([('type_tax_use', '=', 'sale'), ('amount', '=', 15.0)], limit=1)
+                self.impuesto_ids = [(6, 0, tax_15.ids)] if tax_15 else [(5, 0, 0)]
 
     @api.onchange('inventario_id')
     def _onchange_inventario_id(self):
-        if self.tipo_linea in ('medicamento', 'producto') and self.inventario_id:
+        if self.tipo_linea in ('medicamento', 'producto', 'servicio') and self.inventario_id:
             self.precio_unitario = self.inventario_id.precio_venta or 0.0
             self.cantidad = 1.0
-        elif self.tipo_linea == 'servicio' and self.inventario_id:
-            self.precio_unitario = self.inventario_id.precio_venta or 0.0
-            self.cantidad = 1.0
+            self.impuesto_ids = [(6, 0, self.inventario_id.impuesto_id.ids)]
 
     @api.onchange('precio_unitario')
     def _onchange_precio_unitario(self):
