@@ -42,9 +42,6 @@
                                        readonly="estado != 'borrador'"/>
                                 <field name="propietario_id"
                                        readonly="estado != 'borrador'"/>
-                                <field name="impuesto_id"
-                                       readonly="estado != 'borrador'"
-                                       options="{'no_create': True}"/>
                             </group>
                         </group>
 
@@ -78,12 +75,21 @@
                                                readonly="parent.estado != 'borrador'"/>
                                         <field name="precio_unitario"
                                                readonly="parent.estado != 'borrador'"/>
+                                        <field name="impuesto_ids"
+                                               widget="many2many_tags"
+                                               readonly="1"
+                                               force_save="1"
+                                               optional="show"/>
+                                        <field name="impuesto_linea"
+                                               string="IVA"
+                                               readonly="1"/>
                                         <field name="subtotal" readonly="1"/>
                                     </list>
                                 </field>
 
                                 <group class="oe_subtotal_footer oe_right">
                                     <field name="subtotal" readonly="1"/>
+                                    <field name="detalles_impuestos_html" widget="html" nolabel="1" colspan="2"/>
                                     <field name="impuesto_total" readonly="1"/>
                                     <field name="total"
                                            class="oe_subtotal_footer_separator"
