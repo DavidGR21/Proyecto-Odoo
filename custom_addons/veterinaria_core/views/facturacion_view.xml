@@ -77,7 +77,7 @@
                                                readonly="parent.estado != 'borrador'"/>
                                         <field name="impuesto_ids"
                                                widget="many2many_tags"
-                                               readonly="1"
+                                               readonly="parent.estado != 'borrador'"
                                                force_save="1"
                                                optional="show"/>
                                         <field name="impuesto_linea"
