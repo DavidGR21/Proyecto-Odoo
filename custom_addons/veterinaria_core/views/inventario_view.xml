@@ -57,7 +57,7 @@
                             </group>
                         </group>
 
-                        <group invisible="tipo_inventario != 'producto'" string="Configuración Adicional">
+                        <group string="Configuración Adicional">
                             <group>
                                 <field name="impuesto_id" widget="many2many_tags" string="Impuestos"/>
                             </group>
