@@ -45,11 +45,10 @@
                                 <field name="cita_ids" nolabel="1" readonly="1">
                                     <list>
                                         <field name="fecha_hora"/>
-                                        <field name="name" string="Cita"/>
                                         <field name="veterinario_id"/>
                                         <field name="propietario_id"/>
                                         <field name="motivo"/>
-                                        <field name="estado"/>
+                                        <field name="sintomas_resumen" string="Síntomas" optional="show"/>
                                     </list>
                                     <form string="Detalle de Cita">
                                         <sheet>
@@ -65,8 +64,8 @@
                                                     <field name="motivo" readonly="1"/>
                                                 </group>
                                             </group>
-                                            <group string="Observaciones">
-                                                <field name="observaciones" readonly="1"/>
+                                            <group string="Síntomas">
+                                                <field name="sintoma_ids" widget="many2many_tags" readonly="1"/>
                                             </group>
                                             
                                             <!-- Sección de Receta Médica integrada en la Cita -->
