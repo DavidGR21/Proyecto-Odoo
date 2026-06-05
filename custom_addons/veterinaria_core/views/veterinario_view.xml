@@ -18,6 +18,7 @@
                             <group string="Información Profesional">
                                 <field name="especialidad_id" required="1"/>
                                 <field name="matricula_profesional"/>
+                                <field name="user_id" string="Usuario Odoo"/>
                                 <field name="horario_inicio"/>
                                 <field name="horario_fin"/>
                                 <field name="dias_disponibles"/>
