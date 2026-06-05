@@ -875,7 +875,7 @@
             <t t-if="recetas">
                 <div class="d-flex flex-column gap-4 mb-5">
                     <t t-foreach="recetas" t-as="r">
-                        <div class="card vet-recipe-card shadow-sm border-0" t-att-style="'border-left-color: ' + ('#06A77D' if r.facturada else '#F8961E')">
+                        <div class="card vet-recipe-card shadow-sm border-0" t-att-style="'border-left-color: ' + ('#06A77D' if r.state == 'finalizada' else '#F8961E')">
                             <!-- Card Header -->
                             <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
                                 <div class="d-flex align-items-center gap-2 flex-wrap">
@@ -897,7 +897,7 @@
                                         <t t-out="r.veterinario_id.name or 'Sin veterinario'"/>
                                     </span>
                                     <!-- Badge Estado Facturación -->
-                                    <t t-if="r.facturada">
+                                    <t t-if="r.state == 'finalizada'">
                                         <span class="vet-badge-status billed">
                                             <i class="fa fa-check-circle me-1"/> Facturada
                                         </span>
