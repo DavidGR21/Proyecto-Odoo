@@ -28,46 +28,51 @@
                         <!-- ── Tarjetas de métricas rápidas ── -->
                         <div class="row mb-4">
                             <!-- Total citas -->
-                            <div class="col-md-3 col-sm-6">
-                                <div class="bg-primary bg-opacity-10 border border-primary border-opacity-25 rounded-3 p-3 text-center h-100">
-                                    <i class="fa fa-calendar-check-o fa-2x text-primary mb-2"/>
-                                    <div class="fs-2 fw-bold text-primary">
+                            <div class="col-md-3 col-sm-6 mb-3">
+                                <div class="rounded-3 p-3 text-center h-100"
+                                     style="background: rgba(99,91,255,0.10); border: 1.5px solid rgba(99,91,255,0.25);">
+                                    <i class="fa fa-calendar fa-2x mb-2" style="color: #4f46e5;"/>
+                                    <div class="fs-2 fw-bold" style="color: #3730a3;">
                                         <field name="cita_count" readonly="1" nolabel="1"/>
                                     </div>
-                                    <div class="small text-muted">Total de Citas</div>
+                                    <div class="small" style="color: #6b7280;">Total de Citas</div>
                                 </div>
                             </div>
                             <!-- Peso -->
-                            <div class="col-md-3 col-sm-6">
-                                <div class="bg-success bg-opacity-10 border border-success border-opacity-25 rounded-3 p-3 text-center h-100">
-                                    <i class="fa fa-balance-scale fa-2x text-success mb-2"/>
-                                    <div class="fs-2 fw-bold text-success">
+                            <div class="col-md-3 col-sm-6 mb-3">
+                                <div class="rounded-3 p-3 text-center h-100"
+                                     style="background: rgba(16,185,129,0.10); border: 1.5px solid rgba(16,185,129,0.25);">
+                                    <i class="fa fa-balance-scale fa-2x mb-2" style="color: #059669;"/>
+                                    <div class="fs-2 fw-bold" style="color: #065f46;">
                                         <field name="peso" readonly="0" nolabel="1" class="d-inline"/> <span class="small">kg</span>
                                     </div>
-                                    <div class="small text-muted">Peso Actual</div>
+                                    <div class="small" style="color: #6b7280;">Peso Actual</div>
                                 </div>
                             </div>
                             <!-- Tipo de sangre -->
-                            <div class="col-md-3 col-sm-6">
-                                <div class="bg-danger bg-opacity-10 border border-danger border-opacity-25 rounded-3 p-3 text-center h-100">
-                                    <i class="fa fa-tint fa-2x text-danger mb-2"/>
-                                    <div class="fs-5 fw-bold text-danger mt-1">
+                            <div class="col-md-3 col-sm-6 mb-3">
+                                <div class="rounded-3 p-3 text-center h-100"
+                                     style="background: rgba(239,68,68,0.10); border: 1.5px solid rgba(239,68,68,0.25);">
+                                    <i class="fa fa-tint fa-2x mb-2" style="color: #dc2626;"/>
+                                    <div class="fs-5 fw-bold mt-1" style="color: #991b1b;">
                                         <field name="tipo_sangre" readonly="0" nolabel="1" widget="badge"/>
                                     </div>
-                                    <div class="small text-muted">Tipo de Sangre</div>
+                                    <div class="small" style="color: #6b7280;">Tipo de Sangre</div>
                                 </div>
                             </div>
                             <!-- Estado historia -->
-                            <div class="col-md-3 col-sm-6">
-                                <div class="bg-warning bg-opacity-10 border border-warning border-opacity-25 rounded-3 p-3 text-center h-100">
-                                    <i class="fa fa-heartbeat fa-2x text-warning mb-2"/>
-                                    <div class="fs-5 fw-bold text-warning mt-1">
+                            <div class="col-md-3 col-sm-6 mb-3">
+                                <div class="rounded-3 p-3 text-center h-100"
+                                     style="background: rgba(245,158,11,0.10); border: 1.5px solid rgba(245,158,11,0.28);">
+                                    <i class="fa fa-heartbeat fa-2x mb-2" style="color: #d97706;"/>
+                                    <div class="fs-5 fw-bold mt-1" style="color: #92400e;">
                                         <field name="activa" widget="boolean_toggle" nolabel="1"/>
                                     </div>
-                                    <div class="small text-muted">Historia Activa</div>
+                                    <div class="small" style="color: #6b7280;">Historia Activa</div>
                                 </div>
                             </div>
                         </div>
+
 
                         <!-- ── Sección: Información Médica ── -->
                         <div class="o_group mb-3">
