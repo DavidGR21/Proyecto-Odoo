@@ -126,18 +126,46 @@
             <field name="name">veterinaria.cita.search</field>
             <field name="model">veterinaria.cita</field>
             <field name="arch" type="xml">
-                <search>
-                    <field name="paciente_id"/>
-                    <field name="veterinario_id"/>
-                    <field name="propietario_id"/>
-                    <field name="motivo"/>
-                    <filter name="programadas" string="Programadas" domain="[('estado', '=', 'programada')]"/>
-                    <filter name="completadas" string="Completadas" domain="[('estado', '=', 'completada')]"/>
-                    <filter name="canceladas" string="Canceladas" domain="[('estado', '=', 'cancelada')]"/>
+                <search string="Buscar Citas">
+                    <field name="paciente_id" string="Buscar por Paciente"/>
+                    <field name="veterinario_id" string="Buscar por Veterinario"/>
+                    <field name="propietario_id" string="Buscar por Propietario"/>
+                    <field name="motivo" string="Buscar por Motivo"/>
+                    <separator/>
+                    <!-- #8: Filtro para que cada veterinario vea solo sus citas -->
+                    <filter name="mis_citas" string="🩺 Mis Citas"
+                            domain="[('veterinario_id.user_id', '=', uid)]"/>
+                    <separator/>
+                    <!-- Filtros por estado -->
+                    <filter name="programadas" string="📋 Programadas" domain="[('estado', '=', 'programada')]"/>
+                    <!-- #10: Filtro para mostrar citas completadas -->
+                    <filter name="completadas" string="✅ Completadas" domain="[('estado', '=', 'completada')]"/>
+                    <filter name="canceladas" string="❌ Canceladas" domain="[('estado', '=', 'cancelada')]"/>
+                    <filter name="no_asistio" string="⚠️ No Asistió" domain="[('estado', '=', 'no_asistio')]"/>
+                    <separator/>
+                    <!-- #9: Filtros por fechas claros y específicos -->
+                    <filter string="📅 Citas de Hoy" name="filter_hoy"
+                            domain="[('fecha_hora', '&gt;=', context_today().strftime('%Y-%m-%d 00:00:00')), ('fecha_hora', '&lt;=', context_today().strftime('%Y-%m-%d 23:59:59'))]"/>
+                    <filter string="📅 Citas Últimos 7 Días" name="filter_semana"
+                            domain="[('fecha_hora', '&gt;=', (context_today() - datetime.timedelta(days=7)).strftime('%Y-%m-%d 00:00:00'))]"/>
+                    <filter string="📅 Citas de Este Mes" name="filter_mes"
+                            domain="[('fecha_hora', '&gt;=', context_today().strftime('%Y-%m-01'))]"/>
+                    <separator/>
+                    <filter string="🕐 Creadas Hoy" name="filter_creadas_hoy"
+                            domain="[('create_date', '&gt;=', context_today().strftime('%Y-%m-%d 00:00:00')), ('create_date', '&lt;=', context_today().strftime('%Y-%m-%d 23:59:59'))]"/>
+                    <filter string="🕐 Creadas Últimos 7 Días" name="filter_creadas_semana"
+                            domain="[('create_date', '&gt;=', (context_today() - datetime.timedelta(days=7)).strftime('%Y-%m-%d 00:00:00'))]"/>
+                    <filter string="🕐 Creadas Este Mes" name="filter_creadas_mes"
+                            domain="[('create_date', '&gt;=', context_today().strftime('%Y-%m-01'))]"/>
+                    <separator/>
                     <group expand="0" string="Agrupar por">
                         <filter string="Veterinario" name="group_by_vet" context="{'group_by': 'veterinario_id'}"/>
                         <filter string="Estado" name="group_by_estado" context="{'group_by': 'estado'}"/>
-                        <filter string="Fecha" name="group_by_fecha" context="{'group_by': 'fecha_hora'}"/>
+                        <filter string="Paciente" name="group_by_paciente" context="{'group_by': 'paciente_id'}"/>
+                        <filter string="Propietario" name="group_by_propietario" context="{'group_by': 'propietario_id'}"/>
+                        <filter string="Servicio" name="group_by_servicio" context="{'group_by': 'servicio_id'}"/>
+                        <filter string="Fecha de Cita (por mes)" name="group_by_fecha" context="{'group_by': 'fecha_hora:month'}"/>
+                        <filter string="Fecha de Creación (por mes)" name="group_by_create" context="{'group_by': 'create_date:month'}"/>
                     </group>
                 </search>
             </field>

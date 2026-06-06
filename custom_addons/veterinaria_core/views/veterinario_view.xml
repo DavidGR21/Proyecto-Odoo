@@ -8,22 +8,27 @@
             <field name="arch" type="xml">
                 <form string="Veterinario">
                     <sheet>
+                        <field name="can_edit_profile" invisible="1"/>
                         <div class="oe_title">
                             <h1>
-                                <field name="name" placeholder="Ej: Dr. Juan Pérez"/>
+                                <field name="name" placeholder="Ej: Dr. Juan Pérez" readonly="can_edit_profile == False"/>
                             </h1>
+                            <h3>
+                                <field name="email" placeholder="Correo Electrónico" widget="email" readonly="can_edit_profile == False"/>
+                            </h3>
                         </div>
 
                         <group>
                             <group string="Información Profesional">
-                                <field name="especialidad_id" required="1"/>
-                                <field name="matricula_profesional"/>
-                                <field name="horario_inicio"/>
-                                <field name="horario_fin"/>
-                                <field name="dias_disponibles"/>
+                                <field name="especialidad_id" required="1" readonly="can_edit_profile == False"/>
+                                <field name="matricula_profesional" readonly="can_edit_profile == False"/>
+                                <field name="user_id" string="Usuario Odoo" readonly="1"/>
+                                <field name="horario_inicio" readonly="can_edit_profile == False"/>
+                                <field name="horario_fin" readonly="can_edit_profile == False"/>
+                                <field name="dias_disponibles" readonly="can_edit_profile == False"/>
                             </group>
                             <group string="Horario">
-                                <field name="observaciones_horario" placeholder="Ej: Atencion solo por la manana"/>
+                                <field name="observaciones_horario" placeholder="Ej: Atencion solo por la manana" readonly="can_edit_profile == False"/>
                             </group>
                         </group>
                     </sheet>
@@ -58,5 +63,35 @@
                 </search>
             </field>
         </record>
+
+        <!-- Acción Servidor para "Mi Perfil" -->
+        <record id="action_mi_perfil_veterinario" model="ir.actions.server">
+            <field name="name">Mi Perfil</field>
+            <field name="model_id" ref="model_veterinaria_veterinario"/>
+            <field name="state">code</field>
+            <field name="groups_id" eval="[(4, ref('veterinaria_core.group_veterinaria_veterinario'))]"/>
+            <field name="code">
+vet = env['veterinaria.veterinario'].search([('user_id', '=', env.uid)], limit=1)
+if vet:
+    action = {
+        'type': 'ir.actions.act_window',
+        'name': 'Mi Perfil',
+        'res_model': 'veterinaria.veterinario',
+        'res_id': vet.id,
+        'view_mode': 'form',
+        'target': 'current',
+    }
+else:
+    raise Warning('No tienes un perfil de veterinario asignado.')
+            </field>
+        </record>
+
+        <!-- Menú "Mi Perfil" en la raíz o configuración -->
+        <menuitem id="menu_mi_perfil_veterinario"
+                  name="Mi Perfil"
+                  parent="menu_veterinaria_gestion"
+                  action="action_mi_perfil_veterinario"
+                  sequence="100"
+                  groups="veterinaria_core.group_veterinaria_veterinario"/>
     </data>
 </odoo>
