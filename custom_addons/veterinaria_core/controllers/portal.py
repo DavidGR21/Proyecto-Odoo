@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 import base64
+import logging
+from werkzeug.utils import redirect as werkzeug_redirect
 from odoo import http, fields
 from odoo.http import request
 from odoo.addons.portal.controllers.portal import CustomerPortal, get_error
+
+_logger = logging.getLogger(__name__)
 
 
 class VeterinariaPortal(CustomerPortal):
@@ -212,13 +216,14 @@ class VeterinariaPortal(CustomerPortal):
 
     @http.route(['/my/invoices_vet/<int:factura_id>'],
                 type='http', auth='user', website=True)
-    def portal_my_vet_invoice_detail(self, factura_id, **kw):
+    def portal_my_vet_invoice_detail(self, factura_id, payment_status=None, **kw):
         factura = self._check_invoice_access(factura_id)
         if not factura:
             return request.redirect('/my/invoices_vet')
         values = {
             'factura': factura,
             'page_name': 'invoices_vet_detail',
+            'payment_status': payment_status,  # 'success', 'cancel', 'error'
         }
         return request.render(
             'veterinaria_core.portal_my_vet_invoice_detail', values
@@ -241,6 +246,210 @@ class VeterinariaPortal(CustomerPortal):
             ('Content-Disposition',
              'attachment; filename="Factura_%s.pdf"' % (factura.name or factura.id)),
         ])
+
+    # ------------------------------------------------------------------
+    # PayPal — helpers internos (usan la infraestructura nativa de Odoo 18)
+    # ------------------------------------------------------------------
+    def _get_paypal_provider(self):
+        """Retorna el proveedor PayPal activo configurado en Odoo, o None."""
+        provider = request.env['payment.provider'].sudo().search([
+            ('code', '=', 'paypal'),
+            ('state', 'in', ('enabled', 'test')),
+        ], limit=1)
+        return provider or None
+
+    def _create_paypal_order(self, provider, factura, return_url, cancel_url):
+        """Crea una orden PayPal usando el método nativo de Odoo.
+
+        Devuelve (order_id, approval_url) o lanza excepción.
+        El proveedor ya maneja internamente el token (caché + renovación).
+        """
+        company_currency = request.env.company.currency_id
+        currency_code = company_currency.name if company_currency else 'USD'
+        amount_str = '%.2f' % factura.total
+
+        payload = {
+            'intent': 'CAPTURE',
+            'purchase_units': [{
+                'reference_id': factura.name or str(factura.id),
+                'description': f'Factura Veterinaria {factura.name} - VitalPet',
+                'amount': {
+                    'currency_code': currency_code,
+                    'value': amount_str,
+                },
+            }],
+            'payment_source': {
+                'paypal': {
+                    'experience_context': {
+                        'brand_name': 'VitalPet',
+                        'locale': 'es-EC',
+                        'landing_page': 'LOGIN',
+                        'user_action': 'PAY_NOW',
+                        'return_url': return_url,
+                        'cancel_url': cancel_url,
+                    }
+                }
+            },
+        }
+        # _paypal_make_request gestiona el Bearer token automáticamente
+        data = provider._paypal_make_request('/v2/checkout/orders', json_payload=payload)
+        order_id = data.get('id')
+        if not order_id:
+            raise ValueError('PayPal no devolvió un order ID válido.')
+
+        # Construimos la URL de checkout directamente desde el order_id.
+        # Esto es más confiable que extraer el href de los links, ya que
+        # el header PayPal-Partner-Attribution-Id de Odoo puede devolver
+        # hrefs relativos que rompen el redirect.
+        # Patrón: https://api-m.sandbox.paypal.com → https://www.sandbox.paypal.com
+        checkout_base = provider._paypal_get_api_url().replace('api-m.', 'www.')
+        approval_url = f'{checkout_base}/checkoutnow?token={order_id}'
+        return order_id, approval_url
+
+    def _capture_paypal_order(self, provider, order_id):
+        """Captura (cobra) una orden PayPal aprobada. Devuelve True si completada."""
+        try:
+            data = provider._paypal_make_request(
+                f'/v2/checkout/orders/{order_id}/capture',
+                json_payload={},
+            )
+            return data.get('status') == 'COMPLETED'
+        except Exception:
+            _logger.exception('Error al capturar orden PayPal %s', order_id)
+            return False
+
+    # ------------------------------------------------------------------
+    # /my/invoices_vet/<id>/pay — Iniciar pago PayPal
+    # ------------------------------------------------------------------
+    @http.route(['/my/invoices_vet/<int:factura_id>/pay'],
+                type='http', auth='user', website=True, methods=['POST'])
+    def portal_vet_invoice_pay(self, factura_id, **kw):
+        """Inicia el flujo de pago PayPal para una factura veterinaria."""
+        factura = self._check_invoice_access(factura_id)
+        if not factura:
+            return request.redirect('/my/invoices_vet')
+
+        # Solo facturas validadas y no pagadas
+        if factura.estado != 'validado' or factura.pagado:
+            return request.redirect(
+                f'/my/invoices_vet/{factura_id}?payment_status=error'
+            )
+
+        if factura.total <= 0:
+            return request.redirect(
+                f'/my/invoices_vet/{factura_id}?payment_status=error'
+            )
+
+        provider = self._get_paypal_provider()
+        if not provider:
+            _logger.error('No hay proveedor PayPal activo configurado en Odoo.')
+            return request.redirect(
+                f'/my/invoices_vet/{factura_id}?payment_status=error'
+            )
+
+        try:
+            base_site = request.httprequest.host_url.rstrip('/')
+            return_url = f'{base_site}/my/invoices_vet/{factura_id}/payment/return'
+            cancel_url = f'{base_site}/my/invoices_vet/{factura_id}/payment/cancel'
+
+            order_id, approval_url = self._create_paypal_order(
+                provider, factura, return_url, cancel_url
+            )
+
+            if not approval_url:
+                raise ValueError('No se obtuvo approval_url de PayPal.')
+
+            # Guardar referencia de la orden PayPal en la factura
+            factura.sudo().write({'payment_reference': order_id})
+
+            _logger.info(
+                'Factura %s: orden PayPal %s creada. Redirigiendo a: %s',
+                factura.name, order_id, approval_url,
+            )
+            # Usamos werkzeug_redirect para garantizar un 302 limpio
+            # hacia la URL externa de PayPal sin que Odoo modifique la URL.
+            return werkzeug_redirect(approval_url, code=302)
+
+        except Exception as e:
+            _logger.exception('Error al crear orden PayPal para factura %s: %s', factura_id, e)
+            return request.redirect(
+                f'/my/invoices_vet/{factura_id}?payment_status=error'
+            )
+
+    # ------------------------------------------------------------------
+    # /my/invoices_vet/<id>/payment/return — Retorno de PayPal (éxito)
+    # ------------------------------------------------------------------
+    @http.route(['/my/invoices_vet/<int:factura_id>/payment/return'],
+                type='http', auth='user', website=True, methods=['GET'])
+    def portal_vet_invoice_payment_return(self, factura_id, token=None, PayerID=None, **kw):
+        """Callback de retorno de PayPal. Captura la orden y marca la factura como pagada."""
+        factura = self._check_invoice_access(factura_id)
+        if not factura:
+            return request.redirect('/my/invoices_vet')
+
+        # Verificar que no esté ya pagada
+        if factura.pagado:
+            return request.redirect(
+                f'/my/invoices_vet/{factura_id}?payment_status=success'
+            )
+
+        order_id = factura.payment_reference
+        if not order_id:
+            _logger.error('No hay order_id PayPal registrado para factura %s', factura_id)
+            return request.redirect(
+                f'/my/invoices_vet/{factura_id}?payment_status=error'
+            )
+
+        provider = self._get_paypal_provider()
+        if not provider:
+            return request.redirect(
+                f'/my/invoices_vet/{factura_id}?payment_status=error'
+            )
+
+        try:
+            captured = self._capture_paypal_order(provider, order_id)
+
+            if captured:
+                # Marcar factura como pagada
+                factura.sudo().write({
+                    'pagado': True,
+                    'fecha_pago': fields.Datetime.now(),
+                })
+                # Registrar en el chatter
+                factura.sudo().message_post(
+                    body=f'✅ Pago recibido via PayPal. Orden: {order_id}',
+                    message_type='notification',
+                )
+                _logger.info('Factura %s pagada exitosamente via PayPal (orden %s).', factura.name, order_id)
+                return request.redirect(
+                    f'/my/invoices_vet/{factura_id}?payment_status=success'
+                )
+            else:
+                _logger.warning('Captura PayPal fallida para factura %s, orden %s.', factura_id, order_id)
+                return request.redirect(
+                    f'/my/invoices_vet/{factura_id}?payment_status=error'
+                )
+
+        except Exception as e:
+            _logger.exception('Error al capturar pago PayPal para factura %s: %s', factura_id, e)
+            return request.redirect(
+                f'/my/invoices_vet/{factura_id}?payment_status=error'
+            )
+
+    # ------------------------------------------------------------------
+    # /my/invoices_vet/<id>/payment/cancel — Pago cancelado por el usuario
+    # ------------------------------------------------------------------
+    @http.route(['/my/invoices_vet/<int:factura_id>/payment/cancel'],
+                type='http', auth='user', website=True, methods=['GET'])
+    def portal_vet_invoice_payment_cancel(self, factura_id, **kw):
+        """El usuario canceló el pago desde la página de PayPal."""
+        factura = self._check_invoice_access(factura_id)
+        if not factura:
+            return request.redirect('/my/invoices_vet')
+        _logger.info('Pago cancelado por usuario para factura %s.', factura_id)
+        return request.redirect(
+            f'/my/invoices_vet/{factura_id}?payment_status=cancel'
+        )
 
     # ------------------------------------------------------------------
     # /my/prescriptions — recetas
@@ -277,3 +486,4 @@ class VeterinariaPortal(CustomerPortal):
              'attachment; filename="carnet_vacunas_%s.pdf"' % (pet.name or pet.id)),
         ]
         return request.make_response(pdf, headers=pdfhttpheaders)
+
