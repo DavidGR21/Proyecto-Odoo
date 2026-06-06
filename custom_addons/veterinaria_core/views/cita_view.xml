@@ -65,8 +65,8 @@
 
 
 
-                        <group string="Observaciones">
-                            <field name="observaciones" placeholder="Notas adicionales (opcional)"/>
+                        <group string="Síntomas">
+                            <field name="sintoma_ids" widget="many2many_tags" options="{'no_create_edit': False}"/>
                         </group>
 
                         <group>

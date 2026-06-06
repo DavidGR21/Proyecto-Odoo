@@ -147,7 +147,7 @@ class Facturacion(models.Model):
                 if line.cita_id:
                     line.cita_id.facturada = True
                     if line.cita_id.receta_ids:
-                        line.cita_id.receta_ids.write({'facturada': True})
+                        line.cita_id.receta_ids.write({'state': 'finalizada'})
 
             record.estado = 'validado'
 
@@ -159,7 +159,7 @@ class Facturacion(models.Model):
                 if line.cita_id:
                     line.cita_id.facturada = False
                     if line.cita_id.receta_ids:
-                        line.cita_id.receta_ids.write({'facturada': False})
+                        line.cita_id.receta_ids.write({'state': 'borrador'})
             record.estado = 'cancelado'
 
     def action_importar_receta(self):

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- Vista de Formulario para Historia Clínica MEJORADA -->
+        <!-- Vista de Formulario para Historia Clínica - DISEÑO MEJORADO -->
         <record id="view_veterinaria_historia_clinica_form" model="ir.ui.view">
             <field name="name">veterinaria.historia_clinica.form</field>
             <field name="model">veterinaria.historia_clinica</field>
@@ -11,71 +11,169 @@
                         <field name="activa" widget="boolean_toggle"/>
                     </header>
                     <sheet>
-                        <div class="oe_title">
-                            <h1>
+
+                        <!-- ── Cabecera: nombre paciente + fecha apertura ── -->
+                        <div class="oe_title mb-3">
+                            <h1 class="mb-0 text-primary">
+                                <i class="fa fa-paw me-2"/>
                                 <field name="paciente_id" readonly="1"/>
                             </h1>
+                            <div class="text-muted small mt-1">
+                                <i class="fa fa-folder-open me-1"/> Historia Clínica &#160;|&#160;
+                                <i class="fa fa-calendar me-1"/> Apertura:
+                                <field name="fecha_apertura" widget="date" readonly="1" nolabel="1"/>
+                            </div>
+                        </div>
+
+                        <!-- ── Tarjetas de métricas rápidas ── -->
+                        <div class="row mb-4">
+                            <!-- Total citas -->
+                            <div class="col-md-3 col-sm-6 mb-3">
+                                <div class="rounded-3 p-3 text-center h-100"
+                                     style="background: rgba(99,91,255,0.10); border: 1.5px solid rgba(99,91,255,0.25);">
+                                    <i class="fa fa-calendar fa-2x mb-2" style="color: #4f46e5;"/>
+                                    <div class="fs-2 fw-bold" style="color: #3730a3;">
+                                        <field name="cita_count" readonly="1" nolabel="1"/>
+                                    </div>
+                                    <div class="small" style="color: #6b7280;">Total de Citas</div>
+                                </div>
+                            </div>
+                            <!-- Peso -->
+                            <div class="col-md-3 col-sm-6 mb-3">
+                                <div class="rounded-3 p-3 text-center h-100"
+                                     style="background: rgba(16,185,129,0.10); border: 1.5px solid rgba(16,185,129,0.25);">
+                                    <i class="fa fa-balance-scale fa-2x mb-2" style="color: #059669;"/>
+                                    <div class="fs-2 fw-bold" style="color: #065f46;">
+                                        <field name="peso" readonly="0" nolabel="1" class="d-inline"/> <span class="small">kg</span>
+                                    </div>
+                                    <div class="small" style="color: #6b7280;">Peso Actual</div>
+                                </div>
+                            </div>
+                            <!-- Tipo de sangre -->
+                            <div class="col-md-3 col-sm-6 mb-3">
+                                <div class="rounded-3 p-3 text-center h-100"
+                                     style="background: rgba(239,68,68,0.10); border: 1.5px solid rgba(239,68,68,0.25);">
+                                    <i class="fa fa-tint fa-2x mb-2" style="color: #dc2626;"/>
+                                    <div class="fs-5 fw-bold mt-1" style="color: #991b1b;">
+                                        <field name="tipo_sangre" readonly="0" nolabel="1" widget="badge"/>
+                                    </div>
+                                    <div class="small" style="color: #6b7280;">Tipo de Sangre</div>
+                                </div>
+                            </div>
+                            <!-- Estado historia -->
+                            <div class="col-md-3 col-sm-6 mb-3">
+                                <div class="rounded-3 p-3 text-center h-100"
+                                     style="background: rgba(245,158,11,0.10); border: 1.5px solid rgba(245,158,11,0.28);">
+                                    <i class="fa fa-heartbeat fa-2x mb-2" style="color: #d97706;"/>
+                                    <div class="fs-5 fw-bold mt-1" style="color: #92400e;">
+                                        <field name="activa" widget="boolean_toggle" nolabel="1"/>
+                                    </div>
+                                    <div class="small" style="color: #6b7280;">Historia Activa</div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- ── Sección: Información Médica ── -->
+                        <div class="o_group mb-3">
+                            <div class="col-12">
+                                <h5 class="text-primary border-bottom border-primary border-opacity-25 pb-2 mb-3">
+                                    <i class="fa fa-medkit me-2"/>Información Médica
+                                </h5>
+                            </div>
                         </div>
 
                         <group>
-                            <group string="Información del Expediente">
-                                <field name="paciente_id" required="1" readonly="1"/>
-                                <field name="fecha_apertura" readonly="1"/>
-                                <field name="cita_count" readonly="1"/>
+                            <group string="Alertas Clínicas">
+                                <field name="alergias"
+                                       placeholder="Ninguna alergia registrada..."
+                                       widget="char"/>
+                                <field name="condiciones_cronicas"
+                                       placeholder="Sin condiciones crónicas conocidas..."/>
                             </group>
-                        </group>
-
-                        <group>
                             <group string="Datos Generales">
-                                <field name="alergias" placeholder="Alergias conocidas..."/>
-                                <field name="tipo_sangre"/>
-                                <field name="peso"/>
-                                <field name="condiciones_cronicas" placeholder="Condiciones crónicas..."/>
+                                <field name="paciente_id" readonly="1"/>
+                                <field name="fecha_apertura" readonly="1"/>
                             </group>
                         </group>
 
+                        <!-- ── Sección: Observaciones generales ── -->
                         <group>
-                            <group string="Observaciones">
-                                <field name="observaciones" placeholder="Notas adicionales..."/>
+                            <group string="Observaciones Generales" colspan="2">
+                                <field name="observaciones"
+                                       placeholder="Notas clínicas generales del paciente (independientes de cada cita)..."
+                                       nolabel="1"
+                                       colspan="2"/>
                             </group>
                         </group>
 
+                        <!-- ── Notebook: Historial de Citas ── -->
                         <notebook>
                             <page string="Historial de Citas" name="citas">
                                 <field name="cita_ids" nolabel="1" readonly="1">
-                                    <list>
-                                        <field name="fecha_hora"/>
-                                        <field name="name" string="Cita"/>
-                                        <field name="veterinario_id"/>
-                                        <field name="propietario_id"/>
-                                        <field name="motivo"/>
-                                        <field name="estado"/>
+                                    <list decoration-success="estado == 'completada'"
+                                          decoration-danger="estado == 'cancelada'"
+                                          decoration-warning="estado == 'no_asistio'"
+                                          decoration-info="estado == 'programada'"
+                                          default_order="fecha_hora desc">
+                                        <field name="fecha_hora" string="Fecha y Hora" optional="show"/>
+                                        <field name="estado" widget="badge"
+                                               decoration-success="estado == 'completada'"
+                                               decoration-danger="estado == 'cancelada'"
+                                               decoration-warning="estado == 'no_asistio'"
+                                               decoration-info="estado == 'programada'"
+                                               optional="show"/>
+                                        <field name="veterinario_id" string="Veterinario" optional="show"/>
+                                        <field name="propietario_id" string="Propietario" optional="show"/>
+                                        <field name="motivo" string="Motivo de la Cita" optional="show"/>
+                                        <field name="sintomas_resumen" string="Síntomas" optional="show"/>
+                                        <field name="receta_count" string="Recetas" optional="show"/>
                                     </list>
                                     <form string="Detalle de Cita">
                                         <sheet>
+                                            <!-- Cabecera de la cita -->
+                                            <div class="oe_title mb-3">
+                                                <h3>
+                                                    <i class="fa fa-calendar-o me-2 text-primary"/>
+                                                    <field name="name" readonly="1"/>
+                                                </h3>
+                                            </div>
+
+                                            <!-- Estado badge prominente -->
+                                            <div class="mb-3">
+                                                <field name="estado" widget="statusbar"
+                                                       statusbar_visible="programada,completada,cancelada,no_asistio"
+                                                       readonly="1"/>
+                                            </div>
+
                                             <group>
                                                 <group string="Datos de la Cita">
-                                                    <field name="name" readonly="1"/>
                                                     <field name="fecha_hora" readonly="1"/>
                                                     <field name="veterinario_id" readonly="1"/>
                                                     <field name="servicio_id" readonly="1"/>
+                                                    <field name="duracion" readonly="1"/>
                                                 </group>
-                                                <group string="Estado y Motivo">
-                                                    <field name="estado" readonly="1"/>
+                                                <group string="Motivo y Síntomas">
                                                     <field name="motivo" readonly="1"/>
+                                                    <field name="sintoma_ids"
+                                                           widget="many2many_tags"
+                                                           readonly="1"
+                                                           string="Síntomas Reportados"/>
                                                 </group>
                                             </group>
-                                            <group string="Observaciones">
-                                                <field name="observaciones" readonly="1"/>
-                                            </group>
-                                            
-                                            <!-- Sección de Receta Médica integrada en la Cita -->
-                                            <group string="Receta Médica / Tratamiento" invisible="not receta_ids">
+
+                                            <!-- Recetas médicas (solo si existen) -->
+                                            <group string="Receta Médica / Tratamiento"
+                                                   invisible="not receta_ids">
                                                 <field name="receta_ids" readonly="1" nolabel="1">
                                                     <list create="false" edit="false" delete="false">
                                                         <field name="name" string="Referencia"/>
                                                         <field name="fecha_emision" string="Fecha"/>
                                                         <field name="diagnostico" string="Diagnóstico"/>
+                                                        <field name="state" widget="badge"
+                                                               decoration-success="state == 'finalizada'"
+                                                               decoration-warning="state == 'borrador'"
+                                                               string="Estado"/>
                                                     </list>
                                                     <form create="false" edit="false" delete="false">
                                                         <sheet>
@@ -83,6 +181,7 @@
                                                                 <group string="Datos de Receta">
                                                                     <field name="name" string="Referencia" readonly="1"/>
                                                                     <field name="fecha_emision" string="Fecha" readonly="1"/>
+                                                                    <field name="state" widget="badge" readonly="1"/>
                                                                 </group>
                                                                 <group string="Clínico">
                                                                     <field name="diagnostico" string="Diagnóstico" readonly="1"/>
@@ -95,9 +194,9 @@
                                                                             <field name="tipo_origen" string="Origen"/>
                                                                             <field name="nombre_medicamento_display" string="Medicamento"/>
                                                                             <field name="dosis"/>
-                                                                            <field name="frecuencia_horas" string="Cada (horas)"/>
+                                                                            <field name="frecuencia_horas" string="Cada (h)"/>
                                                                             <field name="duracion_dias" string="Días"/>
-                                                                            <field name="cantidad_total" string="Cantidad Total"/>
+                                                                            <field name="cantidad_total" string="Total"/>
                                                                         </list>
                                                                     </field>
                                                                 </page>
@@ -118,6 +217,9 @@
                             </page>
                         </notebook>
                     </sheet>
+
+                    <!-- Chatter -->
+                    <chatter/>
                 </form>
             </field>
         </record>
@@ -127,11 +229,14 @@
             <field name="name">veterinaria.historia_clinica.list</field>
             <field name="model">veterinaria.historia_clinica</field>
             <field name="arch" type="xml">
-                <list create="false" edit="false" delete="false">
+                <list create="false" edit="false" delete="false"
+                      decoration-muted="not activa">
                     <field name="paciente_id"/>
-                    <field name="fecha_apertura"/>
-                    <field name="activa" widget="boolean"/>
-                    <field name="cita_count"/>
+                    <field name="fecha_apertura" string="Apertura"/>
+                    <field name="cita_count" string="Citas" optional="show"/>
+                    <field name="peso" string="Peso (kg)" optional="show"/>
+                    <field name="tipo_sangre" widget="badge" optional="show"/>
+                    <field name="activa" widget="boolean_favorite" string="Activa" optional="show"/>
                 </list>
             </field>
         </record>
