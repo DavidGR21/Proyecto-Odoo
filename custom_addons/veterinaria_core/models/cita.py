@@ -87,6 +87,13 @@ class Cita(models.Model):
     condiciones_cronicas = fields.Text('Condiciones Crónicas')
     peso = fields.Float('Peso (kg)')
     
+    # Observaciones del propietario antes de la cita
+    observaciones_cliente = fields.Text(
+        'Observaciones del Propietario',
+        help='Notas o síntomas nuevos reportados por el propietario antes de la cita. '
+             'Solo editable por el cliente en citas programadas.',
+    )
+
     # Recordatorio
     recordatorio_enviado = fields.Boolean('Recordatorio Enviado', default=False)
 
