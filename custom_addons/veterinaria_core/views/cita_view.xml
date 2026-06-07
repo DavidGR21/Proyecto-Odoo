@@ -69,6 +69,13 @@
                             <field name="sintoma_ids" widget="many2many_tags" options="{'no_create_edit': False}"/>
                         </group>
 
+                        <group string="Observaciones del Propietario (solo editable desde el portal)">
+                            <field name="observaciones_cliente" nolabel="1"
+                                   readonly="1"
+                                   placeholder="El propietario registra síntomas o notas desde su portal antes de la cita..."
+                                   widget="text"/>
+                        </group>
+
                         <group>
                             <group string="Historia Clínica Relacionada">
                                 <field name="historia_clinica_id" readonly="1"/>
@@ -92,7 +99,8 @@
                     <field name="veterinario_id"/>
                     <field name="servicio_id" optional="show"/>
                     <field name="motivo"/>
-                    <field name="estado" decoration-success="estado == 'completada'" 
+                    <field name="observaciones_cliente" optional="show" string="Obs. Propietario" readonly="1"/>
+                    <field name="estado" decoration-success="estado == 'completada'"
                         decoration-danger="estado == 'cancelada'"/>
                 </list>
             </field>
