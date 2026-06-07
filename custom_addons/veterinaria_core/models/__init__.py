@@ -17,3 +17,4 @@ from . import documento_venta
 from . import inventario
 from . import vacuna
 from . import receta
+from . import sintoma

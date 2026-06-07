@@ -43,6 +43,33 @@ class Facturacion(models.Model):
         ('cancelado', 'Cancelado'),
     ], string='Estado', default='borrador', tracking=True)
 
+    # ── Pago PayPal ──────────────────────────────────────────────────────
+    pagado = fields.Boolean(
+        'Pagado',
+        default=False,
+        tracking=True,
+        help='Marcado automáticamente cuando el pago por PayPal es confirmado.',
+    )
+    fecha_pago = fields.Datetime(
+        'Fecha de Pago',
+        readonly=True,
+        help='Fecha y hora en que se confirmó el pago.',
+    )
+    payment_transaction_id = fields.Many2one(
+        'payment.transaction',
+        string='Transacción de Pago',
+        readonly=True,
+        copy=False,
+        help='Transacción de pago de Odoo vinculada a este cobro.',
+    )
+    payment_reference = fields.Char(
+        'Referencia de Pago',
+        readonly=True,
+        copy=False,
+        help='ID de orden/captura generado por PayPal.',
+    )
+    # ─────────────────────────────────────────────────────────────────────
+
     observaciones = fields.Text('Observaciones')
     fecha_factura = fields.Date(
         'Fecha de Factura',
@@ -147,7 +174,7 @@ class Facturacion(models.Model):
                 if line.cita_id:
                     line.cita_id.facturada = True
                     if line.cita_id.receta_ids:
-                        line.cita_id.receta_ids.write({'facturada': True})
+                        line.cita_id.receta_ids.write({'state': 'finalizada'})
 
             record.estado = 'validado'
 
@@ -159,7 +186,7 @@ class Facturacion(models.Model):
                 if line.cita_id:
                     line.cita_id.facturada = False
                     if line.cita_id.receta_ids:
-                        line.cita_id.receta_ids.write({'facturada': False})
+                        line.cita_id.receta_ids.write({'state': 'borrador'})
             record.estado = 'cancelado'
 
     def action_importar_receta(self):
@@ -178,7 +205,13 @@ class Facturacion(models.Model):
         }
 
     def _get_allowed_fields_validado(self):
-        return {'estado'}
+        return {
+            'estado',
+            'pagado',
+            'fecha_pago',
+            'payment_transaction_id',
+            'payment_reference',
+        }
 
     def write(self, vals):
         for record in self:

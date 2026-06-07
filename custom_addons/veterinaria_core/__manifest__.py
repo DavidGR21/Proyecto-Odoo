@@ -27,6 +27,7 @@
         'calendar',
         'stock',
         'crm',
+        'payment',      # proveedores de pago (PayPal, etc.)
     ],
     'data': [
         # Security (groups must load before ACL)
