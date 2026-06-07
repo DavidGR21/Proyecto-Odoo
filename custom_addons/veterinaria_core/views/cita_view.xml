@@ -143,6 +143,9 @@
                     <filter name="canceladas" string="❌ Canceladas" domain="[('estado', '=', 'cancelada')]"/>
                     <filter name="no_asistio" string="⚠️ No Asistió" domain="[('estado', '=', 'no_asistio')]"/>
                     <separator/>
+                    <filter name="mis_citas" string="👨‍⚕️ Mis Citas" domain="[('veterinario_id.user_id', '=', uid)]"/>
+                    <filter name="todas_citas" string="🌎 Todas las citas (Generales)" domain="[(1, '=', 1)]"/>
+                    <separator/>
                     <!-- #9: Filtros por fechas claros y específicos -->
                     <filter string="📅 Citas de Hoy" name="filter_hoy"
                             domain="[('fecha_hora', '&gt;=', context_today().strftime('%Y-%m-%d 00:00:00')), ('fecha_hora', '&lt;=', context_today().strftime('%Y-%m-%d 23:59:59'))]"/>
@@ -171,9 +174,26 @@
             </field>
         </record>
 
-        <!-- Acción para Cita (list primero para mejor navegación #6) -->
+        <!-- Acción para Cita Original -->
         <record id="action_veterinaria_cita" model="ir.actions.act_window">
             <field name="name">Citas</field>
+            <field name="res_model">veterinaria.cita</field>
+            <field name="view_mode">list,calendar,form</field>
+            <field name="context">{'default_estado': 'programada', 'default_duracion': '1.0'}</field>
+        </record>
+
+        <!-- Acción para Mis Citas -->
+        <record id="action_veterinaria_mis_citas" model="ir.actions.act_window">
+            <field name="name">Mis Citas</field>
+            <field name="res_model">veterinaria.cita</field>
+            <field name="view_mode">list,calendar,form</field>
+            <field name="domain">[('veterinario_id.user_id', '=', uid)]</field>
+            <field name="context">{'default_estado': 'programada', 'default_duracion': '1.0'}</field>
+        </record>
+
+        <!-- Acción para Todas las Citas -->
+        <record id="action_veterinaria_todas_citas" model="ir.actions.act_window">
+            <field name="name">Todas las Citas</field>
             <field name="res_model">veterinaria.cita</field>
             <field name="view_mode">list,calendar,form</field>
             <field name="context">{'default_estado': 'programada', 'default_duracion': '1.0'}</field>
