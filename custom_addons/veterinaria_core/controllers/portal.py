@@ -549,11 +549,16 @@ class VeterinariaPortal(CustomerPortal):
         pet = self._check_pet_access(pet_id)
         if not pet:
             return request.redirect('/my/pets')
-        # Renderiza el reporte QWeb-PDF definido en reports/carnet_vacunas_report.xml
-        report_ref = 'veterinaria_core.action_report_carnet_vacunas'
-        pdf, _content_type = request.env['ir.actions.report'].sudo()._render_qweb_pdf(
-            report_ref, [pet.id]
-        )
+        try:
+            # En Odoo 18 _render_qweb_pdf busca primero por report_name, luego por xmlid.
+            # Usar el report_name directamente es más robusto.
+            pdf, _content_type = request.env['ir.actions.report'].sudo()._render_qweb_pdf(
+                'veterinaria_core.report_carnet_vacunas_template',
+                [pet.id]
+            )
+        except Exception as e:
+            _logger.error('Error generando carnet de vacunas para mascota %s: %s', pet_id, e)
+            return request.redirect('/my/pets/%s' % pet_id)
         pdfhttpheaders = [
             ('Content-Type', 'application/pdf'),
             ('Content-Length', len(pdf)),
