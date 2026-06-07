@@ -20,7 +20,7 @@
     -->
     <template id="report_carnet_vacunas_document">
         <t t-call="web.external_layout">
-            <t t-set="doc" t-value="doc.with_context(lang=doc.propietario_id.lang)"/>
+            <t t-set="doc" t-value="doc.with_context(lang=(doc.propietario_id.lang or 'es_ES'))"/>
             <div class="page">
                 <style>
                     .vet-hdr         { background-color:#0d3b5e; padding:12px 16px; margin-bottom:12px; }
