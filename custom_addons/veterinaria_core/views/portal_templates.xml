@@ -55,112 +55,228 @@
         <!-- Dashboard custom: sólo para Cliente Veterinaria -->
         <xpath expr="//div[hasclass('o_portal_docs')]" position="before">
             <t t-if="request.env.user.has_group('veterinaria_core.group_veterinaria_cliente')">
-                <div class="vet-dashboard">
-                    <style>
-                        .vet-dashboard .vet-hero {
-                            background: linear-gradient(135deg, #2E86AB 0%, #5BA3C7 100%);
-                            color: #fff; padding: 30px; border-radius: 16px;
-                            margin-bottom: 30px; box-shadow: 0 4px 16px rgba(46,134,171,0.2);
-                        }
-                        .vet-dashboard .vet-hero h2 { margin: 0 0 6px 0; font-weight: 600; }
-                        .vet-dashboard .vet-hero p { margin: 0; opacity: 0.9; }
-                        .vet-dashboard .vet-card {
-                            background: #fff; border: 1px solid #e9ecef; border-radius: 14px;
-                            padding: 22px; height: 100%;
-                            transition: transform .2s, box-shadow .2s, border-color .2s;
-                            display: flex; flex-direction: column; text-decoration: none; color: inherit;
-                        }
-                        .vet-dashboard .vet-card:hover {
-                            transform: translateY(-3px);
-                            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-                            border-color: #2E86AB;
-                            text-decoration: none;
-                        }
-                        .vet-dashboard .vet-card-icon {
-                            width: 52px; height: 52px; border-radius: 12px;
-                            display: flex; align-items: center; justify-content: center;
-                            font-size: 24px; color: #fff; margin-bottom: 14px;
-                        }
-                        .vet-dashboard .vet-card h5 { margin: 0 0 4px 0; font-weight: 600; color: #212529; }
-                        .vet-dashboard .vet-card p  { margin: 0; color: #6c757d; font-size: 13px; }
-                        .vet-dashboard .vet-section-title {
-                            font-size: 13px; text-transform: uppercase; letter-spacing: .5px;
-                            color: #6c757d; margin: 26px 0 12px 0; font-weight: 600;
-                        }
-                        .vet-c-pets   { background:#2E86AB; }
-                        .vet-c-app    { background:#06A77D; }
-                        .vet-c-hist   { background:#9B5DE5; }
-                        .vet-c-rec    { background:#F15BB5; }
-                        .vet-c-inv    { background:#F8961E; }
-                        .vet-c-sec    { background:#6c757d; }
-                    </style>
+                <!-- Contadores calculados en plantilla -->
+                <t t-set="vp_partner" t-value="request.env.user.partner_id"/>
+                <t t-set="vp_pets"   t-value="request.env['veterinaria.paciente'].search_count([('propietario_id','=',vp_partner.id)])"/>
+                <t t-set="vp_appts"  t-value="request.env['veterinaria.cita'].search_count([('paciente_id.propietario_id','=',vp_partner.id),('estado','=','programada')])"/>
+                <t t-set="vp_inv"    t-value="request.env['veterinaria.facturacion'].search_count([('propietario_id','=',vp_partner.id),('estado','=','validado'),('pagado','=',False)])"/>
+                <t t-set="vp_rx"     t-value="request.env['veterinaria.receta'].search_count([('propietario_id','=',vp_partner.id)])"/>
 
+                <style>
+                /* ── VitalPet Portal Dashboard ─────────────────────────── */
+                .vp-dash { font-family: 'Inter', 'Segoe UI', sans-serif; }
+
+                /* Hero */
+                .vp-hero {
+                    background: linear-gradient(135deg, #0d3b5e 0%, #1a5c8a 45%, #2E86AB 100%);
+                    border-radius: 18px; padding: 28px 32px;
+                    margin-bottom: 28px; color: #fff;
+                    box-shadow: 0 8px 32px rgba(13,59,94,.22);
+                    position: relative; overflow: hidden;
+                }
+                .vp-hero::after {
+                    content: '🐾';
+                    position: absolute; right: 28px; top: 50%;
+                    transform: translateY(-50%);
+                    font-size: 80px; opacity: .1;
+                }
+                .vp-hero-name { font-size: 22px; font-weight: 700; margin: 0 0 4px 0; }
+                .vp-hero-sub  { margin: 0; opacity: .85; font-size: 14px; }
+                .vp-hero-pills { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+                .vp-pill {
+                    background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25);
+                    border-radius: 20px; padding: 5px 14px;
+                    font-size: 12px; font-weight: 600; color: #fff;
+                    display: inline-flex; align-items: center; gap: 6px;
+                }
+                .vp-pill-val { font-size: 16px; font-weight: 800; }
+
+                /* Section label */
+                .vp-section {
+                    font-size: 11px; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: .8px; color: #8e9fb0;
+                    margin: 24px 0 12px 0; padding-left: 4px;
+                    display: flex; align-items: center; gap: 8px;
+                }
+                .vp-section::after {
+                    content: ''; flex: 1; height: 1px; background: #e9ecef;
+                }
+
+                /* Cards */
+                .vp-card {
+                    background: #fff;
+                    border: 1.5px solid #e9ecef;
+                    border-radius: 16px;
+                    padding: 20px;
+                    height: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    text-decoration: none !important;
+                    color: inherit !important;
+                    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+                    position: relative;
+                    overflow: hidden;
+                }
+                .vp-card:hover {
+                    transform: translateY(-4px);
+                    box-shadow: 0 12px 32px rgba(0,0,0,.1);
+                    border-color: transparent;
+                    text-decoration: none !important;
+                }
+                .vp-card-accent {
+                    position: absolute; top: 0; left: 0; right: 0; height: 4px;
+                    border-radius: 16px 16px 0 0;
+                }
+                .vp-icon {
+                    width: 48px; height: 48px; border-radius: 12px;
+                    display: flex; align-items: center; justify-content: center;
+                    font-size: 20px; color: #fff; margin-bottom: 12px; margin-top: 6px;
+                }
+                .vp-card h5 {
+                    font-size: 15px; font-weight: 700; color: #1a2d3d; margin: 0 0 4px 0;
+                }
+                .vp-card p { font-size: 12.5px; color: #6c757d; margin: 0; line-height: 1.5; }
+                .vp-card-badge {
+                    margin-top: auto; padding-top: 12px;
+                    font-size: 11px; font-weight: 700; color: #8e9fb0;
+                }
+                .vp-count {
+                    display: inline-block; padding: 2px 10px; border-radius: 12px;
+                    font-weight: 800; font-size: 13px; color: #fff;
+                }
+
+                /* Color palette */
+                .vp-c1 { background: #2E86AB; }
+                .vp-c2 { background: #06A77D; }
+                .vp-c3 { background: #7b5ea7; }
+                .vp-c4 { background: #e8567a; }
+                .vp-c5 { background: #f4951e; }
+                .vp-c6 { background: #4b7bec; }
+                .vp-c7 { background: #546e7a; }
+
+                .vp-card:hover .vp-c1-b { border-color: #2E86AB; }
+                .vp-card:hover .vp-c2-b { border-color: #06A77D; }
+                .vp-card:hover .vp-c3-b { border-color: #7b5ea7; }
+                .vp-card:hover .vp-c4-b { border-color: #e8567a; }
+                .vp-card:hover .vp-c5-b { border-color: #f4951e; }
+                .vp-card:hover .vp-c6-b { border-color: #4b7bec; }
+                </style>
+
+                <div class="vp-dash">
                     <!-- Hero -->
-                    <div class="vet-hero d-flex justify-content-between align-items-center flex-wrap gap-3">
-                        <div>
-                            <h2>Hola, <t t-out="request.env.user.partner_id.name"/> 🐾</h2>
-                            <p>Bienvenido al portal de VitalPet. Aquí puedes gestionar la salud de tus mascotas.</p>
+                    <div class="vp-hero">
+                        <div class="vp-hero-name">
+                            Hola, <t t-out="vp_partner.name"/>
                         </div>
-                        <div class="d-flex align-items-center gap-3">
-                            <i class="fa fa-paw d-none d-sm-inline" style="font-size:48px;opacity:.25;"/>
+                        <p class="vp-hero-sub">
+                            Bienvenido al portal de VitalPet. Aquí puedes gestionar la salud de tus mascotas.
+                        </p>
+                        <div class="vp-hero-pills">
+                            <span class="vp-pill">
+                                <i class="fa fa-paw"/>
+                                <span class="vp-pill-val" t-out="vp_pets"/>
+                                Mascota<t t-if="vp_pets != 1">s</t>
+                            </span>
+                            <span class="vp-pill">
+                                <i class="fa fa-calendar-check-o"/>
+                                <span class="vp-pill-val" t-out="vp_appts"/>
+                                Cita<t t-if="vp_appts != 1">s</t> programada<t t-if="vp_appts != 1">s</t>
+                            </span>
+                            <t t-if="vp_inv > 0">
+                                <span class="vp-pill" style="background:rgba(248,150,30,.3);border-color:rgba(248,150,30,.5);">
+                                    <i class="fa fa-exclamation-circle"/>
+                                    <span class="vp-pill-val" t-out="vp_inv"/>
+                                    Factura<t t-if="vp_inv != 1">s</t> pendiente<t t-if="vp_inv != 1">s</t>
+                                </span>
+                            </t>
                         </div>
                     </div>
 
                     <!-- Atención clínica -->
-                    <div class="vet-section-title">Atención clínica</div>
+                    <div class="vp-section">Atención clínica</div>
                     <div class="row g-3">
-                        <div class="col-md-6 col-lg-4">
-                            <a href="/my/pets" class="vet-card">
-                                <div class="vet-card-icon vet-c-pets"><i class="fa fa-paw"/></div>
+                        <div class="col-sm-6 col-lg-4">
+                            <a href="/my/pets" class="vp-card">
+                                <div class="vp-card-accent vp-c1"/>
+                                <div class="vp-icon vp-c1"><i class="fa fa-paw"/></div>
                                 <h5>Mis Mascotas</h5>
-                                <p>Información completa de cada una de tus mascotas registradas.</p>
+                                <p>Información, fotos, vacunas y expedientes de tus mascotas.</p>
+                                <div class="vp-card-badge">
+                                    <span class="vp-count vp-c1" t-out="vp_pets"/>
+                                    mascota<t t-if="vp_pets != 1">s</t> registrada<t t-if="vp_pets != 1">s</t>
+                                </div>
                             </a>
                         </div>
-                        <div class="col-md-6 col-lg-4">
-                            <a href="/my/appointments" class="vet-card">
-                                <div class="vet-card-icon vet-c-app"><i class="fa fa-calendar"/></div>
+                        <div class="col-sm-6 col-lg-4">
+                            <a href="/my/appointments" class="vp-card">
+                                <div class="vp-card-accent vp-c2"/>
+                                <div class="vp-icon vp-c2"><i class="fa fa-calendar"/></div>
                                 <h5>Mis Citas</h5>
-                                <p>Próximas citas y el historial de tus visitas a la clínica.</p>
+                                <p>Próximas visitas, historial de consultas y observaciones.</p>
+                                <div class="vp-card-badge">
+                                    <span class="vp-count vp-c2" t-out="vp_appts"/>
+                                    cita<t t-if="vp_appts != 1">s</t> programada<t t-if="vp_appts != 1">s</t>
+                                </div>
                             </a>
                         </div>
-                        <div class="col-md-6 col-lg-4">
-                            <a href="/my/medical_records" class="vet-card">
-                                <div class="vet-card-icon vet-c-hist"><i class="fa fa-stethoscope"/></div>
+                        <div class="col-sm-6 col-lg-4">
+                            <a href="/my/medical_records" class="vp-card">
+                                <div class="vp-card-accent vp-c3"/>
+                                <div class="vp-icon vp-c3"><i class="fa fa-stethoscope"/></div>
                                 <h5>Historia Clínica</h5>
-                                <p>Expedientes médicos completos de tus mascotas.</p>
+                                <p>Expedientes médicos completos, diagnósticos y evolución.</p>
+                                <div class="vp-card-badge">Ver expedientes →</div>
                             </a>
                         </div>
-                        <div class="col-md-6 col-lg-4">
-                            <a href="/my/prescriptions" class="vet-card">
-                                <div class="vet-card-icon vet-c-rec"><i class="fa fa-medkit"/></div>
+                        <div class="col-sm-6 col-lg-4">
+                            <a href="/my/prescriptions" class="vp-card">
+                                <div class="vp-card-accent vp-c4"/>
+                                <div class="vp-icon vp-c4"><i class="fa fa-medkit"/></div>
                                 <h5>Recetas Médicas</h5>
-                                <p>Medicamentos recetados con dosis e indicaciones.</p>
+                                <p>Medicamentos recetados con dosis, frecuencia e indicaciones.</p>
+                                <div class="vp-card-badge">
+                                    <span class="vp-count vp-c4" t-out="vp_rx"/>
+                                    receta<t t-if="vp_rx != 1">s</t>
+                                </div>
                             </a>
                         </div>
-                        <div class="col-md-6 col-lg-4">
-                            <a href="/my/invoices_vet" class="vet-card">
-                                <div class="vet-card-icon vet-c-inv"><i class="fa fa-file-text"/></div>
+                        <div class="col-sm-6 col-lg-4">
+                            <a href="/my/invoices_vet" class="vp-card">
+                                <div class="vp-card-accent vp-c5"/>
+                                <div class="vp-icon vp-c5"><i class="fa fa-file-text-o"/></div>
                                 <h5>Mis Facturas</h5>
-                                <p>Consulta y descarga tus facturas veterinarias.</p>
+                                <p>Consulta, descarga y paga tus facturas veterinarias.</p>
+                                <t t-if="vp_inv > 0">
+                                    <div class="vp-card-badge" style="color:#f4951e;">
+                                        <span class="vp-count vp-c5" t-out="vp_inv"/> pendiente<t t-if="vp_inv != 1">s</t> de pago
+                                    </div>
+                                </t>
+                                <t t-else="">
+                                    <div class="vp-card-badge">Ver facturas →</div>
+                                </t>
                             </a>
                         </div>
                     </div>
 
-                    <!-- Cuenta -->
-                    <div class="vet-section-title">Mi cuenta</div>
+                    <!-- Mi cuenta -->
+                    <div class="vp-section">Mi cuenta</div>
                     <div class="row g-3">
-                        <div class="col-md-6 col-lg-4">
-                            <a href="/my/account" class="vet-card">
-                                <div class="vet-card-icon vet-c-pets"><i class="fa fa-user"/></div>
+                        <div class="col-sm-6 col-lg-4">
+                            <a href="/my/account" class="vp-card">
+                                <div class="vp-card-accent vp-c6"/>
+                                <div class="vp-icon vp-c6"><i class="fa fa-user-circle"/></div>
                                 <h5>Mi Perfil</h5>
-                                <p>Edita tu información de contacto y foto de perfil.</p>
+                                <p>Actualiza tu información de contacto y foto de perfil.</p>
+                                <div class="vp-card-badge">Editar perfil →</div>
                             </a>
                         </div>
-                        <div class="col-md-6 col-lg-4">
-                            <a href="/my/security" class="vet-card">
-                                <div class="vet-card-icon vet-c-sec"><i class="fa fa-lock"/></div>
-                                <h5>Conexión y Seguridad</h5>
-                                <p>Cambia tu contraseña o elimina tu cuenta.</p>
+                        <div class="col-sm-6 col-lg-4">
+                            <a href="/my/security" class="vp-card">
+                                <div class="vp-card-accent vp-c7"/>
+                                <div class="vp-icon vp-c7"><i class="fa fa-shield"/></div>
+                                <h5>Seguridad</h5>
+                                <p>Cambia tu contraseña o administra el acceso a tu cuenta.</p>
+                                <div class="vp-card-badge">Configurar →</div>
                             </a>
                         </div>
                     </div>
@@ -375,54 +491,163 @@
     </template>
 
     <!-- =====================================================
-         /my/pets — Listado de mascotas
+         /my/pets — Listado de mascotas (rediseñado)
          ===================================================== -->
     <template id="portal_my_pets" name="Mis Mascotas">
         <t t-call="portal.portal_layout">
-            <t t-set="breadcrumbs_searchbar" t-value="True"/>
-            <t t-call="portal.portal_searchbar">
-                <t t-set="title">Mis Mascotas</t>
-            </t>
+            <style>
+                .pm-grid-card {
+                    background: #fff; border: 1.5px solid #e4eef5;
+                    border-radius: 16px; overflow: hidden;
+                    transition: transform .2s, box-shadow .2s;
+                    height: 100%; display: flex; flex-direction: column;
+                    text-decoration: none !important; color: inherit !important;
+                }
+                .pm-grid-card:hover {
+                    transform: translateY(-4px);
+                    box-shadow: 0 12px 28px rgba(46,134,171,.14);
+                    border-color: #2E86AB;
+                }
+                .pm-photo-area {
+                    height: 160px; background: linear-gradient(135deg,#e3f0f8 0%,#dceef7 100%);
+                    display: flex; align-items: center; justify-content: center;
+                    position: relative; overflow: hidden;
+                }
+                .pm-photo-area img {
+                    width: 100%; height: 100%; object-fit: cover;
+                }
+                .pm-placeholder-icon {
+                    font-size: 64px; color: #2E86AB; opacity: .3;
+                }
+                .pm-vac-badge {
+                    position: absolute; top: 10px; right: 10px;
+                    padding: 3px 10px; border-radius: 12px;
+                    font-size: 11px; font-weight: 700; color: #fff;
+                }
+                .pm-vac-ok   { background: #27ae60; }
+                .pm-vac-bad  { background: #e74c3c; }
+                .pm-vac-none { background: #7f8c8d; }
+                .pm-body { padding: 16px; flex: 1; }
+                .pm-name {
+                    font-size: 16px; font-weight: 700; color: #0d3b5e;
+                    margin: 0 0 4px 0;
+                }
+                .pm-species { font-size: 12px; color: #6c757d; margin: 0 0 10px 0; }
+                .pm-stat {
+                    display: inline-flex; align-items: center; gap: 4px;
+                    font-size: 11px; color: #546e7a; background: #f0f8ff;
+                    padding: 3px 8px; border-radius: 10px; margin-right: 4px;
+                    margin-bottom: 4px;
+                }
+                .pm-footer {
+                    padding: 12px 16px; border-top: 1px solid #e9ecef;
+                    display: flex; gap: 8px;
+                }
+                .pm-footer a {
+                    flex: 1; text-align: center; font-size: 12px;
+                    padding: 7px 0; border-radius: 8px; text-decoration: none;
+                    font-weight: 600; transition: background .15s;
+                }
+                .pm-btn-primary {
+                    background: #2E86AB; color: #fff;
+                }
+                .pm-btn-primary:hover { background: #1a5c8a; color: #fff; }
+                .pm-btn-outline {
+                    border: 1.5px solid #2E86AB; color: #2E86AB;
+                }
+                .pm-btn-outline:hover { background: #e3f0f8; }
+                .pm-empty-state {
+                    text-align: center; padding: 48px 20px;
+                    background: #f7fbfe; border-radius: 16px;
+                    border: 2px dashed #cde4f0; margin-top: 20px;
+                }
+            </style>
+
+            <div class="d-flex align-items-center justify-content-between mt-3 mb-3 flex-wrap gap-2">
+                <h3 class="m-0" style="color:#0d3b5e;">Mis Mascotas</h3>
+                <t t-if="pets">
+                    <span class="badge rounded-pill px-3 py-2"
+                          style="background:#2E86AB; font-size:13px;">
+                        <t t-out="len(pets)"/> mascota<t t-if="len(pets) != 1">s</t>
+                    </span>
+                </t>
+            </div>
+
             <t t-if="not pets">
-                <div class="alert alert-info" role="alert">
-                    Aún no tiene mascotas registradas. Contacte a la clínica para registrar a su primera mascota.
+                <div class="pm-empty-state">
+                    <i class="fa fa-paw fa-3x mb-3 d-block" style="color:#2E86AB; opacity:.3;"/>
+                    <h5 style="color:#0d3b5e;">Aun no tienes mascotas registradas</h5>
+                    <p class="text-muted small mb-0">
+                        Contacta a la clinica para que registren a tu primera mascota.
+                    </p>
                 </div>
             </t>
+
             <t t-if="pets">
-                <div class="row mt-3">
+                <div class="row g-4 pb-4">
                     <t t-foreach="pets" t-as="pet">
-                        <div class="col-md-4 col-sm-6 mb-4">
-                            <div class="card h-100 shadow-sm">
-                                <div class="text-center pt-3">
+                        <div class="col-md-6 col-lg-4">
+                            <div class="pm-grid-card shadow-sm">
+                                <!-- Foto -->
+                                <div class="pm-photo-area">
                                     <t t-if="pet.foto">
                                         <img t-attf-src="/web/image/veterinaria.paciente/#{pet.id}/foto"
-                                             class="rounded-circle"
-                                             style="width:120px;height:120px;object-fit:cover;"
-                                             alt="Foto de la mascota"/>
+                                             alt="Foto"/>
                                     </t>
                                     <t t-else="">
-                                        <span class="fa fa-paw fa-5x text-secondary"/>
+                                        <i class="fa fa-paw pm-placeholder-icon"/>
+                                    </t>
+                                    <!-- Badge vacunación -->
+                                    <t t-if="pet.estado_vacunacion == 'al_dia'">
+                                        <span class="pm-vac-badge pm-vac-ok">
+                                            <i class="fa fa-check-circle me-1"/>Al dia
+                                        </span>
+                                    </t>
+                                    <t t-elif="pet.estado_vacunacion == 'atrasado'">
+                                        <span class="pm-vac-badge pm-vac-bad">
+                                            <i class="fa fa-exclamation-circle me-1"/>Atrasada
+                                        </span>
+                                    </t>
+                                    <t t-else="">
+                                        <span class="pm-vac-badge pm-vac-none">Sin vacunas</span>
                                     </t>
                                 </div>
-                                <div class="card-body text-center">
-                                    <h5 class="card-title mb-1">
-                                        <a t-attf-href="/my/pets/#{pet.id}" t-out="pet.name"/>
-                                    </h5>
-                                    <p class="text-muted small mb-1">
+                                <!-- Cuerpo -->
+                                <div class="pm-body">
+                                    <p class="pm-name" t-out="pet.name"/>
+                                    <p class="pm-species">
                                         <t t-out="dict(pet._fields['especie'].selection).get(pet.especie, '')"/>
-                                        <t t-if="pet.raza"> · <t t-out="pet.raza"/></t>
+                                        <t t-if="pet.raza"> &middot; <t t-out="pet.raza"/></t>
                                     </p>
-                                    <p class="small mb-2">
-                                        <span class="badge bg-info" t-out="dict(pet._fields['estado_vacunacion'].selection).get(pet.estado_vacunacion, '')"/>
-                                    </p>
-                                    <div class="btn-group btn-group-sm" role="group">
-                                        <a t-attf-href="/my/pets/#{pet.id}" class="btn btn-outline-primary">
-                                            <i class="fa fa-eye"/> Ver
-                                        </a>
-                                        <a t-attf-href="/my/vaccination_card/#{pet.id}" class="btn btn-outline-success">
-                                            <i class="fa fa-file-pdf-o"/> Carnet
-                                        </a>
+                                    <div>
+                                        <t t-if="pet.peso">
+                                            <span class="pm-stat">
+                                                <i class="fa fa-balance-scale"/>
+                                                <t t-out="pet.peso"/> kg
+                                            </span>
+                                        </t>
+                                        <t t-if="pet.microchip">
+                                            <span class="pm-stat">
+                                                <i class="fa fa-microchip"/>
+                                                Chip
+                                            </span>
+                                        </t>
+                                        <t t-if="pet.alergias">
+                                            <span class="pm-stat" style="color:#c0392b; background:#fdeaea;">
+                                                <i class="fa fa-warning"/>
+                                                Alergias
+                                            </span>
+                                        </t>
                                     </div>
+                                </div>
+                                <!-- Acciones -->
+                                <div class="pm-footer">
+                                    <a t-attf-href="/my/pets/#{pet.id}" class="pm-btn-primary">
+                                        <i class="fa fa-eye me-1"/>Ver detalle
+                                    </a>
+                                    <a t-attf-href="/my/vaccination_card/#{pet.id}" class="pm-btn-outline">
+                                        <i class="fa fa-file-pdf-o me-1"/>Carnet
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -433,157 +658,326 @@
     </template>
 
     <!-- =====================================================
-         /my/pets/<id> — Detalle de la mascota
+         /my/pets/<id> — Detalle de la mascota (rediseñado)
          ===================================================== -->
     <template id="portal_my_pet_detail" name="Detalle de Mascota">
         <t t-call="portal.portal_layout">
-            <div class="card mt-3 shadow-sm">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3 text-center">
-                            <t t-if="pet.foto">
-                                <img t-attf-src="/web/image/veterinaria.paciente/#{pet.id}/foto"
-                                     class="rounded-circle"
-                                     style="width:150px;height:150px;object-fit:cover;"
-                                     alt="Foto"/>
-                            </t>
-                            <t t-else="">
-                                <span class="fa fa-paw fa-5x text-secondary"/>
-                            </t>
-                            <div class="mt-3">
-                                <a t-attf-href="/my/vaccination_card/#{pet.id}" class="btn btn-success btn-sm">
-                                    <i class="fa fa-file-pdf-o"/> Descargar Carnet
-                                </a>
-                            </div>
+            <style>
+                .pd-hero { border-radius:16px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,.07); margin-top:16px; margin-bottom:20px; }
+                .pd-hero-photo { background:linear-gradient(135deg,#0d3b5e 0%,#2E86AB 100%); padding:28px 0 0 0; text-align:center; min-height:160px; position:relative; }
+                .pd-hero-photo img { width:130px; height:130px; object-fit:cover; border-radius:50%; border:4px solid rgba(255,255,255,.85); margin-bottom:-20px; position:relative; z-index:1; }
+                .pd-photo-placeholder { width:130px; height:130px; border-radius:50%; border:4px solid rgba(255,255,255,.6); background:rgba(255,255,255,.15); display:inline-flex; align-items:center; justify-content:center; margin-bottom:-20px; position:relative; z-index:1; }
+                .pd-hero-body { background:#fff; padding:28px 24px 20px; }
+                .pd-name { font-size:22px; font-weight:700; color:#0d3b5e; margin:0 0 6px 0; }
+                .pd-species { font-size:14px; color:#6c757d; margin:0 0 14px 0; }
+                .pd-chips { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
+                .pd-chip { display:inline-flex; align-items:center; gap:6px; padding:5px 12px; border-radius:20px; font-size:12px; font-weight:600; }
+                .pd-chip-blue   { background:#e3f0f8; color:#0d3b5e; }
+                .pd-chip-green  { background:#e8f5e9; color:#1b5e20; }
+                .pd-chip-red    { background:#fdeaea; color:#c0392b; }
+                .pd-chip-orange { background:#fff3e0; color:#e65100; }
+                .pd-chip-gray   { background:#f0f0f0; color:#546e7a; }
+                .pd-actions { display:flex; gap:10px; flex-wrap:wrap; }
+                .pd-info-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:0; }
+                .pd-info-item { padding:10px 14px; border-bottom:1px solid #f0f0f0; }
+                .pd-info-item:nth-child(odd)  { border-right:1px solid #f0f0f0; }
+                .pd-info-lbl { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#8e9fb0; margin:0 0 2px 0; }
+                .pd-info-val { font-size:13px; color:#2c3e50; margin:0; font-weight:500; }
+                .pd-section { margin:20px 0 0 0; border:1.5px solid #e4eef5; border-radius:14px; overflow:hidden; }
+                .pd-section-hdr { background:#f7fbfe; padding:12px 18px; border-bottom:1px solid #e4eef5; display:flex; align-items:center; gap:10px; }
+                .pd-section-hdr span { font-size:14px; font-weight:700; color:#0d3b5e; }
+                .pd-section-hdr .pd-count { margin-left:auto; font-size:11px; font-weight:700; background:#2E86AB; color:#fff; padding:2px 9px; border-radius:10px; }
+                .pd-section-body { background:#fff; }
+                .pd-empty { padding:20px; text-align:center; color:#8e9fb0; font-size:13px; font-style:italic; }
+                .pd-vac-row-next { color:#27ae60; font-weight:600; }
+                .pd-rx-item { padding:14px 18px; border-bottom:1px solid #f0f0f0; }
+                .pd-rx-item:last-child { border-bottom:none; }
+                .pd-rx-name { font-weight:700; color:#0d3b5e; font-size:13px; }
+                .pd-rx-date { font-size:11px; color:#8e9fb0; }
+                .pd-rx-diag { font-size:12px; color:#546e7a; background:#f8fafc; border-left:3px solid #8e9fb0; padding:6px 10px; margin:8px 0 0 0; border-radius:0 4px 4px 0; }
+                .pd-rx-meds { width:100%; font-size:11px; margin-top:8px; border-collapse:collapse; }
+                .pd-rx-meds th { background:#f1f5f9; color:#475569; font-size:10px; text-transform:uppercase; letter-spacing:.4px; padding:5px 8px; font-weight:700; }
+                .pd-rx-meds td { padding:5px 8px; border-bottom:1px solid #f0f0f0; color:#334155; }
+                .pd-change-foto label { cursor:pointer; }
+            </style>
+
+            <!-- Hero de la mascota -->
+            <div class="pd-hero">
+                <div class="pd-hero-photo">
+                    <t t-if="pet.foto">
+                        <img t-attf-src="/web/image/veterinaria.paciente/#{pet.id}/foto"
+                             alt="Foto de la mascota"/>
+                    </t>
+                    <t t-else="">
+                        <div class="pd-photo-placeholder">
+                            <i class="fa fa-paw fa-4x" style="color:rgba(255,255,255,.6);"/>
                         </div>
-                        <div class="col-md-9">
-                            <h3 t-out="pet.name"/>
-                            <table class="table table-sm mt-3">
-                                <tr><th>Especie</th><td t-out="dict(pet._fields['especie'].selection).get(pet.especie, '')"/></tr>
-                                <tr><th>Raza</th><td t-out="pet.raza or '-'"/></tr>
-                                <tr><th>Fecha de nacimiento</th><td t-out="pet.fecha_nacimiento or '-'"/></tr>
-                                <tr><th>Peso</th><td><t t-out="pet.peso or 0"/> kg</td></tr>
-                                <tr><th>Microchip</th><td t-out="pet.microchip or '-'"/></tr>
-                                <tr><th>Estado de vacunación</th>
-                                    <td><span class="badge bg-info" t-out="dict(pet._fields['estado_vacunacion'].selection).get(pet.estado_vacunacion, '')"/></td>
-                                </tr>
-                                <tr><th>Alergias</th><td t-out="pet.alergias or 'Ninguna registrada'"/></tr>
-                            </table>
-                        </div>
+                    </t>
+                </div>
+                <div class="pd-hero-body">
+                    <p class="pd-name" t-out="pet.name"/>
+                    <p class="pd-species">
+                        <t t-out="dict(pet._fields['especie'].selection).get(pet.especie, '')"/>
+                        <t t-if="pet.raza"> &middot; <t t-out="pet.raza"/></t>
+                    </p>
+                    <!-- Chips informativos -->
+                    <div class="pd-chips">
+                        <t t-if="pet.peso">
+                            <span class="pd-chip pd-chip-blue">
+                                <i class="fa fa-balance-scale"/>
+                                <t t-out="pet.peso"/> kg
+                            </span>
+                        </t>
+                        <t t-if="pet.microchip">
+                            <span class="pd-chip pd-chip-blue">
+                                <i class="fa fa-microchip"/>
+                                Chip: <t t-out="pet.microchip"/>
+                            </span>
+                        </t>
+                        <t t-if="pet.estado_vacunacion == 'al_dia'">
+                            <span class="pd-chip pd-chip-green">
+                                <i class="fa fa-check-circle"/>
+                                Vacunas al dia
+                            </span>
+                        </t>
+                        <t t-elif="pet.estado_vacunacion == 'atrasado'">
+                            <span class="pd-chip pd-chip-orange">
+                                <i class="fa fa-exclamation-circle"/>
+                                Vacunacion atrasada
+                            </span>
+                        </t>
+                        <t t-else="">
+                            <span class="pd-chip pd-chip-gray">
+                                <i class="fa fa-times-circle"/>
+                                Sin vacunas
+                            </span>
+                        </t>
+                        <t t-if="pet.alergias">
+                            <span class="pd-chip pd-chip-red">
+                                <i class="fa fa-warning"/>
+                                Alergias
+                            </span>
+                        </t>
+                    </div>
+                    <!-- Acciones -->
+                    <div class="pd-actions">
+                        <a t-attf-href="/my/vaccination_card/#{pet.id}"
+                           class="btn btn-success btn-sm">
+                            <i class="fa fa-file-pdf-o me-1"/>Descargar Carnet
+                        </a>
+                        <form t-attf-action="/my/pets/#{pet.id}" method="post"
+                              enctype="multipart/form-data" class="d-inline pd-change-foto">
+                            <input type="hidden" name="csrf_token"
+                                   t-att-value="request.csrf_token()"/>
+                            <label for="pet_foto_input"
+                                   class="btn btn-outline-secondary btn-sm mb-0">
+                                <i class="fa fa-camera me-1"/>Cambiar foto
+                            </label>
+                            <input type="file" id="pet_foto_input" name="foto"
+                                   accept="image/*" class="d-none"
+                                   onchange="this.form.submit()"/>
+                        </form>
                     </div>
                 </div>
             </div>
 
-            <!-- Historia clínica de esta mascota -->
-            <div class="card mt-4 shadow-sm">
-                <div class="card-header"><strong>Historia Clínica</strong></div>
-                <div class="card-body p-0">
+            <!-- Grid de información detallada -->
+            <div class="pd-section">
+                <div class="pd-section-hdr">
+                    <i class="fa fa-info-circle" style="color:#2E86AB;"/>
+                    <span>Informacion de la mascota</span>
+                </div>
+                <div class="pd-info-grid pd-section-body">
+                    <div class="pd-info-item">
+                        <p class="pd-info-lbl">Especie</p>
+                        <p class="pd-info-val"
+                           t-out="dict(pet._fields['especie'].selection).get(pet.especie, '-')"/>
+                    </div>
+                    <div class="pd-info-item">
+                        <p class="pd-info-lbl">Raza</p>
+                        <p class="pd-info-val" t-out="pet.raza or 'No especificada'"/>
+                    </div>
+                    <div class="pd-info-item">
+                        <p class="pd-info-lbl">Fecha de nacimiento</p>
+                        <p class="pd-info-val" t-out="pet.fecha_nacimiento or 'No registrada'"/>
+                    </div>
+                    <div class="pd-info-item">
+                        <p class="pd-info-lbl">Peso</p>
+                        <p class="pd-info-val">
+                            <t t-if="pet.peso"><t t-out="pet.peso"/> kg</t>
+                            <t t-else="">No registrado</t>
+                        </p>
+                    </div>
+                    <div class="pd-info-item">
+                        <p class="pd-info-lbl">Numero de microchip</p>
+                        <p class="pd-info-val" t-out="pet.microchip or 'No registrado'"/>
+                    </div>
+                    <div class="pd-info-item">
+                        <p class="pd-info-lbl">Fecha de registro</p>
+                        <p class="pd-info-val" t-out="pet.fecha_registro or '-'"/>
+                    </div>
+                    <div class="pd-info-item" style="grid-column:span 2;">
+                        <p class="pd-info-lbl">Alergias conocidas</p>
+                        <p class="pd-info-val" t-out="pet.alergias or 'Ninguna registrada'"/>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Historia clínica -->
+            <div class="pd-section">
+                <div class="pd-section-hdr">
+                    <i class="fa fa-stethoscope" style="color:#7b5ea7;"/>
+                    <span>Historia Clinica</span>
+                    <t t-if="pet.historia_clinica_ids">
+                        <span class="pd-count" t-out="len(pet.historia_clinica_ids)"/>
+                    </t>
+                </div>
+                <div class="pd-section-body">
                     <t t-if="not pet.historia_clinica_ids">
-                        <div class="p-3 text-muted">Sin historia clínica registrada.</div>
+                        <p class="pd-empty">Sin historia clinica registrada.</p>
                     </t>
                     <t t-if="pet.historia_clinica_ids">
-                        <table class="table table-sm mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Fecha</th>
-                                    <th>Tipo sangre</th>
-                                    <th>Peso</th>
-                                    <th>Observaciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr t-foreach="pet.historia_clinica_ids" t-as="h">
-                                    <td t-out="h.fecha_apertura"/>
-                                    <td t-out="dict(h._fields['tipo_sangre'].selection).get(h.tipo_sangre, '-')"/>
-                                    <td><t t-out="h.peso or 0"/> kg</td>
-                                    <td t-out="h.observaciones or '-'"/>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Fecha apertura</th>
+                                        <th>Tipo de sangre</th>
+                                        <th>Peso registrado</th>
+                                        <th>Condiciones cronicas</th>
+                                        <th>Observaciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="pet.historia_clinica_ids" t-as="h">
+                                        <td t-out="h.fecha_apertura"/>
+                                        <td t-out="dict(h._fields['tipo_sangre'].selection).get(h.tipo_sangre, '-')"/>
+                                        <td><t t-out="h.peso or 0"/> kg</td>
+                                        <td t-out="h.condiciones_cronicas or '-'"/>
+                                        <td t-out="h.observaciones or '-'"/>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </t>
                 </div>
             </div>
 
             <!-- Vacunas aplicadas -->
-            <div class="card mt-4 shadow-sm">
-                <div class="card-header"><strong>Vacunas aplicadas</strong></div>
-                <div class="card-body p-0">
+            <div class="pd-section">
+                <div class="pd-section-hdr">
+                    <i class="fa fa-syringe" style="color:#06A77D;"/>
+                    <span>Vacunas Aplicadas</span>
+                    <t t-if="pet.vacuna_aplicada_ids">
+                        <span class="pd-count" t-out="len(pet.vacuna_aplicada_ids)"/>
+                    </t>
+                </div>
+                <div class="pd-section-body">
                     <t t-if="not pet.vacuna_aplicada_ids">
-                        <div class="p-3 text-muted">No hay vacunas registradas.</div>
+                        <p class="pd-empty">No hay vacunas registradas para esta mascota.</p>
                     </t>
                     <t t-if="pet.vacuna_aplicada_ids">
-                        <table class="table table-sm mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Fecha</th>
-                                    <th>Vacuna</th>
-                                    <th>Veterinario</th>
-                                    <th>Lote</th>
-                                    <th>Próxima dosis</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr t-foreach="pet.vacuna_aplicada_ids" t-as="v">
-                                    <td t-out="v.fecha_aplicacion"/>
-                                    <td t-out="v.vacuna_id.name"/>
-                                    <td t-out="v.veterinario_id.name or '-'"/>
-                                    <td t-out="v.lote or '-'"/>
-                                    <td t-out="v.proxima_dosis or '-'"/>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Vacuna</th>
+                                        <th>Fecha aplicacion</th>
+                                        <th>Veterinario</th>
+                                        <th>Lote</th>
+                                        <th>Proxima dosis</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="pet.vacuna_aplicada_ids" t-as="v">
+                                        <td><strong t-out="v.vacuna_id.name"/></td>
+                                        <td t-out="v.fecha_aplicacion"/>
+                                        <td t-out="v.veterinario_id.name or '-'"/>
+                                        <td t-out="v.lote or '-'"/>
+                                        <td>
+                                            <t t-if="v.proxima_dosis">
+                                                <span class="pd-vac-row-next" t-out="v.proxima_dosis"/>
+                                            </t>
+                                            <t t-else="">-</t>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </t>
                 </div>
             </div>
 
-            <!-- Recetas -->
-            <div class="card mt-4 mb-5 shadow-sm">
-                <div class="card-header"><strong>Recetas</strong></div>
-                <div class="card-body p-0">
+            <!-- Recetas médicas -->
+            <div class="pd-section mb-5">
+                <div class="pd-section-hdr">
+                    <i class="fa fa-medkit" style="color:#e8567a;"/>
+                    <span>Recetas Medicas</span>
+                    <t t-if="pet.receta_ids">
+                        <span class="pd-count" t-out="len(pet.receta_ids)"/>
+                    </t>
+                </div>
+                <div class="pd-section-body">
                     <t t-if="not pet.receta_ids">
-                        <div class="p-3 text-muted">No hay recetas registradas.</div>
+                        <p class="pd-empty">No hay recetas registradas para esta mascota.</p>
                     </t>
                     <t t-if="pet.receta_ids">
                         <t t-foreach="pet.receta_ids" t-as="r">
-                            <div class="border-bottom p-3">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="pd-rx-item">
+                                <div class="d-flex align-items-start justify-content-between gap-2 flex-wrap">
                                     <div>
-                                        <strong t-out="r.name"/>
-                                        <span class="text-muted ms-2" t-out="r.fecha_emision"/>
+                                        <span class="pd-rx-name" t-out="r.name"/>
+                                        <span class="pd-rx-date ms-2" t-out="r.fecha_emision"/>
                                     </div>
-                                    <span class="badge bg-secondary"
-                                          t-out="r.veterinario_id.name or 'Sin veterinario'"/>
+                                    <div class="d-flex gap-2 align-items-center flex-wrap">
+                                        <span class="badge"
+                                              style="background:#f3e5f5; color:#4a148c; font-weight:600; padding:5px 10px;">
+                                            <i class="fa fa-user-md me-1"/>
+                                            <t t-out="r.veterinario_id.name or 'Sin veterinario'"/>
+                                        </span>
+                                        <t t-if="r.state == 'finalizada'">
+                                            <span class="badge" style="background:#e3f2fd; color:#0d47a1;">
+                                                <i class="fa fa-check-circle me-1"/>Facturada
+                                            </span>
+                                        </t>
+                                        <t t-else="">
+                                            <span class="badge" style="background:#e8f5e9; color:#1b5e20;">
+                                                <i class="fa fa-heartbeat me-1"/>Activa
+                                            </span>
+                                        </t>
+                                    </div>
                                 </div>
                                 <t t-if="r.diagnostico">
-                                    <p class="small mb-2"><em>Diagnóstico:</em>
-                                        <t t-out="r.diagnostico"/></p>
+                                    <div class="pd-rx-diag">
+                                        <strong>Diagnostico:</strong> <t t-out="r.diagnostico"/>
+                                    </div>
                                 </t>
                                 <t t-if="r.linea_ids">
-                                    <table class="table table-sm mb-0">
-                                        <thead>
-                                            <tr>
-                                                <th>Medicamento</th>
-                                                <th>Dosis</th>
-                                                <th>Cada (h)</th>
-                                                <th>Días</th>
-                                                <th>Total</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr t-foreach="r.linea_ids" t-as="l">
-                                                <td t-out="l.nombre_medicamento_display"/>
-                                                <td t-out="l.dosis"/>
-                                                <td t-out="l.frecuencia_horas"/>
-                                                <td t-out="l.duracion_dias"/>
-                                                <td t-out="l.cantidad_total"/>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                    <div class="table-responsive mt-2">
+                                        <table class="pd-rx-meds">
+                                            <thead>
+                                                <tr>
+                                                    <th>Medicamento</th>
+                                                    <th>Dosis</th>
+                                                    <th>Cada (h)</th>
+                                                    <th>Dias</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr t-foreach="r.linea_ids" t-as="l">
+                                                    <td t-out="l.nombre_medicamento_display"/>
+                                                    <td t-out="l.dosis"/>
+                                                    <td t-out="l.frecuencia_horas"/>
+                                                    <td t-out="l.duracion_dias"/>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </t>
                                 <t t-if="r.observaciones_adicionales">
                                     <p class="small text-muted mt-2 mb-0">
-                                        <em>Indicaciones:</em>
-                                        <t t-out="r.observaciones_adicionales"/>
+                                        <i class="fa fa-info-circle me-1"/>
+                                        <em><t t-out="r.observaciones_adicionales"/></em>
                                     </p>
                                 </t>
                             </div>
@@ -599,70 +993,169 @@
          ===================================================== -->
     <template id="portal_my_appointments" name="Mis Citas">
         <t t-call="portal.portal_layout">
-            <h3 class="mt-3">Mis Citas</h3>
+            <style>
+                .apt-card {
+                    border: 1.5px solid #e4eef5;
+                    border-left: 5px solid #2E86AB;
+                    border-radius: 12px;
+                    background: #fff;
+                    box-shadow: 0 2px 8px rgba(0,0,0,.04);
+                    transition: box-shadow .2s;
+                }
+                .apt-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,.09); }
+                .apt-label { font-size: 10px; font-weight: 700; text-transform: uppercase;
+                             letter-spacing: .5px; color: #8e9fb0; margin-bottom: 2px; }
+                .apt-value { font-size: 14px; color: #1a2d3d; font-weight: 500; }
+                .apt-obs-box { background: #f7fbfe; border-radius: 8px; padding: 12px 14px; }
+                .apt-obs-box .form-control:focus { border-color: #2E86AB; box-shadow: 0 0 0 .2rem rgba(46,134,171,.2); }
+                .apt-section {
+                    font-size: 11px; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: .8px; color: #8e9fb0;
+                    margin: 24px 0 12px 0; padding-left: 2px;
+                    display: flex; align-items: center; gap: 8px;
+                }
+                .apt-section::after { content:''; flex:1; height:1px; background:#e9ecef; }
+            </style>
 
-            <h5 class="mt-4">Próximas citas</h5>
+            <!-- Header -->
+            <div class="d-flex align-items-center justify-content-between mt-3 mb-2 flex-wrap gap-2">
+                <h3 class="m-0">Mis Citas</h3>
+                <small class="text-muted">
+                    <i class="fa fa-info-circle me-1"/>
+                    Puedes agregar observaciones en las citas programadas.
+                </small>
+            </div>
+
+            <!-- Próximas citas (cards con form de observaciones) -->
+            <div class="apt-section">Próximas citas</div>
             <t t-if="not upcoming">
-                <div class="alert alert-light">No tiene citas programadas.</div>
+                <div class="alert alert-light text-center py-4">
+                    <i class="fa fa-calendar-o fa-2x text-muted d-block mb-2"/>
+                    No tiene citas programadas actualmente.
+                </div>
             </t>
             <t t-if="upcoming">
-                <table class="table table-striped table-sm">
-                    <thead>
-                        <tr>
-                            <th>Fecha y hora</th>
-                            <th>Mascota</th>
-                            <th>Veterinario</th>
-                            <th>Servicio</th>
-                            <th>Motivo</th>
-                            <th>Duración</th>
-                            <th>Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr t-foreach="upcoming" t-as="c">
-                            <td t-out="c.fecha_hora"/>
-                            <td><a t-attf-href="/my/pets/#{c.paciente_id.id}" t-out="c.paciente_id.name"/></td>
-                            <td t-out="c.veterinario_id.name or '-'"/>
-                            <td t-out="c.servicio_id.name or '-'"/>
-                            <td t-out="c.motivo"/>
-                            <td><t t-out="c.duracion_horas"/> h</td>
-                            <td>
-                                <span class="badge bg-primary"
-                                      t-out="dict(c._fields['estado'].selection).get(c.estado, '')"/>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="d-flex flex-column gap-3 mb-2">
+                    <t t-foreach="upcoming" t-as="c">
+                        <div class="apt-card">
+                            <div class="card-body p-3 p-md-4">
+                                <div class="row g-3">
+                                    <!-- Info principal -->
+                                    <div class="col-md-7">
+                                        <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
+                                            <span class="badge bg-primary">
+                                                <i class="fa fa-clock-o me-1"/>
+                                                <t t-out="c.fecha_hora"/>
+                                            </span>
+                                            <span t-attf-class="badge #{'bg-info' if c.estado == 'programada' else 'bg-secondary'}">
+                                                <t t-out="dict(c._fields['estado'].selection).get(c.estado,'')"/>
+                                            </span>
+                                            <span class="text-muted small">
+                                                <t t-out="c.duracion_horas"/> h
+                                            </span>
+                                        </div>
+                                        <div class="row g-2">
+                                            <div class="col-6">
+                                                <div class="apt-label">Mascota</div>
+                                                <div class="apt-value">
+                                                    <a t-attf-href="/my/pets/#{c.paciente_id.id}"
+                                                       class="text-decoration-none fw-semibold"
+                                                       t-out="c.paciente_id.name"/>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="apt-label">Veterinario</div>
+                                                <div class="apt-value" t-out="c.veterinario_id.name or '-'"/>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="apt-label">Servicio</div>
+                                                <div class="apt-value" t-out="c.servicio_id.name or '-'"/>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="apt-label">Motivo</div>
+                                                <div class="apt-value" t-out="c.motivo or '-'"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Observaciones del propietario -->
+                                    <div class="col-md-5">
+                                        <div class="apt-obs-box h-100">
+                                            <div class="apt-label mb-2">
+                                                <i class="fa fa-pencil me-1"/>
+                                                Observaciones / nuevos síntomas
+                                            </div>
+                                            <t t-if="c.estado == 'programada'">
+                                                <form t-attf-action="/my/appointments/#{c.id}/observations"
+                                                      method="post">
+                                                    <input type="hidden" name="csrf_token"
+                                                           t-att-value="request.csrf_token()"/>
+                                                    <textarea name="observaciones_cliente"
+                                                              class="form-control form-control-sm mb-2"
+                                                              rows="3"
+                                                              placeholder="Ej: tiene fiebre desde ayer, no quiere comer, cojea de la pata derecha..."><t t-out="obs_upcoming.get(c.id, '')"/></textarea>
+                                                    <button type="submit"
+                                                            class="btn btn-primary btn-sm w-100">
+                                                        <i class="fa fa-save me-1"/> Guardar observacion
+                                                    </button>
+                                                </form>
+                                            </t>
+                                            <t t-else="">
+                                                <p class="small text-muted mb-0 fst-italic"
+                                                   t-out="obs_upcoming.get(c.id, '') or 'Sin observaciones registradas.'"/>
+                                            </t>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
             </t>
 
-            <h5 class="mt-4">Citas pasadas</h5>
+            <!-- Citas pasadas (tabla compacta) -->
+            <div class="apt-section">Citas pasadas</div>
             <t t-if="not past">
-                <div class="alert alert-light">Sin citas pasadas.</div>
+                <div class="alert alert-light text-center py-3">Sin citas pasadas registradas.</div>
             </t>
             <t t-if="past">
-                <table class="table table-sm">
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Mascota</th>
-                            <th>Veterinario</th>
-                            <th>Motivo</th>
-                            <th>Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr t-foreach="past" t-as="c">
-                            <td t-out="c.fecha_hora"/>
-                            <td t-out="c.paciente_id.name"/>
-                            <td t-out="c.veterinario_id.name or '-'"/>
-                            <td t-out="c.motivo"/>
-                            <td>
-                                <span t-attf-class="badge bg-#{ 'success' if c.estado=='completada' else ('danger' if c.estado in ('cancelada','no_asistio') else 'secondary') }"
-                                      t-out="dict(c._fields['estado'].selection).get(c.estado, '')"/>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Mascota</th>
+                                <th>Veterinario</th>
+                                <th>Motivo</th>
+                                <th>Observaciones</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="past" t-as="c">
+                                <td class="small text-nowrap" t-out="c.fecha_hora"/>
+                                <td t-out="c.paciente_id.name"/>
+                                <td t-out="c.veterinario_id.name or '-'"/>
+                                <td class="small" t-out="c.motivo or '-'"/>
+                                <td class="small text-muted fst-italic"
+                                    t-out="obs_past.get(c.id, '') or '—'"/>
+                                <td>
+                                    <t t-if="c.estado == 'completada'">
+                                        <span class="badge bg-success"
+                                              t-out="dict(c._fields['estado'].selection).get(c.estado,'')"/>
+                                    </t>
+                                    <t t-elif="c.estado in ('cancelada', 'no_asistio')">
+                                        <span class="badge bg-danger"
+                                              t-out="dict(c._fields['estado'].selection).get(c.estado,'')"/>
+                                    </t>
+                                    <t t-else="">
+                                        <span class="badge bg-secondary"
+                                              t-out="dict(c._fields['estado'].selection).get(c.estado,'')"/>
+                                    </t>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </t>
         </t>
     </template>
@@ -795,12 +1288,16 @@
                     font-size: 0.85rem;
                 }
                 .vet-badge-status.active {
+                    background-color: #e8f5e9;
+                    color: #1b5e20;
+                }
+                .vet-badge-status.ended {
                     background-color: #fff3e0;
                     color: #e65100;
                 }
                 .vet-badge-status.billed {
-                    background-color: #e8f5e9;
-                    color: #1b5e20;
+                    background-color: #e3f2fd;
+                    color: #0d47a1;
                 }
                 .vet-diagnostico-box {
                     background-color: #f8fafc;
@@ -875,7 +1372,9 @@
             <t t-if="recetas">
                 <div class="d-flex flex-column gap-4 mb-5">
                     <t t-foreach="recetas" t-as="r">
-                        <div class="card vet-recipe-card shadow-sm border-0" t-att-style="'border-left-color: ' + ('#06A77D' if r.state == 'finalizada' else '#F8961E')">
+                        <t t-set="rx_status" t-value="receta_status.get(r.id, 'activa')"/>
+                        <div class="card vet-recipe-card shadow-sm border-0"
+                             t-att-style="'border-left-color:' + ('#1b5e20' if rx_status == 'activa' else ('#e65100' if rx_status == 'terminada' else '#0d47a1'))">
                             <!-- Card Header -->
                             <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
                                 <div class="d-flex align-items-center gap-2 flex-wrap">
@@ -896,15 +1395,20 @@
                                         <i class="fa fa-user-md me-1"/>
                                         <t t-out="r.veterinario_id.name or 'Sin veterinario'"/>
                                     </span>
-                                    <!-- Badge Estado Facturación -->
-                                    <t t-if="r.state == 'finalizada'">
+                                    <!-- Badge Estado del tratamiento (3 estados) -->
+                                    <t t-if="rx_status == 'facturada'">
                                         <span class="vet-badge-status billed">
                                             <i class="fa fa-check-circle me-1"/> Facturada
                                         </span>
                                     </t>
+                                    <t t-elif="rx_status == 'terminada'">
+                                        <span class="vet-badge-status ended">
+                                            <i class="fa fa-calendar-check-o me-1"/> Tratamiento concluido
+                                        </span>
+                                    </t>
                                     <t t-else="">
                                         <span class="vet-badge-status active">
-                                            <i class="fa fa-clock-o me-1"/> Activa / Pendiente
+                                            <i class="fa fa-heartbeat me-1"/> En tratamiento
                                         </span>
                                     </t>
                                 </div>
