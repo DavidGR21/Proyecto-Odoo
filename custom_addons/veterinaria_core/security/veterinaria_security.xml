@@ -63,7 +63,7 @@
         </record>
     </data>
 
-    <data noupdate="1">
+    <data noupdate="0"> <!-- CAMBIO TEMPORAL: Cambiar a 0 para forzar la actualización de las reglas -->
         <!-- ============================================================ -->
         <!-- REGLAS DE REGISTRO (Record Rules) — #11                      -->
         <!-- ============================================================ -->

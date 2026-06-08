@@ -7,6 +7,16 @@ import logging
 _logger = logging.getLogger(__name__)
 
 
+SPANISH_WEEKDAYS = {
+    0: 'Lunes',
+    1: 'Martes',
+    2: 'Miércoles',
+    3: 'Jueves',
+    4: 'Viernes',
+    5: 'Sábado',
+    6: 'Domingo',
+}
+
 class Cita(models.Model):
     _name = 'veterinaria.cita'
     _description = 'Cita Veterinaria'
@@ -108,7 +118,10 @@ class Cita(models.Model):
         for record in self:
             if not record.fecha_hora:
                 return {'domain': {'veterinario_id': []}}
-            start = record.fecha_hora
+            
+            # Convertir la fecha_hora a la zona horaria local del usuario para la comparación
+            local_start_dt = fields.Datetime.context_timestamp(self, record.fecha_hora)
+            start = local_start_dt
             duration = float(record.duracion or 0.0)
             end = start + timedelta(hours=duration)
             weekday = start.weekday()  # 0=Mon .. 6=Sun
@@ -149,7 +162,8 @@ class Cita(models.Model):
                 for ex in existing:
                     if not ex.fecha_hora:
                         continue
-                    ex_start = ex.fecha_hora
+                    # Convertir ex.fecha_hora a la zona horaria local del usuario para la comparación
+                    ex_start = fields.Datetime.context_timestamp(self, ex.fecha_hora)
                     ex_end = ex_start + timedelta(hours=ex.duracion_horas or 0.0)
                     if ex_start < end and ex_end > start:
                         conflict = True
@@ -188,6 +202,85 @@ class Cita(models.Model):
                 raise ValidationError('Debe ingresar el Motivo de la cita')
             if not record.fecha_hora:
                 raise ValidationError('Debe seleccionar la Fecha y Hora de la cita')
+
+    @api.constrains('veterinario_id', 'fecha_hora', 'duracion', 'estado')
+    def _check_veterinario_disponibilidad(self):
+        """
+        Valida que el veterinario esté disponible en el horario y día de la cita,
+        y que no haya solapamientos con otras citas.
+        """
+        for record in self:
+            if not record.veterinario_id or not record.fecha_hora or not record.duracion:
+                # Si faltan campos esenciales, la validación no es aplicable aquí.
+                # (Ya hay un @api.constrains para campos requeridos)
+                continue
+
+            vet = record.veterinario_id
+            
+            # Convertir la fecha_hora a la zona horaria local del usuario para la comparación
+            local_start_dt = fields.Datetime.context_timestamp(self, record.fecha_hora)
+            start = local_start_dt
+            duration = float(record.duracion)
+            end = start + timedelta(hours=duration)
+            weekday = start.weekday()  # 0=Lunes .. 6=Domingo
+            day_name_spanish = SPANISH_WEEKDAYS.get(weekday, start.strftime('%A')) # Fallback por si acaso
+
+            # 1. Verificar si el día de la semana está disponible para el veterinario
+            ok_day = False
+            if vet.dias_disponibles == 'todos':
+                ok_day = True
+            elif vet.dias_disponibles == 'lun_vie' and weekday in range(0, 5):
+                ok_day = True
+            elif vet.dias_disponibles == 'lun_sab' and weekday in range(0, 6):
+                ok_day = True
+            elif vet.dias_disponibles == 'sab_dom' and weekday in (5, 6):
+                ok_day = True
+
+            if not ok_day:
+                raise ValidationError(
+                    f"El veterinario {vet.name} no está disponible el {day_name_spanish} "
+                    f"según su configuración de días disponibles."
+                )
+
+            # 2. Verificar si el horario de la cita está dentro del horario laboral del veterinario
+            if not vet.horario_inicio or not vet.horario_fin:
+                raise ValidationError(f"El veterinario {vet.name} no tiene un horario laboral configurado.")
+
+            try:
+                h_start_float = float(vet.horario_inicio.split(':')[0]) + float(vet.horario_inicio.split(':')[1]) / 60.0
+                h_end_float = float(vet.horario_fin.split(':')[0]) + float(vet.horario_fin.split(':')[1]) / 60.0
+            except Exception:
+                raise ValidationError(
+                    f"Error en la configuración de horario del veterinario {vet.name}. "
+                    f"Verifique los formatos de hora (ej. '08:00')."
+                )
+
+            appointment_start_hour_float = start.hour + start.minute / 60.0
+            appointment_end_hour_float = appointment_start_hour_float + duration
+
+            if not (appointment_start_hour_float >= h_start_float and appointment_end_hour_float <= h_end_float):
+                raise ValidationError(f"La cita para el veterinario {vet.name} está fuera de su horario laboral "
+                                      f"({vet.horario_inicio} - {vet.horario_fin}).")
+
+            # 3. Verificar solapamientos con otras citas del mismo veterinario
+            # Excluir el registro actual si es una actualización
+            domain = [
+                ('veterinario_id', '=', vet.id),
+                ('estado', '!=', 'cancelada'),
+                ('id', '!=', record.id),  # Excluir el registro actual en caso de edición
+                ('fecha_hora', '<', end),  # Citas que empiezan antes de que esta termine
+            ]
+            conflicting_appointments = self.search(domain)
+
+            for conflict_rec in conflicting_appointments:
+                # Convertir conflict_rec.fecha_hora a la zona horaria local del usuario para la comparación
+                conflict_start_local = fields.Datetime.context_timestamp(self, conflict_rec.fecha_hora)
+                conflict_end_local = conflict_start_local + timedelta(hours=conflict_rec.duracion_horas or 0.0)
+                if conflict_end_local > start:  # Si la cita conflictiva termina después de que esta empieza
+                    raise ValidationError(
+                        f"El veterinario {vet.name} ya tiene una cita programada "
+                        f"({conflict_rec.name}) que se solapa con este horario."
+                    )
 
     def _map_estado_historia(self):
         self.ensure_one()
@@ -265,18 +358,37 @@ class Cita(models.Model):
             return
         template = self.env['mail.template'].sudo().browse(template_id)
         for record in self:
-            if not record.propietario_id:
-                _logger.warning("Cita %s no tiene propietario_id. No se envía correo.", record.name)
-                continue
-            if not record.propietario_id.email:
-                _logger.warning("Cita %s: El propietario %s no tiene email registrado.", record.name, record.propietario_id.name)
-                continue
-            try:
-                template.send_mail(record.id, force_send=True)
-                _logger.info('Email de confirmación enviado para cita %s al correo %s', record.name, record.propietario_id.email)
-            except Exception as e:
-                _logger.error('Error al enviar email de confirmación para cita %s: %s', record.name, e)
-
+            # Enviar al propietario
+            if record.propietario_id and record.propietario_id.email and record.estado == 'programada':
+                try:
+                    template.send_mail(record.id, force_send=True)
+                    _logger.info('Email de confirmación de cita enviado al propietario %s para cita %s', record.propietario_id.name, record.name)
+                except Exception as e:
+                    _logger.warning('No se pudo enviar email de confirmación al propietario %s para cita %s: %s', record.propietario_id.name, record.name, e)
+                    
+    def _send_confirmacion_email_veterinario(self):
+        """Envía email de confirmación al crear una cita al veterinario"""
+        template = self.env.ref('veterinaria_core.mail_template_cita_confirmacion_veterinario', raise_if_not_found=False)
+        if not template:
+            return
+        for record in self:
+            # Enviar al veterinario
+            if record.veterinario_id and record.veterinario_id.email and record.estado == 'programada':
+                try:
+                    # Usamos with_context para pasar información adicional a la plantilla si fuera necesario
+                    # y para asegurar que el idioma de la plantilla se renderice correctamente para el veterinario.
+                    template.with_context(
+                        lang=record.veterinario_id.user_id.lang if record.veterinario_id.user_id else self.env.user.lang,
+                        recipient_is_veterinarian=True # Contexto para diferenciar en la plantilla si es necesario
+                    ).send_mail(
+                        record.id,
+                        force_send=True,
+                        email_values={'email_to': record.veterinario_id.email} # Forzar el destinatario
+                    )
+                    _logger.info('Email de confirmación de cita enviado al veterinario %s para cita %s', record.veterinario_id.name, record.name)
+                except Exception as e:
+                    _logger.warning('No se pudo enviar email de confirmación al veterinario %s para cita %s: %s', record.veterinario_id.name, record.name, e)
+                    
     def _send_completada_email(self):
         """Envía resumen post-consulta al completar la cita"""
         template_id = self.env['ir.model.data'].sudo()._xmlid_to_res_id('veterinaria_core.mail_template_cita_completada')
@@ -364,24 +476,12 @@ class Cita(models.Model):
                     if str_val in ['0.5', '1.0']:
                         vals['duracion'] = str_val
                 except Exception:
-                    pass
-            if vals.get('veterinario_id') and vals.get('fecha_hora'):
-                start = fields.Datetime.to_datetime(vals['fecha_hora']) if isinstance(vals['fecha_hora'], str) else vals['fecha_hora']
-                duration = float(vals.get('duracion') or 1.0)
-                end = start + timedelta(hours=duration)
-                conflicts = self.env['veterinaria.cita'].search([
-                    ('veterinario_id', '=', vals['veterinario_id']),
-                    ('estado', '!=', 'cancelada'),
-                    ('fecha_hora', '<', end),
-                ])
-                for ex in conflicts:
-                    ex_end = ex.fecha_hora + timedelta(hours=ex.duracion_horas or 0.0)
-                    if ex_end > start:
-                        raise ValidationError('El veterinario no está disponible en ese horario (conflicto con otra cita).')
+                    pass # Keep existing logic for duration normalization
         records = super().create(vals_list)
+        # Sincronizar historia clínica y enviar email de confirmación al crear la cita
         records._sync_historia()
-        # Enviar email de confirmación (#8)
         records._send_confirmacion_email()
+        records._send_confirmacion_email_veterinario()
         return records
 
     def write(self, vals):
