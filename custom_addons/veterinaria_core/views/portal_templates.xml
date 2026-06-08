@@ -380,124 +380,234 @@
     </template>
 
     <!-- =====================================================
-         /my/security simplificado para Cliente Veterinaria
-         Solo cambio de contraseña + eliminar cuenta
+         /my/security — Seguridad (VitalPet style)
          ===================================================== -->
     <template id="portal_my_security_simple"
               name="Veterinaria: /my/security simplificado">
         <t t-call="portal.portal_layout">
             <div class="o_portal_security_body w-md-75 w-lg-50 pb-5">
-                <t t-set="additional_title">Seguridad</t>
                 <t t-set="no_breadcrumbs" t-value="1"/>
+            <style>
+                /* VitalPet · Seguridad ================================== */
+                .vp-sec-wrap {
+                    font-family: 'Inter','Segoe UI',sans-serif;
+                    max-width: 640px; margin: 0 auto; padding: 8px 0 40px;
+                }
+                .vp-sec-hero {
+                    background: linear-gradient(135deg, #0d3b5e 0%, #1a5c8a 100%);
+                    border-radius: 16px; padding: 22px 26px;
+                    display: flex; align-items: center; gap: 16px;
+                    color: #fff; margin-bottom: 24px;
+                }
+                .vp-sec-hero-icon {
+                    width: 54px; height: 54px; border-radius: 14px;
+                    background: rgba(255,255,255,.15);
+                    display: flex; align-items: center; justify-content: center;
+                    flex-shrink: 0; font-size: 1.5rem;
+                }
+                .vp-sec-hero h2 { font-size: 1.15rem; font-weight: 700; margin: 0 0 3px; }
+                .vp-sec-hero p  { font-size: .83rem; opacity: .75; margin: 0; }
+                .vp-sec-card {
+                    background: #fff; border-radius: 16px;
+                    border: 1px solid #e4eef5;
+                    box-shadow: 0 2px 12px rgba(46,134,171,.07);
+                    margin-bottom: 20px; overflow: hidden;
+                }
+                .vp-sec-card-hdr {
+                    display: flex; align-items: center; gap: 12px;
+                    padding: 14px 22px; border-bottom: 1px solid #e4eef5;
+                    background: #f7fbfe;
+                }
+                .vp-sec-card-hdr-icon {
+                    width: 38px; height: 38px; border-radius: 10px;
+                    display: flex; align-items: center; justify-content: center;
+                    font-size: .95rem; flex-shrink: 0;
+                }
+                .vp-sec-card-hdr h5 { font-size: .93rem; font-weight: 700; margin: 0; color: #0d3b5e; }
+                .vp-sec-card-hdr p  { font-size: .76rem; margin: 0; color: #8e9fb0; }
+                .vp-sec-card-body { padding: 22px; }
+                .vp-sec-field label {
+                    font-weight: 600; font-size: .78rem;
+                    color: #546e7a; text-transform: uppercase; letter-spacing: .04em;
+                    display: block; margin-bottom: 4px;
+                }
+                .vp-sec-field .form-control {
+                    border-radius: 8px; border-color: #cde4f0;
+                    padding: 10px 13px; font-size: .93rem;
+                    transition: border-color .2s, box-shadow .2s;
+                }
+                .vp-sec-field .form-control:focus {
+                    border-color: #2E86AB;
+                    box-shadow: 0 0 0 3px rgba(46,134,171,.12);
+                    outline: none;
+                }
+                .vp-sec-submit {
+                    background: linear-gradient(135deg, #2E86AB, #1a5c8a);
+                    border: none; border-radius: 10px;
+                    padding: 10px 26px; font-weight: 600; font-size: .9rem;
+                    color: #fff; cursor: pointer; transition: opacity .15s;
+                }
+                .vp-sec-submit:hover { opacity: .9; }
+                .vp-sec-danger .vp-sec-card-hdr { background: #fff9f9; border-bottom-color: #fde8e8; }
+                .vp-sec-danger { border-color: #fde8e8 !important; }
+                .vp-back-link {
+                    display: inline-flex; align-items: center; gap: 6px;
+                    color: #546e7a; text-decoration: none; font-size: .84rem;
+                    margin-bottom: 16px; font-weight: 500;
+                }
+                .vp-back-link:hover { color: #2E86AB; text-decoration: none; }
+            </style>
 
-                <div class="alert alert-danger" role="alert" t-if="errors and errors.get('errors')">
+            <div class="vp-sec-wrap">
+                <a href="/my/" class="vp-back-link">
+                    <i class="fa fa-chevron-left"/> Volver al Inicio
+                </a>
+
+                <div class="alert alert-danger rounded-3 mb-3" role="alert"
+                     t-if="errors and errors.get('errors')">
+                    <i class="fa fa-exclamation-circle" style="margin-right:6px;"/>
                     <t t-esc="errors['errors']"/>
                 </div>
 
-                <div class="d-flex gap-2 my-3">
-                    <a href="/my/" title="Volver" class="btn btn-light px-2">
-                        <i class="oi oi-chevron-left"/>
-                    </a>
-                    <h3 class="my-0">Conexión y Seguridad</h3>
+                <!-- Hero -->
+                <div class="vp-sec-hero">
+                    <div class="vp-sec-hero-icon"><i class="fa fa-shield"/></div>
+                    <div>
+                        <h2>Conexión y Seguridad</h2>
+                        <p>Gestiona tu contraseña y las opciones de tu cuenta</p>
+                    </div>
                 </div>
 
-                <!-- Cambiar contraseña -->
-                <section name="portal_change_password">
-                    <h4>Cambiar contraseña</h4>
-                    <div class="alert alert-success" role="alert"
-                         t-if="success and success.get('password')">
-                        ¡Contraseña actualizada!
+                <!-- Cambiar Contraseña -->
+                <div class="vp-sec-card">
+                    <div class="vp-sec-card-hdr">
+                        <div class="vp-sec-card-hdr-icon" style="background:#e8f4fb;color:#2E86AB;">
+                            <i class="fa fa-lock"/>
+                        </div>
+                        <div>
+                            <h5>Cambiar Contraseña</h5>
+                            <p>Actualiza tu contraseña periódicamente para mayor seguridad</p>
+                        </div>
                     </div>
-                    <div class="alert alert-danger" role="alert"
+                    <div class="vp-sec-card-body">
+                        <div class="alert alert-success rounded-3 mb-3" role="alert"
+                         t-if="success and success.get('password')">
+                            <i class="fa fa-check-circle" style="margin-right:6px;"/>
+                            ¡Contraseña actualizada correctamente!
+                        </div>
+                        <div class="alert alert-danger rounded-3 mb-3" role="alert"
                          t-if="errors and errors.get('password')">
+                            <i class="fa fa-times-circle" style="margin-right:6px;"/>
                         <t t-esc="errors['password']"/>
                     </div>
                     <form action="/my/security" method="post" class="oe_reset_password_form">
                         <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                         <input type="hidden" name="op" value="password"/>
-                        <div class="mb-3">
-                            <label for="current">Contraseña actual:</label>
-                            <input type="password" class="form-control form-control-sm"
+                            <div class="vp-sec-field mb-3">
+                                <label for="current">Contraseña Actual</label>
+                                <input type="password" class="form-control"
                                    id="current" name="old"
-                                   autocomplete="current-password" required="required"/>
+                                       autocomplete="current-password" required="required"
+                                       placeholder="••••••••"/>
                         </div>
-                        <div class="mb-3">
-                            <label for="new">Nueva contraseña:</label>
-                            <input type="password" class="form-control form-control-sm"
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6 vp-sec-field">
+                                    <label for="new">Nueva Contraseña</label>
+                                    <input type="password" class="form-control"
                                    id="new" name="new1"
-                                   autocomplete="new-password" required="required"/>
+                                           autocomplete="new-password" required="required"
+                                           placeholder="••••••••"/>
                         </div>
-                        <div class="mb-3">
-                            <label for="new2">Confirmar nueva contraseña:</label>
-                            <input type="password" class="form-control form-control-sm"
+                                <div class="col-md-6 vp-sec-field">
+                                    <label for="new2">Confirmar Contraseña</label>
+                                    <input type="password" class="form-control"
                                    id="new2" name="new2"
-                                   autocomplete="new-password" required="required"/>
+                                           autocomplete="new-password" required="required"
+                                           placeholder="••••••••"/>
                         </div>
-                        <button type="submit" class="btn btn-primary">Cambiar contraseña</button>
+                            </div>
+                            <button type="submit" class="vp-sec-submit">
+                                <i class="fa fa-save" style="margin-right:6px;"/> Guardar Cambios
+                            </button>
                     </form>
-                </section>
+                    </div>
+                </div>
 
-                <!-- Eliminar cuenta -->
-                <section name="portal_deactivate_account" class="mt-5">
-                    <h4>Eliminar cuenta</h4>
+                <!-- Zona de Peligro -->
+                <div class="vp-sec-card vp-sec-danger">
+                    <div class="vp-sec-card-hdr">
+                        <div class="vp-sec-card-hdr-icon" style="background:#fde8e8;color:#e74c3c;">
+                            <i class="fa fa-trash"/>
+                        </div>
+                        <div>
+                            <h5 style="color:#c0392b;">Zona de Peligro</h5>
+                            <p>Acciones irreversibles sobre tu cuenta</p>
+                        </div>
+                    </div>
+                    <div class="vp-sec-card-body">
+                        <p style="font-size:.87rem;color:#546e7a;margin-bottom:14px;">
+                            Al eliminar tu cuenta se desactivará tu acceso al portal.
+                            Toda tu información clínica permanecerá en nuestros registros por razones de salud animal.
+                        </p>
                     <t t-set="deactivate_error" t-value="errors and errors.get('deactivate')"/>
-                    <button class="btn btn-outline-danger" data-bs-toggle="modal"
+                        <button class="btn btn-outline-danger rounded-3 fw-semibold"
+                                style="font-size:.88rem;"
+                                data-bs-toggle="modal"
                             data-bs-target="#portal_deactivate_account_modal">
-                        Eliminar mi cuenta
+                            <i class="fa fa-user-times" style="margin-right:6px;"/> Eliminar mi cuenta
                     </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Eliminar Cuenta -->
                     <div t-attf-class="modal #{'show d-block' if open_deactivate_modal else ''}"
                          id="portal_deactivate_account_modal" tabindex="-1" role="dialog">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header bg-danger text-white">
-                                    <h5 class="modal-title">¿Estás seguro?</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"/>
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content" style="border-radius:16px;overflow:hidden;border:none;">
+                        <div class="modal-header" style="background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border:none;padding:16px 22px;">
+                            <h5 class="modal-title">
+                                <i class="fa fa-exclamation-triangle" style="margin-right:7px;"/>
+                                ¿Eliminar cuenta?
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"/>
                                 </div>
                                 <form action="/my/deactivate_account" method="post"
-                                      class="modal-body"
+                              class="modal-body p-4"
                                       id="portal_deactivate_account_form">
-                                    <div>
-                                        <div class="alert alert-danger"
+                            <div class="alert alert-danger rounded-3"
                                              t-if="deactivate_error == 'other'">
-                                            Ha ocurrido un error.
-                                        </div>
-                                        <p class="text-muted">
-                                            Esta acción desactiva tu cuenta y no podrás
-                                            volver a iniciar sesión.<br/>
-                                            <b>
-                                                <i class="fa fa-exclamation-triangle text-danger"/>
-                                                Esta acción no se puede deshacer.
-                                            </b>
-                                        </p>
-                                        <hr/>
-                                        <p>1. Ingresa tu contraseña para confirmar:</p>
+                                Ha ocurrido un error. Por favor intenta de nuevo.
+                            </div>
+                            <p style="font-size:.88rem;color:#546e7a;margin-bottom:16px;">
+                                Esta acción <strong>desactiva tu cuenta</strong> permanentemente.
+                                No podrás volver a iniciar sesión.
+                            </p>
+                            <div class="vp-sec-field mb-3">
+                                <label>1. Ingresa tu contraseña para confirmar</label>
                                         <input name="password" type="password" required="1"
-                                               class="form-control"
-                                               placeholder="Contraseña"/>
-                                        <hr/>
-                                        <p>
-                                            2. Confirma escribiendo tu login
-                                            (<t t-esc="env.user.login"/>):
-                                        </p>
+                                       class="form-control" placeholder="Tu contraseña actual"/>
+                            </div>
+                            <div class="vp-sec-field mb-2">
+                                <label>
+                                    2. Confirma escribiendo tu usuario
+                                    (<strong><t t-esc="env.user.login"/></strong>)
+                                </label>
                                         <input name="validation" type="text" required="1"
-                                               class="form-control"/>
+                                       class="form-control"
+                                       t-attf-placeholder="#{env.user.login}"/>
                                     </div>
-                                    <input type="hidden" name="csrf_token"
-                                           t-att-value="request.csrf_token()"/>
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                                 </form>
-                                <div class="modal-footer justify-content-start">
-                                    <input type="submit" class="btn btn-danger"
+                        <div class="modal-footer" style="border:none;padding:0 22px 18px;gap:8px;">
+                            <input type="submit" class="btn btn-danger rounded-3 fw-semibold"
                                            form="portal_deactivate_account_form"
-                                           value="Eliminar cuenta"/>
-                                    <button type="button" class="btn btn-light"
-                                            data-bs-dismiss="modal">
-                                        Cancelar
-                                    </button>
+                                   value="Sí, eliminar mi cuenta"/>
+                            <button type="button" class="btn btn-light rounded-3"
+                                    data-bs-dismiss="modal">Cancelar</button>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </section>
             </div>
         </t>
     </template>
