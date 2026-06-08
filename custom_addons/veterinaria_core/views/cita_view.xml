@@ -132,19 +132,12 @@
                     <field name="propietario_id" string="Buscar por Propietario"/>
                     <field name="motivo" string="Buscar por Motivo"/>
                     <separator/>
-                    <!-- #8: Filtro para que cada veterinario vea solo sus citas -->
-                    <filter name="mis_citas" string="🩺 Mis Citas"
-                            domain="[('veterinario_id.user_id', '=', uid)]"/>
-                    <separator/>
                     <!-- Filtros por estado -->
                     <filter name="programadas" string="📋 Programadas" domain="[('estado', '=', 'programada')]"/>
                     <!-- #10: Filtro para mostrar citas completadas -->
                     <filter name="completadas" string="✅ Completadas" domain="[('estado', '=', 'completada')]"/>
                     <filter name="canceladas" string="❌ Canceladas" domain="[('estado', '=', 'cancelada')]"/>
                     <filter name="no_asistio" string="⚠️ No Asistió" domain="[('estado', '=', 'no_asistio')]"/>
-                    <separator/>
-                    <filter name="mis_citas" string="👨‍⚕️ Mis Citas" domain="[('veterinario_id.user_id', '=', uid)]"/>
-                    <filter name="todas_citas" string="🌎 Todas las citas (Generales)" domain="[(1, '=', 1)]"/>
                     <separator/>
                     <!-- #9: Filtros por fechas claros y específicos -->
                     <filter string="📅 Citas de Hoy" name="filter_hoy"
@@ -182,21 +175,27 @@
             <field name="context">{'default_estado': 'programada', 'default_duracion': '1.0'}</field>
         </record>
 
-        <!-- Acción para Mis Citas -->
-        <record id="action_veterinaria_mis_citas" model="ir.actions.act_window">
-            <field name="name">Mis Citas</field>
+        <!-- Acción base para Cita (usada por el Server Action) -->
+        <record id="action_veterinaria_cita_base" model="ir.actions.act_window">
+            <field name="name">Citas</field>
             <field name="res_model">veterinaria.cita</field>
             <field name="view_mode">list,calendar,form</field>
-            <field name="domain">[('veterinario_id.user_id', '=', uid)]</field>
             <field name="context">{'default_estado': 'programada', 'default_duracion': '1.0'}</field>
         </record>
 
-        <!-- Acción para Todas las Citas -->
-        <record id="action_veterinaria_todas_citas" model="ir.actions.act_window">
-            <field name="name">Todas las Citas</field>
-            <field name="res_model">veterinaria.cita</field>
-            <field name="view_mode">list,calendar,form</field>
-            <field name="context">{'default_estado': 'programada', 'default_duracion': '1.0'}</field>
+        <!-- Server Action para enrutar Citas según el usuario y bloquear la vista a Veterinarios -->
+        <record id="action_veterinaria_cita_server" model="ir.actions.server">
+            <field name="name">Citas</field>
+            <field name="model_id" ref="veterinaria_core.model_veterinaria_cita"/>
+            <field name="state">code</field>
+            <field name="code">
+action = env.ref('veterinaria_core.action_veterinaria_cita_base').sudo().read()[0]
+# Si es un veterinario y no es administrador, FORZAMOS el dominio para que no pueda ver ni buscar otras citas
+if env.user.has_group('veterinaria_core.group_veterinaria_veterinario') and not env.user.has_group('veterinaria_core.group_veterinaria_admin'):
+    action['domain'] = [('veterinario_id.user_id', '=', env.uid)]
+
+action_res = action
+            </field>
         </record>
     </data>
 </odoo>
