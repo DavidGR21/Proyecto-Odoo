@@ -86,12 +86,5 @@ else:
             </field>
         </record>
 
-        <!-- Menú "Mi Perfil" en la raíz o configuración -->
-        <menuitem id="menu_mi_perfil_veterinario"
-                  name="Mi Perfil"
-                  parent="menu_veterinaria_gestion"
-                  action="action_mi_perfil_veterinario"
-                  sequence="100"
-                  groups="veterinaria_core.group_veterinaria_veterinario"/>
     </data>
 </odoo>

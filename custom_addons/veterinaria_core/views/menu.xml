@@ -87,10 +87,17 @@
             parent="menu_veterinaria_gestion" sequence="19" action="action_veterinaria_especialidad"
             groups="group_veterinaria_admin"/>
         
-        <menuitem id="menu_veterinaria_historia" name="Historia Clínica" 
+        <menuitem id="menu_veterinaria_historia" name="Historia Clínica"
             parent="menu_veterinaria_gestion" sequence="20" action="action_veterinaria_historia_clinica"
             groups="group_veterinaria_veterinario"/>
-        
+
+        <menuitem id="menu_mi_perfil_veterinario"
+                  name="Mi Perfil"
+                  parent="menu_veterinaria_gestion"
+                  action="action_mi_perfil_veterinario"
+                  sequence="100"
+                  groups="veterinaria_core.group_veterinaria_veterinario"/>
+
         <!-- ============================================================ -->
         <!-- 2. CITAS Y CALENDARIO — Recepcionista y superiores (#11)     -->
         <!-- ============================================================ -->
