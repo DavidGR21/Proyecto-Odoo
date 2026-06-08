@@ -7,7 +7,6 @@
     <template id="portal_my_details_inherit_photo"
               name="Veterinaria: foto de perfil"
               inherit_id="portal.portal_my_details" priority="20">
-        <!-- El form de /my/account no tiene clase, lo identificamos por su action -->
         <xpath expr="//form[@action='/my/account']" position="attributes">
             <attribute name="enctype">multipart/form-data</attribute>
         </xpath>
@@ -385,7 +384,7 @@
     <template id="portal_my_security_simple"
               name="Veterinaria: /my/security simplificado">
         <t t-call="portal.portal_layout">
-            <div class="o_portal_security_body w-md-75 w-lg-50 pb-5">
+            <t t-set="additional_title">Seguridad</t>
                 <t t-set="no_breadcrumbs" t-value="1"/>
             <style>
                 /* VitalPet · Seguridad ================================== */
@@ -691,6 +690,7 @@
             <li t-if="page_name == 'invoices_vet_detail'" t-attf-class="breadcrumb-item active">
                 <t t-out="factura.name"/>
             </li>
+            <li t-if="page_name == 'guide'" t-attf-class="breadcrumb-item active">Guía de Uso</li>
         </xpath>
     </template>
 
@@ -964,27 +964,27 @@
                 .vp-pd-hero {
                     background:linear-gradient(135deg,#0d3b5e 0%,#1a5c8a 55%,#2E86AB 100%);
                     border-radius:20px; margin-top:16px;
-                    overflow:hidden; box-shadow:0 6px 24px rgba(13,59,94,.2);
+                    box-shadow:0 6px 24px rgba(13,59,94,.2);
                 }
                 .vp-pd-hero-inner {
-                    display:flex; align-items:flex-end; gap:0;
-                    padding:28px 28px 0; flex-wrap:wrap;
+                    display:flex; align-items:center; gap:24px;
+                    padding:28px; flex-wrap:wrap;
                 }
-                .vp-pd-photo-wrap { flex-shrink:0; margin-bottom:-26px; position:relative; z-index:2; }
+                .vp-pd-photo-wrap { flex-shrink:0; }
                 .vp-pd-photo-wrap img {
-                    width:124px; height:124px; border-radius:50%;
+                    width:120px; height:120px; border-radius:50%;
                     border:4px solid rgba(255,255,255,.85); object-fit:cover;
-                    display:block; box-shadow:0 4px 16px rgba(0,0,0,.25);
+                    display:block; box-shadow:0 4px 16px rgba(0,0,0,.3);
                 }
                 .vp-pd-no-photo {
-                    width:124px; height:124px; border-radius:50%;
-                    border:4px solid rgba(255,255,255,.45);
+                    width:120px; height:120px; border-radius:50%;
+                    border:4px solid rgba(255,255,255,.4);
                     background:rgba(255,255,255,.1);
                     display:flex; align-items:center; justify-content:center;
                 }
                 .vp-pd-no-photo i { font-size:48px; color:rgba(255,255,255,.4); }
                 .vp-pd-info {
-                    flex:1; min-width:220px; padding:0 0 28px 22px; color:#fff;
+                    flex:1; min-width:220px; color:#fff;
                 }
                 .vp-pd-name { font-size:24px; font-weight:800; margin:0 0 4px 0; line-height:1.2; }
                 .vp-pd-species { font-size:14px; opacity:.8; margin:0 0 14px 0; }
