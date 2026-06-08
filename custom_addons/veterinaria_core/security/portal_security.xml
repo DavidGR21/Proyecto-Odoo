@@ -104,6 +104,18 @@
             <field name="perm_unlink" eval="False"/>
         </record>
 
+        <!-- Líneas de receta: solo de mascotas propias -->
+        <record id="rule_receta_linea_cliente_portal" model="ir.rule">
+            <field name="name">Cliente Portal: Líneas de recetas de mis mascotas</field>
+            <field name="model_id" ref="model_veterinaria_receta_linea"/>
+            <field name="domain_force">[('paciente_id.propietario_id.user_ids', 'in', [user.id])]</field>
+            <field name="groups" eval="[(4, ref('group_veterinaria_cliente'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
         <!-- Catálogo de vacunas: solo lectura para el cliente -->
         <record id="rule_vacuna_cliente_portal" model="ir.rule">
             <field name="name">Cliente Portal: Lectura catálogo vacunas</field>
