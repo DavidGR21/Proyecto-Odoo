@@ -96,7 +96,7 @@
         <!-- Foto de perfil antes de los campos nativos -->
         <xpath expr="//t[@t-call='portal.portal_my_details_fields']" position="before">
             <div class="col-12 mb-4">
-                <div class="text-center mb-3">
+                <div class="vp-photo-box">
                     <t t-if="partner.image_1920">
                         <img t-attf-src="/web/image/res.partner/#{partner.id}/image_1920"
                              style="width:70px;height:70px;object-fit:cover;border-radius:50%;border:3px solid #2E86AB;"
@@ -237,6 +237,7 @@
                 .vp-c5 { background: #f4951e; }
                 .vp-c6 { background: #4b7bec; }
                 .vp-c7 { background: #546e7a; }
+                .vp-c8 { background: #00b4d8; }
 
                 .vp-card:hover .vp-c1-b { border-color: #2E86AB; }
                 .vp-card:hover .vp-c2-b { border-color: #06A77D; }
@@ -361,6 +362,15 @@
                                 <h5>Seguridad</h5>
                                 <p>Cambia tu contraseña o administra el acceso a tu cuenta.</p>
                                 <div class="vp-card-badge">Configurar →</div>
+                            </a>
+                        </div>
+                        <div class="col-sm-6 col-lg-4">
+                            <a href="/my/guia" class="vp-card">
+                                <div class="vp-card-accent vp-c8"/>
+                                <div class="vp-icon vp-c8"><i class="fa fa-compass"/></div>
+                                <h5>Guía de Uso</h5>
+                                <p>Aprende a usar cada sección del portal con pasos detallados.</p>
+                                <div class="vp-card-badge">Ver tutorial →</div>
                             </a>
                         </div>
                     </div>
