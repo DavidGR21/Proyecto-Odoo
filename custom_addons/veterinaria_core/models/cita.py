@@ -35,7 +35,13 @@ class Cita(models.Model):
     duracion_horas = fields.Float('Duración (horas)', compute='_compute_duracion_horas', store=True)
     
     motivo = fields.Text('Motivo de la Cita', required=True)
-    observaciones = fields.Text('Observaciones')
+    sintoma_ids = fields.Many2many('veterinaria.sintoma', string='Síntomas')
+    sintomas_resumen = fields.Char(
+        string='Síntomas',
+        compute='_compute_sintomas_resumen',
+        store=True,
+        help='Primeros 3 síntomas de la cita'
+    )
     
     # Estado
     estado = fields.Selection([
@@ -54,6 +60,17 @@ class Cita(models.Model):
     def _compute_receta_count(self):
         for rec in self:
             rec.receta_count = len(rec.receta_ids)
+
+    @api.depends('sintoma_ids')
+    def _compute_sintomas_resumen(self):
+        for rec in self:
+            nombres = rec.sintoma_ids.mapped('name')
+            if not nombres:
+                rec.sintomas_resumen = False
+            elif len(nombres) <= 3:
+                rec.sintomas_resumen = ', '.join(nombres)
+            else:
+                rec.sintomas_resumen = ', '.join(nombres[:3]) + '...'
 
     alergias = fields.Text('Alergias de la Mascota')
     tipo_sangre = fields.Selection([
@@ -183,7 +200,7 @@ class Cita(models.Model):
             'tipo_sangre': self.tipo_sangre or 'desconocido',
             'peso': self.peso or self.paciente_id.peso,
             'condiciones_cronicas': self.condiciones_cronicas,
-            'observaciones': self.observaciones,
+            # Las observaciones generales son independientes de los síntomas por cita
         }
 
     @api.onchange('paciente_id')
@@ -227,8 +244,7 @@ class Cita(models.Model):
                 update_vals['peso'] = record.paciente_id.peso
             if record.condiciones_cronicas:
                 update_vals['condiciones_cronicas'] = record.condiciones_cronicas
-            if record.observaciones:
-                update_vals['observaciones'] = record.observaciones
+            # Los síntomas de cada cita NO se escriben en observaciones generales de la historia
             historia.write(update_vals)
 
     # ==================================================================
@@ -376,7 +392,6 @@ class Cita(models.Model):
             'veterinario_id',
             'fecha_hora',
             'motivo',
-            'observaciones',
             'estado',
         }
         if campos_sincronizados.intersection(vals.keys()):

@@ -88,6 +88,8 @@ class FacturacionLineaWizard(models.TransientModel):
                 raise ValidationError('El precio unitario debe coincidir con el precio de inventario')
         taxes = []
         if self.tipo_linea == 'cita':
+            if self.cita_id:
+                self.cita_id.facturada = True
             tax_15 = self.env['account.tax'].search([('type_tax_use', '=', 'sale'), ('amount', '=', 15.0)], limit=1)
             taxes = tax_15.ids if tax_15 else []
         elif self.tipo_linea != 'cita' and self.inventario_id:
@@ -163,6 +165,7 @@ class FacturacionMultilineaWizard(models.TransientModel):
                     'precio_unitario': precio,
                     'impuesto_ids': [(6, 0, taxes)],
                 })
+                cita.facturada = True
         else:
             if not self.inventario_ids:
                 raise ValidationError('Debe seleccionar al menos un item.')
@@ -210,9 +213,9 @@ class ImportarRecetaWizard(models.TransientModel):
 
     @api.onchange('propietario_id')
     def _onchange_propietario_id(self):
-        """Filtra cita_id para mostrar todas las citas con receta no facturadas del propietario."""
+        """Filtra cita_id para mostrar todas las citas con receta en estado borrador del propietario."""
         if self.propietario_id:
-            return {'domain': {'cita_id': [('propietario_id', '=', self.propietario_id.id), ('receta_ids', '!=', False), ('receta_ids.facturada', '=', False)]}}
+            return {'domain': {'cita_id': [('propietario_id', '=', self.propietario_id.id), ('receta_ids', '!=', False), ('receta_ids.state', '=', 'borrador')]}}
 
     linea_ids = fields.One2many(
         'veterinaria.importar.receta.wizard.linea',
@@ -267,7 +270,12 @@ class ImportarRecetaWizard(models.TransientModel):
                 })
                 lineas_creadas += 1
         
-        if lineas_creadas == 0:
+        if lineas_creadas > 0:
+            # Marcar la receta como finalizada
+            receta = self.env['veterinaria.receta'].search([('cita_id', '=', self.cita_id.id)], limit=1)
+            if receta:
+                receta.write({'state': 'finalizada'})
+        else:
             raise ValidationError("No se pudo importar ninguna línea. Asegúrese de que las cantidades sean mayores a cero.")
             
         return {

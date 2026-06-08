@@ -875,7 +875,7 @@
             <t t-if="recetas">
                 <div class="d-flex flex-column gap-4 mb-5">
                     <t t-foreach="recetas" t-as="r">
-                        <div class="card vet-recipe-card shadow-sm border-0" t-att-style="'border-left-color: ' + ('#06A77D' if r.facturada else '#F8961E')">
+                        <div class="card vet-recipe-card shadow-sm border-0" t-att-style="'border-left-color: ' + ('#06A77D' if r.state == 'finalizada' else '#F8961E')">
                             <!-- Card Header -->
                             <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
                                 <div class="d-flex align-items-center gap-2 flex-wrap">
@@ -897,7 +897,7 @@
                                         <t t-out="r.veterinario_id.name or 'Sin veterinario'"/>
                                     </span>
                                     <!-- Badge Estado Facturación -->
-                                    <t t-if="r.facturada">
+                                    <t t-if="r.state == 'finalizada'">
                                         <span class="vet-badge-status billed">
                                             <i class="fa fa-check-circle me-1"/> Facturada
                                         </span>
@@ -1009,8 +1009,21 @@
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-start mb-3">
                                         <h5 class="m-0" t-out="f.name"/>
-                                        <span t-attf-class="badge rounded-pill bg-#{ 'success' if f.estado=='validado' else ('danger' if f.estado=='cancelado' else 'warning text-dark') }"
-                                              t-out="dict(f._fields['estado'].selection).get(f.estado, '')"/>
+                                        <div class="d-flex flex-column align-items-end gap-1">
+                                            <span t-attf-class="badge rounded-pill bg-#{ 'success' if f.estado=='validado' else ('danger' if f.estado=='cancelado' else 'warning text-dark') }"
+                                                  t-out="dict(f._fields['estado'].selection).get(f.estado, '')"/>
+                                            <!-- Badge Pagado -->
+                                            <t t-if="f.pagado">
+                                                <span class="badge rounded-pill" style="background:#06A77D;">
+                                                    <i class="fa fa-check-circle me-1"/>Pagado
+                                                </span>
+                                            </t>
+                                            <t t-elif="f.estado == 'validado' and not f.pagado">
+                                                <span class="badge rounded-pill bg-warning text-dark">
+                                                    <i class="fa fa-clock-o me-1"/>Pago pendiente
+                                                </span>
+                                            </t>
+                                        </div>
                                     </div>
                                     <p class="text-muted small mb-2">
                                         <i class="fa fa-calendar me-1"/>
@@ -1042,6 +1055,18 @@
                                            class="btn btn-outline-secondary btn-sm">
                                             <i class="fa fa-file-pdf-o me-1"/> Descargar PDF
                                         </a>
+                                        <!-- Botón pago rápido desde listado -->
+                                        <t t-if="f.estado == 'validado' and not f.pagado and f.total &gt; 0">
+                                            <form t-attf-action="/my/invoices_vet/#{f.id}/pay" method="post">
+                                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                                <button type="submit" class="btn btn-sm w-100"
+                                                        style="background:#003087;color:#fff;border:none;">
+                                                    <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg"
+                                                         alt="PayPal" style="height:16px;vertical-align:middle;margin-right:6px;"/>
+                                                    Pagar con PayPal
+                                                </button>
+                                            </form>
+                                        </t>
                                     </div>
                                 </div>
                             </div>
@@ -1057,6 +1082,72 @@
          ===================================================== -->
     <template id="portal_my_vet_invoice_detail" name="Detalle de Factura Veterinaria">
         <t t-call="portal.portal_layout">
+
+            <!-- ── Estilos de la sección PayPal ────────────────────────── -->
+            <style>
+                .paypal-pay-box {
+                    background: linear-gradient(135deg, #003087 0%, #009cde 100%);
+                    border-radius: 16px;
+                    padding: 28px 30px;
+                    color: #fff;
+                    box-shadow: 0 6px 24px rgba(0,48,135,0.18);
+                }
+                .paypal-pay-box h5 { font-weight: 700; margin-bottom: 4px; }
+                .paypal-pay-box .amount {
+                    font-size: 2.4rem;
+                    font-weight: 800;
+                    letter-spacing: -1px;
+                }
+                .paypal-btn {
+                    background: #FFD140;
+                    color: #003087;
+                    border: none;
+                    border-radius: 10px;
+                    font-weight: 700;
+                    font-size: 1rem;
+                    padding: 12px 28px;
+                    cursor: pointer;
+                    transition: all .2s;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 10px;
+                    text-decoration: none;
+                }
+                .paypal-btn:hover {
+                    background: #f0c000;
+                    color: #003087;
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+                }
+                .paid-box {
+                    background: linear-gradient(135deg, #06A77D 0%, #0abf91 100%);
+                    border-radius: 16px;
+                    padding: 24px 28px;
+                    color: #fff;
+                    box-shadow: 0 6px 24px rgba(6,167,125,0.18);
+                }
+            </style>
+
+            <!-- ── Alertas de resultado del pago ───────────────────────── -->
+            <t t-if="payment_status == 'success'">
+                <div class="alert alert-success d-flex align-items-center gap-2 mt-3" role="alert">
+                    <i class="fa fa-check-circle fa-lg"/>
+                    <strong>¡Pago recibido!</strong> Tu factura ha sido pagada exitosamente con PayPal.
+                </div>
+            </t>
+            <t t-elif="payment_status == 'cancel'">
+                <div class="alert alert-warning d-flex align-items-center gap-2 mt-3" role="alert">
+                    <i class="fa fa-exclamation-triangle fa-lg"/>
+                    <strong>Pago cancelado.</strong> Cancelaste el proceso de pago. Puedes intentarlo de nuevo cuando quieras.
+                </div>
+            </t>
+            <t t-elif="payment_status == 'error'">
+                <div class="alert alert-danger d-flex align-items-center gap-2 mt-3" role="alert">
+                    <i class="fa fa-times-circle fa-lg"/>
+                    <strong>Error en el pago.</strong> No pudimos procesar el pago. Verifica que la pasarela PayPal esté activa o inténtalo más tarde.
+                </div>
+            </t>
+
             <div class="mt-3 mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <div>
                     <h3 class="m-0"><t t-out="factura.name"/></h3>
@@ -1064,9 +1155,14 @@
                         Emitida el <t t-out="factura.fecha_factura"/>
                     </small>
                 </div>
-                <div class="d-flex gap-2">
+                <div class="d-flex gap-2 flex-wrap align-items-center">
                     <span t-attf-class="badge rounded-pill bg-#{ 'success' if factura.estado=='validado' else ('danger' if factura.estado=='cancelado' else 'warning text-dark') } fs-6 px-3 py-2"
                           t-out="dict(factura._fields['estado'].selection).get(factura.estado, '')"/>
+                    <t t-if="factura.pagado">
+                        <span class="badge rounded-pill fs-6 px-3 py-2" style="background:#06A77D;">
+                            <i class="fa fa-check-circle me-1"/>Pagado
+                        </span>
+                    </t>
                     <a t-attf-href="/my/invoices_vet/#{factura.id}/pdf"
                        class="btn btn-primary">
                         <i class="fa fa-file-pdf-o me-1"/> Descargar PDF
@@ -1110,6 +1206,56 @@
                     </div>
                 </div>
             </div>
+
+            <!-- ── Sección de Pago PayPal ────────────────────────────────── -->
+            <t t-if="factura.estado == 'validado' and not factura.pagado and factura.total &gt; 0">
+                <div class="paypal-pay-box mb-4">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                        <div>
+                            <h5><i class="fa fa-lock me-2"/>Paga de forma segura con PayPal</h5>
+                            <p class="m-0" style="opacity:.85;font-size:.9rem;">
+                                Serás redirigido a PayPal para completar el pago de forma segura.
+                                No almacenamos datos de tarjeta.
+                            </p>
+                            <div class="mt-2 amount">
+                                $<t t-out="'%.2f' % (factura.total or 0)"/>
+                                <span style="font-size:1rem;font-weight:400;opacity:.8;"> USD</span>
+                            </div>
+                        </div>
+                        <div>
+                            <form t-attf-action="/my/invoices_vet/#{factura.id}/pay" method="post">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <button type="submit" class="paypal-btn">
+                                    <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg"
+                                         alt="PayPal" style="height:22px;"/>
+                                    Pagar con PayPal
+                                </button>
+                            </form>
+                            <p class="mt-2 mb-0 text-center" style="font-size:.78rem;opacity:.7;">
+                                <i class="fa fa-shield me-1"/>Pago cifrado y seguro
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </t>
+
+            <!-- ── Confirmación de Pago Completado ──────────────────────── -->
+            <t t-if="factura.pagado">
+                <div class="paid-box mb-4 d-flex align-items-center gap-3">
+                    <i class="fa fa-check-circle fa-2x" style="opacity:.9;"/>
+                    <div>
+                        <h5 class="m-0">Factura pagada</h5>
+                        <p class="m-0" style="opacity:.85;font-size:.9rem;">
+                            Pago recibido el
+                            <t t-out="factura.fecha_pago or ''"/>
+                            via PayPal.
+                            <t t-if="factura.payment_reference">
+                                Ref: <strong t-out="factura.payment_reference"/>
+                            </t>
+                        </p>
+                    </div>
+                </div>
+            </t>
 
             <!-- Líneas -->
             <div class="card border-0 shadow-sm" style="border-radius:14px;">

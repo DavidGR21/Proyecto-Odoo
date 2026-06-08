@@ -29,13 +29,13 @@
             <field name="model">veterinaria.receta</field>
             <field name="arch" type="xml">
                 <form string="Receta Médica">
-                    <field name="facturada" invisible="1"/>
+                    <header>
+                        <field name="state" widget="statusbar" statusbar_visible="borrador,finalizada"/>
+                    </header>
+
                     <sheet>
                         <div class="oe_title">
                             <h1><field name="name" readonly="1"/></h1>
-                            <div class="alert alert-info" role="alert" invisible="not facturada">
-                                <strong>Receta Facturada:</strong> Esta prescripción ya ha sido procesada por administración y no puede ser modificada.
-                            </div>
                         </div>
 
                         <group>
@@ -50,19 +50,16 @@
                             </group>
                         </group>
 
-                        <group string="Diagnóstico" readonly="facturada">
+                        <group string="Diagnóstico" readonly="state == 'finalizada'">
                             <field name="diagnostico" nolabel="1"
                                    placeholder="Diagnóstico clínico resumido..."/>
                         </group>
 
-                        <notebook readonly="facturada">
+                        <notebook readonly="state == 'finalizada'">
                             <page string="💊 Tratamiento" name="medicamentos">
-                                <field name="linea_ids" readonly="facturada">
+                                <field name="linea_ids">
                                     <!-- Bloqueo dinámico de edición en la lista -->
-                                    <list string="Medicamentos"
-                                          create="not facturada"
-                                          delete="not facturada"
-                                          edit="not facturada">
+                                    <list string="Medicamentos">
                                         <field name="nombre_medicamento_display" string="Medicamento"/>
                                         <field name="dosis" string="Dosis"/>
                                         <field name="frecuencia_horas" string="Cada (h)"/>

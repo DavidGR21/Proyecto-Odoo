@@ -109,12 +109,10 @@ class Receta(models.Model):
     )
 
     # ── Estado de Facturación ────────────────────────────────────────────────
-    facturada = fields.Boolean(
-        'Ya Facturada',
-        default=False,
-        help='Indica si esta receta ya fue procesada por el área administrativa.',
-        copy=False,
-    )
+    state = fields.Selection([
+        ('borrador', 'Borrador'),
+        ('finalizada', 'Finalizada'),
+    ], string='Estado', default='borrador', copy=False, tracking=True)
 
     # ── Validación ────────────────────────────────────────────────────────────
     _sql_constraints = [
@@ -139,14 +137,14 @@ class Receta(models.Model):
 
     def write(self, vals):
         for rec in self:
-            if rec.facturada and any(f not in ['facturada'] for f in vals):
-                raise UserError("No se puede modificar una receta médica que ya ha sido facturada.")
+            if rec.state == 'finalizada' and any(f not in ['state'] for f in vals):
+                raise UserError("No se puede modificar una receta médica que ya ha sido finalizada.")
         return super().write(vals)
 
     def unlink(self):
         for rec in self:
-            if rec.facturada:
-                raise UserError("No se puede eliminar una receta médica que ya ha sido facturada.")
+            if rec.state == 'finalizada':
+                raise UserError("No se puede eliminar una receta médica que ya ha sido finalizada.")
         return super().unlink()
 
 
@@ -268,18 +266,18 @@ class RecetaLinea(models.Model):
     def create(self, vals):
         if vals.get('receta_id'):
             receta = self.env['veterinaria.receta'].browse(vals['receta_id'])
-            if receta.facturada:
-                raise UserError("No se pueden añadir nuevas líneas a una receta que ya ha sido facturada.")
+            if receta.state == 'finalizada':
+                raise UserError("No se pueden añadir nuevas líneas a una receta que ya ha sido finalizada.")
         return super().create(vals)
 
     def write(self, vals):
         for rec in self:
-            if rec.receta_id.facturada:
-                raise UserError("No se puede modificar una línea de receta que ya ha sido facturada.")
+            if rec.receta_id.state == 'finalizada':
+                raise UserError("No se puede modificar una línea de receta que ya ha sido finalizada.")
         return super().write(vals)
 
     def unlink(self):
         for rec in self:
-            if rec.receta_id.facturada:
-                raise UserError("No se puede eliminar una línea de receta que ya ha sido facturada.")
+            if rec.receta_id.state == 'finalizada':
+                raise UserError("No se puede eliminar una línea de receta que ya ha sido finalizada.")
         return super().unlink()
