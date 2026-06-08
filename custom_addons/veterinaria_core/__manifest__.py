@@ -55,11 +55,10 @@
         'views/facturacion_linea_view.xml',
         'views/facturacion_wizard_view.xml',
         'views/documento_venta_view.xml',
-        'views/sintoma_view.xml',
+        # Cita debe cargarse antes que menu.xml porque el menu usa un server action de cita
+        'views/cita_view.xml',
         # Menús base (deben cargarse antes de submenus en vacunas/recetas)
         'views/menu.xml',
-        # Cita debe cargarse antes de receta_view (receta extiende la vista de cita)
-        'views/cita_view.xml',
         'views/vacuna_view.xml',
         'views/receta_view.xml',
         # Portal templates (deben cargarse tras los menús)

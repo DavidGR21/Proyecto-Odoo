@@ -95,7 +95,7 @@
         <!-- 2. CITAS Y CALENDARIO — Recepcionista y superiores (#11)     -->
         <!-- ============================================================ -->
         <menuitem id="menu_veterinaria_citas" name="Agenda / Citas" 
-            parent="menu_veterinaria_root" sequence="20" action="action_veterinaria_cita"
+            parent="menu_veterinaria_root" sequence="20" action="action_veterinaria_cita_server"
             groups="group_veterinaria_recepcionista"/>
         
         <!-- ============================================================ -->
