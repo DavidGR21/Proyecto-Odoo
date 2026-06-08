@@ -7,7 +7,8 @@
     -->
     <template id="vitalpet_navbar" name="VitalPet Navbar" inherit_id="website.layout">
         <xpath expr="//div[@id='wrapwrap']/main" position="before">
-            <t t-if="not no_header">
+            <t t-set="is_portal_page" t-value="request.httprequest.path.startswith('/my') or request.httprequest.path.startswith('/web/login') or request.httprequest.path.startswith('/web/signup') or request.httprequest.path.startswith('/web/reset_password')"/>
+            <t t-if="not no_header and not is_portal_page">
                 <!-- Topbar de informacion (solo escritorio) -->
                 <div class="vp-topbar d-none d-lg-block">
                     <div class="container">
@@ -144,6 +145,14 @@
                     </div>
                 </nav>
             </t>
+        </xpath>
+
+        <!-- Añadir clase vp-portal-page al body en rutas del portal/login
+             para que el CSS pueda restaurar el header#top de Odoo en esas páginas -->
+        <xpath expr="//body" position="attributes">
+            <attribute name="t-attf-class">
+                #{body_classname or ''} #{'vp-portal-page' if request.httprequest.path.startswith('/my') or request.httprequest.path.startswith('/web/login') or request.httprequest.path.startswith('/web/signup') or request.httprequest.path.startswith('/web/reset_password') else ''}
+            </attribute>
         </xpath>
     </template>
 </odoo>
