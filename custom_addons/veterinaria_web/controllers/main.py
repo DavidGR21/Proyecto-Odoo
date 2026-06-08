@@ -20,11 +20,16 @@ class VitalPetWebsite(http.Controller):
     # -------------------------------------------------------------------------
     @http.route('/', type='http', auth='public', website=True, sitemap=True)
     def pagina_inicio(self, **kwargs):
-        """Renderiza la página de inicio / landing page."""
+        """Renderiza la página de inicio / landing page.
+        Si el usuario ya está autenticado (no público), lo redirige al portal.
+        """
+        if not request.env.user._is_public():
+            return request.redirect('/my')
         valores = {
             'titulo_pagina': 'VitalPet - Clínica Veterinaria',
         }
         return request.render('veterinaria_web.pagina_inicio', valores)
+
 
     # -------------------------------------------------------------------------
     # Página de Servicios
