@@ -82,7 +82,7 @@ if vet:
         'target': 'current',
     }
 else:
-    raise Warning('No tienes un perfil de veterinario asignado.')
+    raise UserError('No tienes un perfil de veterinario asignado.')
             </field>
         </record>
 
