@@ -385,7 +385,7 @@
               name="Veterinaria: /my/security simplificado">
         <t t-call="portal.portal_layout">
             <t t-set="additional_title">Seguridad</t>
-                <t t-set="no_breadcrumbs" t-value="1"/>
+            <t t-set="no_breadcrumbs" t-value="1"/>
             <style>
                 /* VitalPet · Seguridad ================================== */
                 .vp-sec-wrap {
@@ -490,45 +490,45 @@
                     </div>
                     <div class="vp-sec-card-body">
                         <div class="alert alert-success rounded-3 mb-3" role="alert"
-                         t-if="success and success.get('password')">
+                             t-if="success and success.get('password')">
                             <i class="fa fa-check-circle" style="margin-right:6px;"/>
                             ¡Contraseña actualizada correctamente!
                         </div>
                         <div class="alert alert-danger rounded-3 mb-3" role="alert"
-                         t-if="errors and errors.get('password')">
+                             t-if="errors and errors.get('password')">
                             <i class="fa fa-times-circle" style="margin-right:6px;"/>
-                        <t t-esc="errors['password']"/>
-                    </div>
-                    <form action="/my/security" method="post" class="oe_reset_password_form">
-                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                        <input type="hidden" name="op" value="password"/>
+                            <t t-esc="errors['password']"/>
+                        </div>
+                        <form action="/my/security" method="post" class="oe_reset_password_form">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <input type="hidden" name="op" value="password"/>
                             <div class="vp-sec-field mb-3">
                                 <label for="current">Contraseña Actual</label>
                                 <input type="password" class="form-control"
-                                   id="current" name="old"
+                                       id="current" name="old"
                                        autocomplete="current-password" required="required"
                                        placeholder="••••••••"/>
-                        </div>
+                            </div>
                             <div class="row g-3 mb-3">
                                 <div class="col-md-6 vp-sec-field">
                                     <label for="new">Nueva Contraseña</label>
                                     <input type="password" class="form-control"
-                                   id="new" name="new1"
+                                           id="new" name="new1"
                                            autocomplete="new-password" required="required"
                                            placeholder="••••••••"/>
-                        </div>
+                                </div>
                                 <div class="col-md-6 vp-sec-field">
                                     <label for="new2">Confirmar Contraseña</label>
                                     <input type="password" class="form-control"
-                                   id="new2" name="new2"
+                                           id="new2" name="new2"
                                            autocomplete="new-password" required="required"
                                            placeholder="••••••••"/>
-                        </div>
+                                </div>
                             </div>
                             <button type="submit" class="vp-sec-submit">
                                 <i class="fa fa-save" style="margin-right:6px;"/> Guardar Cambios
                             </button>
-                    </form>
+                        </form>
                     </div>
                 </div>
 
@@ -548,20 +548,20 @@
                             Al eliminar tu cuenta se desactivará tu acceso al portal.
                             Toda tu información clínica permanecerá en nuestros registros por razones de salud animal.
                         </p>
-                    <t t-set="deactivate_error" t-value="errors and errors.get('deactivate')"/>
+                        <t t-set="deactivate_error" t-value="errors and errors.get('deactivate')"/>
                         <button class="btn btn-outline-danger rounded-3 fw-semibold"
                                 style="font-size:.88rem;"
                                 data-bs-toggle="modal"
-                            data-bs-target="#portal_deactivate_account_modal">
+                                data-bs-target="#portal_deactivate_account_modal">
                             <i class="fa fa-user-times" style="margin-right:6px;"/> Eliminar mi cuenta
-                    </button>
+                        </button>
                     </div>
                 </div>
             </div>
 
             <!-- Modal Eliminar Cuenta -->
-                    <div t-attf-class="modal #{'show d-block' if open_deactivate_modal else ''}"
-                         id="portal_deactivate_account_modal" tabindex="-1" role="dialog">
+            <div t-attf-class="modal #{'show d-block' if open_deactivate_modal else ''}"
+                 id="portal_deactivate_account_modal" tabindex="-1" role="dialog">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content" style="border-radius:16px;overflow:hidden;border:none;">
                         <div class="modal-header" style="background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border:none;padding:16px 22px;">
@@ -570,12 +570,12 @@
                                 ¿Eliminar cuenta?
                             </h5>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"/>
-                                </div>
-                                <form action="/my/deactivate_account" method="post"
+                        </div>
+                        <form action="/my/deactivate_account" method="post"
                               class="modal-body p-4"
-                                      id="portal_deactivate_account_form">
+                              id="portal_deactivate_account_form">
                             <div class="alert alert-danger rounded-3"
-                                             t-if="deactivate_error == 'other'">
+                                 t-if="deactivate_error == 'other'">
                                 Ha ocurrido un error. Por favor intenta de nuevo.
                             </div>
                             <p style="font-size:.88rem;color:#546e7a;margin-bottom:16px;">
@@ -584,7 +584,7 @@
                             </p>
                             <div class="vp-sec-field mb-3">
                                 <label>1. Ingresa tu contraseña para confirmar</label>
-                                        <input name="password" type="password" required="1"
+                                <input name="password" type="password" required="1"
                                        class="form-control" placeholder="Tu contraseña actual"/>
                             </div>
                             <div class="vp-sec-field mb-2">
@@ -592,21 +592,21 @@
                                     2. Confirma escribiendo tu usuario
                                     (<strong><t t-esc="env.user.login"/></strong>)
                                 </label>
-                                        <input name="validation" type="text" required="1"
+                                <input name="validation" type="text" required="1"
                                        class="form-control"
                                        t-attf-placeholder="#{env.user.login}"/>
-                                    </div>
+                            </div>
                             <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                                </form>
+                        </form>
                         <div class="modal-footer" style="border:none;padding:0 22px 18px;gap:8px;">
                             <input type="submit" class="btn btn-danger rounded-3 fw-semibold"
-                                           form="portal_deactivate_account_form"
+                                   form="portal_deactivate_account_form"
                                    value="Sí, eliminar mi cuenta"/>
                             <button type="button" class="btn btn-light rounded-3"
                                     data-bs-dismiss="modal">Cancelar</button>
-                                </div>
-                            </div>
                         </div>
+                    </div>
+                </div>
             </div>
         </t>
     </template>
@@ -1591,16 +1591,16 @@
             </style>
 
             <div class="vp-apt-wrap">
-            <!-- Header -->
+                <!-- Header -->
                 <div class="d-flex align-items-center justify-content-between mt-3 mb-1 flex-wrap gap-2">
                     <h3 class="m-0 fw-bold" style="color:#0d3b5e;">
                         <i class="fa fa-calendar me-2" style="color:#2E86AB;"/>Mis Citas
                     </h3>
-                <small class="text-muted">
-                    <i class="fa fa-info-circle me-1"/>
+                    <small class="text-muted">
+                        <i class="fa fa-info-circle me-1"/>
                         Puedes añadir observaciones en tus citas programadas.
-                </small>
-            </div>
+                    </small>
+                </div>
 
                 <!-- ── Próximas citas ─────────────────────────────── -->
                 <div class="vp-apt-sec">
@@ -1616,15 +1616,15 @@
                     </t>
                 </div>
 
-            <t t-if="not upcoming">
+                <t t-if="not upcoming">
                     <div class="vp-apt-empty">
                         <i class="fa fa-calendar-o"/>
                         <p>No tienes citas programadas actualmente.</p>
-                </div>
-            </t>
-            <t t-if="upcoming">
+                    </div>
+                </t>
+                <t t-if="upcoming">
                     <div class="d-flex flex-column gap-3">
-                    <t t-foreach="upcoming" t-as="c">
+                        <t t-foreach="upcoming" t-as="c">
                             <div class="vp-apt-card vp-apt-upcoming">
                                 <div class="d-flex">
                                     <!-- Bloque de fecha -->
@@ -1638,80 +1638,80 @@
                                     </div>
                                     <!-- Contenido -->
                                     <div class="flex-1 p-3 p-md-4" style="flex:1; min-width:0;">
-                                <div class="row g-3">
-                                    <div class="col-md-7">
-                                        <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
+                                        <div class="row g-3">
+                                            <div class="col-md-7">
+                                                <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
                                                     <span class="vp-apt-badge vp-badge-prog">
                                                         <i class="fa fa-circle" style="font-size:7px;"/>
-                                                <t t-out="dict(c._fields['estado'].selection).get(c.estado,'')"/>
-                                            </span>
+                                                        <t t-out="dict(c._fields['estado'].selection).get(c.estado,'')"/>
+                                                    </span>
                                                     <t t-if="c.duracion_horas">
-                                            <span class="text-muted small">
+                                                        <span class="text-muted small">
                                                             <i class="fa fa-clock-o me-1"/>
-                                                <t t-out="c.duracion_horas"/> h
-                                            </span>
+                                                            <t t-out="c.duracion_horas"/> h
+                                                        </span>
                                                     </t>
-                                        </div>
-                                        <div class="row g-2">
-                                            <div class="col-6">
+                                                </div>
+                                                <div class="row g-2">
+                                                    <div class="col-6">
                                                         <p class="vp-apt-lbl">Mascota</p>
                                                         <p class="vp-apt-val">
-                                                    <a t-attf-href="/my/pets/#{c.paciente_id.id}"
-                                                       class="text-decoration-none fw-semibold"
+                                                            <a t-attf-href="/my/pets/#{c.paciente_id.id}"
+                                                               class="text-decoration-none fw-semibold"
                                                                style="color:#2E86AB;"
-                                                       t-out="c.paciente_id.name"/>
+                                                               t-out="c.paciente_id.name"/>
                                                         </p>
-                                            </div>
-                                            <div class="col-6">
+                                                    </div>
+                                                    <div class="col-6">
                                                         <p class="vp-apt-lbl">Veterinario</p>
                                                         <p class="vp-apt-val" t-out="c.veterinario_id.name or '-'"/>
-                                            </div>
-                                            <div class="col-6">
+                                                    </div>
+                                                    <div class="col-6">
                                                         <p class="vp-apt-lbl">Servicio</p>
                                                         <p class="vp-apt-val" t-out="c.servicio_id.name or '-'"/>
-                                            </div>
-                                            <div class="col-6">
+                                                    </div>
+                                                    <div class="col-6">
                                                         <p class="vp-apt-lbl">Motivo</p>
                                                         <p class="vp-apt-val" t-out="c.motivo or '-'"/>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
                                             <!-- Observaciones -->
-                                    <div class="col-md-5">
+                                            <div class="col-md-5">
                                                 <div class="vp-apt-obs">
                                                     <p class="vp-apt-lbl mb-2">
-                                                <i class="fa fa-pencil me-1"/>
-                                                Observaciones / nuevos síntomas
+                                                        <i class="fa fa-pencil me-1"/>
+                                                        Observaciones / nuevos síntomas
                                                     </p>
-                                            <t t-if="c.estado == 'programada'">
-                                                <form t-attf-action="/my/appointments/#{c.id}/observations"
-                                                      method="post">
-                                                    <input type="hidden" name="csrf_token"
-                                                           t-att-value="request.csrf_token()"/>
-                                                    <textarea name="observaciones_cliente"
-                                                              class="form-control form-control-sm mb-2"
-                                                              rows="3"
+                                                    <t t-if="c.estado == 'programada'">
+                                                        <form t-attf-action="/my/appointments/#{c.id}/observations"
+                                                              method="post">
+                                                            <input type="hidden" name="csrf_token"
+                                                                   t-att-value="request.csrf_token()"/>
+                                                            <textarea name="observaciones_cliente"
+                                                                      class="form-control form-control-sm mb-2"
+                                                                      rows="3"
                                                                       placeholder="Ej: tiene fiebre, no quiere comer..."><t t-out="obs_upcoming.get(c.id, '')"/></textarea>
-                                                    <button type="submit"
+                                                            <button type="submit"
                                                                     class="btn btn-sm w-100"
                                                                     style="background:#2E86AB; color:#fff; font-weight:600;">
                                                                 <i class="fa fa-save me-1"/>Guardar
-                                                    </button>
-                                                </form>
-                                            </t>
-                                            <t t-else="">
+                                                            </button>
+                                                        </form>
+                                                    </t>
+                                                    <t t-else="">
                                                         <p class="small text-muted fst-italic mb-0"
                                                            t-out="obs_upcoming.get(c.id,'') or 'Sin observaciones.'"/>
-                                            </t>
+                                                    </t>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                            </div>
-                    </t>
-                </div>
-            </t>
+                        </t>
+                    </div>
+                </t>
 
                 <!-- ── Historial de citas ─────────────────────────── -->
                 <div class="vp-apt-sec">
@@ -1727,13 +1727,13 @@
                     </t>
                 </div>
 
-            <t t-if="not past">
+                <t t-if="not past">
                     <div class="vp-apt-empty">
                         <i class="fa fa-history"/>
                         <p>Sin citas pasadas registradas.</p>
                     </div>
-            </t>
-            <t t-if="past">
+                </t>
+                <t t-if="past">
                     <div class="d-flex flex-column gap-3 pb-5">
                         <t t-foreach="past" t-as="c">
                             <t t-set="apt_class"
@@ -1755,23 +1755,23 @@
                                         <div class="d-flex align-items-start justify-content-between gap-2 flex-wrap mb-3">
                                             <div class="d-flex align-items-center gap-2 flex-wrap">
                                                 <!-- Badge de estado con color -->
-                                    <t t-if="c.estado == 'completada'">
+                                                <t t-if="c.estado == 'completada'">
                                                     <span class="vp-apt-badge vp-badge-done">
                                                         <i class="fa fa-check-circle" style="font-size:10px;"/>
                                                         <t t-out="dict(c._fields['estado'].selection).get(c.estado,'')"/>
                                                     </span>
-                                    </t>
+                                                </t>
                                                 <t t-elif="c.estado in ('cancelada','no_asistio')">
                                                     <span class="vp-apt-badge vp-badge-cancel">
                                                         <i class="fa fa-times-circle" style="font-size:10px;"/>
                                                         <t t-out="dict(c._fields['estado'].selection).get(c.estado,'')"/>
                                                     </span>
-                                    </t>
-                                    <t t-else="">
+                                                </t>
+                                                <t t-else="">
                                                     <span class="vp-apt-badge vp-badge-other">
                                                         <t t-out="dict(c._fields['estado'].selection).get(c.estado,'')"/>
                                                     </span>
-                                    </t>
+                                                </t>
                                             </div>
                                         </div>
                                         <div class="row g-2">
@@ -1801,8 +1801,8 @@
                                             <div class="vp-apt-obs-ro">
                                                 <i class="fa fa-comment-o me-1"/>
                                                 <t t-out="obs_past.get(c.id)"/>
-                </div>
-            </t>
+                                            </div>
+                                        </t>
                                     </div>
                                 </div>
                             </div>
@@ -2022,7 +2022,7 @@
                         </div>
                     </div>
                 </t>
-            <t t-if="not historias">
+                <t t-if="not historias">
                     <div class="vp-hc-page-hdr">
                         <div>
                             <h3><i class="fa fa-heartbeat" style="margin-right:8px;"/>Historia Clínica</h3>
@@ -2038,7 +2038,7 @@
                 </t>
 
                 <!-- ── Historia card per pet ── -->
-                    <t t-foreach="historias" t-as="h">
+                <t t-foreach="historias" t-as="h">
                     <div class="vp-hc-card">
                         <!-- Card Header -->
                         <div class="vp-hc-card-hdr">
@@ -2139,8 +2139,8 @@
                                         </span>
                                     </t>
                                 </button>
-                                            </li>
-                                        </ul>
+                            </li>
+                        </ul>
 
                         <!-- Tab Content -->
                         <div class="tab-content vp-hc-tab-content">
@@ -2259,8 +2259,8 @@
 
                             <!-- ── Recetas ── -->
                             <div t-attf-id="vp-hc-rx-#{h.id}" class="tab-pane fade" role="tabpanel">
-                                    <t t-if="h.receta_ids">
-                                            <t t-foreach="h.receta_ids" t-as="r">
+                                <t t-if="h.receta_ids">
+                                    <t t-foreach="h.receta_ids" t-as="r">
                                         <div class="vp-hc-rx">
                                             <div class="vp-hc-rx-hdr">
                                                 <span class="vp-hc-rx-ref">
@@ -2303,32 +2303,32 @@
                                                             <span class="vp-hc-rx-med-pos">
                                                                 <t t-out="l.dosis"/> ud ·
                                                                 c/<t t-out="l.frecuencia_horas"/>h ·
-                                                            <t t-out="l.duracion_dias"/> días
+                                                                <t t-out="l.duracion_dias"/> días
                                                             </span>
-                                                </li>
+                                                        </li>
+                                                    </t>
+                                                </ul>
                                             </t>
-                                        </ul>
-                                    </t>
                                             <t t-if="r.instrucciones_generales">
                                                 <div style="font-size:.8rem;color:#546e7a;margin-top:8px;border-left:3px solid #f4951e;padding-left:8px;">
                                                     <i class="fa fa-info-circle" style="margin-right:3px;color:#f4951e;"/>
                                                     <t t-out="r.instrucciones_generales"/>
-                                </div>
+                                                </div>
                                             </t>
-                            </div>
+                                        </div>
                                     </t>
                                 </t>
                                 <t t-else="">
                                     <div class="vp-hc-tab-empty">
                                         <i class="fa fa-file-text-o"/>
                                         Sin recetas emitidas aún
-                        </div>
-                    </t>
-                </div>
+                                    </div>
+                                </t>
+                            </div>
 
                         </div><!-- /tab-content -->
                     </div><!-- /vp-hc-card -->
-            </t>
+                </t>
             </div><!-- /vp-hc-wrap -->
         </t>
     </template>
@@ -2514,12 +2514,12 @@
                         <span class="badge rounded-pill px-3 py-2"
                               style="background:#2E86AB; font-size:13px;">
                             <t t-out="len(recetas)"/> receta<t t-if="len(recetas) != 1">s</t>
-                    </span>
+                        </span>
                     </t>
-            </div>
+                </div>
 
                 <!-- Empty -->
-            <t t-if="not recetas">
+                <t t-if="not recetas">
                     <div class="vp-rx-empty">
                         <i class="fa fa-file-text-o"/>
                         <h5 class="fw-bold mb-2" style="color:#0d3b5e;">
@@ -2528,14 +2528,14 @@
                         <p class="text-muted small mb-0">
                             Cuando tu veterinario emita una receta durante una consulta, aparecerá aquí.
                         </p>
-                </div>
-            </t>
+                    </div>
+                </t>
 
                 <!-- Listado de hojas de receta -->
-            <t t-if="recetas">
+                <t t-if="recetas">
                     <div class="d-flex flex-column gap-4 pb-5">
-                    <t t-foreach="recetas" t-as="r">
-                        <t t-set="rx_status" t-value="receta_status.get(r.id, 'activa')"/>
+                        <t t-foreach="recetas" t-as="r">
+                            <t t-set="rx_status" t-value="receta_status.get(r.id, 'activa')"/>
                             <div class="vp-script">
                                 <!-- Encabezado de clínica -->
                                 <div class="vp-script-clinic">
@@ -2547,30 +2547,30 @@
                                         <div class="vp-script-clinic-sub">
                                             Documento oficial de prescripción veterinaria
                                         </div>
-                                </div>
-                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2 flex-wrap">
                                         <span class="vp-script-num">
                                             <i class="fa fa-hashtag me-1"/>
                                             <t t-out="r.name"/>
-                                    </span>
+                                        </span>
                                         <!-- Estado de la receta -->
-                                    <t t-if="rx_status == 'facturada'">
+                                        <t t-if="rx_status == 'facturada'">
                                             <span class="vp-rx-status vp-rx-s-billed">
                                                 <i class="fa fa-check-circle"/>Facturada
-                                        </span>
-                                    </t>
-                                    <t t-elif="rx_status == 'terminada'">
+                                            </span>
+                                        </t>
+                                        <t t-elif="rx_status == 'terminada'">
                                             <span class="vp-rx-status vp-rx-s-ended">
                                                 <i class="fa fa-calendar-check-o"/>Tratamiento concluido
-                                        </span>
-                                    </t>
-                                    <t t-else="">
+                                            </span>
+                                        </t>
+                                        <t t-else="">
                                             <span class="vp-rx-status vp-rx-s-active">
                                                 <i class="fa fa-heartbeat"/>En tratamiento
-                                        </span>
-                                    </t>
+                                            </span>
+                                        </t>
+                                    </div>
                                 </div>
-                            </div>
 
                                 <!-- Cuerpo -->
                                 <div class="vp-script-body">
@@ -2603,17 +2603,17 @@
                                     </div>
 
                                     <!-- Símbolo Rx + diagnóstico -->
-                                <t t-if="r.diagnostico">
+                                    <t t-if="r.diagnostico">
                                         <div class="vp-script-diag">
                                             <p class="vp-script-diag-lbl">
                                                 <i class="fa fa-stethoscope me-1"/>Diagnóstico
                                             </p>
                                             <p class="vp-script-diag-val" t-out="r.diagnostico"/>
-                                    </div>
-                                </t>
+                                        </div>
+                                    </t>
 
                                     <!-- Medicamentos -->
-                                <t t-if="r.linea_ids">
+                                    <t t-if="r.linea_ids">
                                         <div class="vp-script-meds">
                                             <p class="vp-script-meds-lbl">
                                                 <span class="vp-rx-symbol">℞</span>
@@ -2644,7 +2644,7 @@
                                                             </span>
                                                             <span class="vp-med-pos-item">
                                                                 <i class="fa fa-calendar"/>
-                                                        <t t-out="l.duracion_dias"/> días
+                                                                <t t-out="l.duracion_dias"/> días
                                                             </span>
                                                         </div>
                                                     </div>
@@ -2655,23 +2655,23 @@
                                                     </t>
                                                 </div>
                                             </t>
-                                    </div>
-                                </t>
+                                        </div>
+                                    </t>
 
                                     <!-- Indicaciones -->
-                                <t t-if="r.observaciones_adicionales or r.instrucciones_generales">
+                                    <t t-if="r.observaciones_adicionales or r.instrucciones_generales">
                                         <div class="vp-script-notes">
                                             <p class="vp-script-notes-lbl">
                                                 <i class="fa fa-info-circle me-1"/>Indicaciones de uso
                                             </p>
-                                        <t t-if="r.instrucciones_generales">
+                                            <t t-if="r.instrucciones_generales">
                                                 <p><strong>Instrucciones:</strong> <t t-out="r.instrucciones_generales"/></p>
-                                        </t>
-                                        <t t-if="r.observaciones_adicionales">
+                                            </t>
+                                            <t t-if="r.observaciones_adicionales">
                                                 <p><strong>Observaciones:</strong> <t t-out="r.observaciones_adicionales"/></p>
-                                        </t>
-                                    </div>
-                                </t>
+                                            </t>
+                                        </div>
+                                    </t>
 
                                     <!-- Firma -->
                                     <div class="vp-script-footer">
@@ -2680,15 +2680,15 @@
                                             <div class="vp-script-sig-name"
                                                  t-out="r.veterinario_id.name or 'Médico Veterinario'"/>
                                             <div class="vp-script-sig-sub">Firma del veterinario</div>
-                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <!-- Borde picado al pie -->
                                 <div class="vp-script-tear"/>
-                        </div>
-                    </t>
-                </div>
-            </t>
+                            </div>
+                        </t>
+                    </div>
+                </t>
             </div>
         </t>
     </template>
@@ -2807,12 +2807,12 @@
                                   style="background:#546e7a; font-size:12px;">
                                 <t t-out="len(facturas)"/> en total
                             </span>
-            </div>
+                        </div>
                     </t>
                 </div>
 
                 <!-- Empty -->
-            <t t-if="not facturas">
+                <t t-if="not facturas">
                     <div class="vp-inv-empty">
                         <i class="fa fa-file-text-o"/>
                         <h5 class="fw-bold mb-2" style="color:#0d3b5e;">
@@ -2821,17 +2821,17 @@
                         <p class="text-muted small mb-0">
                             Tus facturas veterinarias aparecerán aquí cuando sean emitidas.
                         </p>
-                </div>
-            </t>
+                    </div>
+                </t>
 
                 <!-- Grid de cards -->
-            <t t-if="facturas">
+                <t t-if="facturas">
                     <div class="row g-3 pb-5">
-                    <t t-foreach="facturas" t-as="f">
+                        <t t-foreach="facturas" t-as="f">
                             <div class="col-md-6 col-xl-4">
                                 <div class="vp-inv-card">
                                     <!-- Franja de color -->
-                                            <t t-if="f.pagado">
+                                    <t t-if="f.pagado">
                                         <div class="vp-inv-stripe vp-stripe-paid"/>
                                     </t>
                                     <t t-elif="f.estado == 'validado' and not f.pagado">
@@ -2879,13 +2879,13 @@
 
                                         <!-- Info -->
                                         <div class="vp-inv-info mb-2">
-                                        <t t-set="mascotas" t-value="f.linea_ids.mapped('cita_id.paciente_id.name')"/>
+                                            <t t-set="mascotas" t-value="f.linea_ids.mapped('cita_id.paciente_id.name')"/>
                                             <div class="vp-inv-info-row">
                                                 <i class="fa fa-paw"/>
-                                        <t t-if="mascotas">
-                                            <t t-out="', '.join([m for m in mascotas if m])"/>
-                                        </t>
-                                        <t t-else="">Sin mascotas asociadas</t>
+                                                <t t-if="mascotas">
+                                                    <t t-out="', '.join([m for m in mascotas if m])"/>
+                                                </t>
+                                                <t t-else="">Sin mascotas asociadas</t>
                                             </div>
                                             <div class="vp-inv-info-row">
                                                 <i class="fa fa-list-ol"/>
@@ -2897,7 +2897,7 @@
                                         <div class="vp-inv-amount-wrap">
                                             <p class="vp-inv-amount-lbl">Total a pagar</p>
                                             <p class="vp-inv-amount-val">
-                                            $<t t-out="'%.2f' % (f.total or 0)"/>
+                                                $<t t-out="'%.2f' % (f.total or 0)"/>
                                             </p>
                                         </div>
                                     </div>
@@ -2905,34 +2905,34 @@
                                     <!-- Botones -->
                                     <div class="vp-inv-footer">
                                         <div class="vp-inv-btns">
-                                        <a t-attf-href="/my/invoices_vet/#{f.id}"
+                                            <a t-attf-href="/my/invoices_vet/#{f.id}"
                                                class="vp-inv-btn vp-inv-btn-solid">
                                                 <i class="fa fa-eye"/>Ver detalle
-                                        </a>
-                                        <a t-attf-href="/my/invoices_vet/#{f.id}/pdf"
+                                            </a>
+                                            <a t-attf-href="/my/invoices_vet/#{f.id}/pdf"
                                                class="vp-inv-btn vp-inv-btn-outline">
                                                 <i class="fa fa-file-pdf-o"/>PDF
-                                        </a>
-                                        <t t-if="f.estado == 'validado' and not f.pagado and f.total &gt; 0">
+                                            </a>
+                                            <t t-if="f.estado == 'validado' and not f.pagado and f.total &gt; 0">
                                                 <form t-attf-action="/my/invoices_vet/#{f.id}/pay" method="post"
                                                       style="grid-column:1/-1;">
                                                     <input type="hidden" name="csrf_token"
                                                            t-att-value="request.csrf_token()"/>
                                                     <button type="submit"
                                                             class="vp-inv-btn vp-inv-btn-pp w-100">
-                                                    <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg"
+                                                        <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg"
                                                              alt="PayPal" style="height:15px; vertical-align:middle;"/>
-                                                    Pagar con PayPal
-                                                </button>
-                                            </form>
-                                        </t>
+                                                        Pagar con PayPal
+                                                    </button>
+                                                </form>
+                                            </t>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </t>
-                </div>
-            </t>
+                        </t>
+                    </div>
+                </t>
             </div>
         </t>
     </template>
@@ -3196,6 +3196,626 @@
                     <i class="fa fa-arrow-left me-1"/> Volver al listado
                 </a>
             </div>
+        </t>
+    </template>
+
+    <!-- =====================================================
+         /my/guia — Guía de Uso del Portal (VitalPet)
+         ===================================================== -->
+    <template id="portal_my_guide" name="Guía de Uso">
+        <t t-call="portal.portal_layout">
+            <style>
+                /* VitalPet · Guía de Uso ==================================== */
+                .vp-guide-wrap {
+                    font-family: 'Inter','Segoe UI',sans-serif;
+                    padding-bottom: 48px;
+                }
+
+                /* ── Hero ── */
+                .vp-guide-hero {
+                    background: linear-gradient(135deg, #0d3b5e 0%, #00b4d8 100%);
+                    border-radius: 18px; padding: 28px 32px;
+                    color: #fff; margin-bottom: 28px;
+                    display: flex; align-items: center; gap: 24px;
+                    position: relative; overflow: hidden;
+                }
+                .vp-guide-hero::after {
+                    content: ''; position: absolute; right: -20px; top: -20px;
+                    width: 160px; height: 160px; border-radius: 50%;
+                    background: rgba(255,255,255,.07);
+                }
+                .vp-guide-hero::before {
+                    content: ''; position: absolute; right: 50px; bottom: -40px;
+                    width: 120px; height: 120px; border-radius: 50%;
+                    background: rgba(255,255,255,.05);
+                }
+                .vp-guide-hero-icon {
+                    width: 68px; height: 68px; border-radius: 18px;
+                    background: rgba(255,255,255,.18);
+                    display: flex; align-items: center; justify-content: center;
+                    font-size: 1.8rem; flex-shrink: 0;
+                }
+                .vp-guide-hero h2 { font-size: 1.35rem; font-weight: 700; margin: 0 0 5px; }
+                .vp-guide-hero p  { font-size: .88rem; opacity: .8; margin: 0 0 14px; }
+                .vp-guide-quick-links {
+                    display: flex; gap: 8px; flex-wrap: wrap;
+                }
+                .vp-guide-qlink {
+                    display: inline-flex; align-items: center; gap: 5px;
+                    background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.3);
+                    border-radius: 20px; padding: 4px 12px;
+                    font-size: .75rem; font-weight: 600; color: #fff;
+                    text-decoration: none; transition: background .15s;
+                }
+                .vp-guide-qlink:hover { background: rgba(255,255,255,.28); color: #fff; text-decoration: none; }
+
+                /* ── Quick start steps ── */
+                .vp-guide-qs {
+                    background: #f7fbfe; border-radius: 14px;
+                    border: 1px solid #e4eef5; padding: 20px 24px;
+                    margin-bottom: 28px;
+                }
+                .vp-guide-qs-title {
+                    font-size: .75rem; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: .07em; color: #8e9fb0; margin-bottom: 14px;
+                    display: flex; align-items: center; gap: 8px;
+                }
+                .vp-guide-qs-title::after { content: ''; flex: 1; height: 1px; background: #e4eef5; }
+                .vp-guide-steps { display: flex; gap: 16px; flex-wrap: wrap; }
+                .vp-guide-step {
+                    flex: 1; min-width: 160px;
+                    display: flex; align-items: flex-start; gap: 10px;
+                }
+                .vp-guide-step-num {
+                    width: 28px; height: 28px; border-radius: 50%;
+                    background: linear-gradient(135deg, #0d3b5e, #2E86AB);
+                    color: #fff; font-size: .75rem; font-weight: 700;
+                    display: flex; align-items: center; justify-content: center;
+                    flex-shrink: 0; margin-top: 2px;
+                }
+                .vp-guide-step-text { font-size: .85rem; color: #2c3e50; line-height: 1.45; }
+                .vp-guide-step-text strong { color: #0d3b5e; display: block; margin-bottom: 2px; }
+
+                /* ── Section cards ── */
+                .vp-guide-section-label {
+                    font-size: .73rem; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: .07em; color: #8e9fb0;
+                    margin: 24px 0 14px; display: flex; align-items: center; gap: 8px;
+                }
+                .vp-guide-section-label::after { content: ''; flex: 1; height: 1px; background: #e4eef5; }
+
+                .vp-guide-card {
+                    background: #fff; border-radius: 14px;
+                    border: 1px solid #e4eef5;
+                    box-shadow: 0 2px 10px rgba(46,134,171,.06);
+                    overflow: hidden; height: 100%;
+                    display: flex; flex-direction: column;
+                }
+                .vp-guide-card-hdr {
+                    padding: 14px 18px 12px;
+                    display: flex; align-items: center; gap: 12px;
+                    border-bottom: 1px solid #f0f4f8;
+                }
+                .vp-guide-card-icon {
+                    width: 40px; height: 40px; border-radius: 11px;
+                    display: flex; align-items: center; justify-content: center;
+                    font-size: .95rem; color: #fff; flex-shrink: 0;
+                }
+                .vp-guide-card-hdr-text h6 {
+                    font-size: .93rem; font-weight: 700; color: #0d3b5e; margin: 0 0 2px;
+                }
+                .vp-guide-card-hdr-text p {
+                    font-size: .76rem; color: #8e9fb0; margin: 0;
+                }
+                .vp-guide-card-body { padding: 16px 18px; flex: 1; }
+                .vp-guide-can-label {
+                    font-size: .7rem; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: .05em; color: #8e9fb0; margin-bottom: 7px;
+                }
+                .vp-guide-can-list { list-style: none; padding: 0; margin: 0 0 14px; }
+                .vp-guide-can-list li {
+                    display: flex; align-items: flex-start; gap: 7px;
+                    font-size: .83rem; color: #2c3e50; padding: 3px 0;
+                    line-height: 1.4;
+                }
+                .vp-guide-can-list li i {
+                    color: #27ae60; font-size: .7rem; margin-top: 4px; flex-shrink: 0;
+                }
+                .vp-guide-how-label {
+                    font-size: .7rem; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: .05em; color: #8e9fb0; margin-bottom: 7px;
+                }
+                .vp-guide-how-list { list-style: none; padding: 0; margin: 0; counter-reset: step-c; }
+                .vp-guide-how-list li {
+                    display: flex; align-items: flex-start; gap: 8px;
+                    font-size: .82rem; color: #546e7a; padding: 3px 0;
+                    line-height: 1.4; counter-increment: step-c;
+                }
+                .vp-guide-how-list li::before {
+                    content: counter(step-c);
+                    width: 18px; height: 18px; border-radius: 50%;
+                    background: #e8f4fb; color: #2E86AB;
+                    font-size: .68rem; font-weight: 700;
+                    display: inline-flex; align-items: center; justify-content: center;
+                    flex-shrink: 0; margin-top: 2px;
+                }
+                .vp-guide-card-footer {
+                    padding: 12px 18px;
+                    border-top: 1px solid #f0f4f8;
+                    background: #fafcff;
+                }
+                .vp-guide-go-btn {
+                    display: inline-flex; align-items: center; gap: 6px;
+                    font-size: .82rem; font-weight: 600;
+                    padding: 7px 16px; border-radius: 8px; text-decoration: none;
+                    transition: opacity .15s;
+                }
+                .vp-guide-go-btn:hover { opacity: .85; text-decoration: none; }
+
+                /* ── Tip box ── */
+                .vp-guide-tip {
+                    display: flex; align-items: flex-start; gap: 8px;
+                    background: #fffbec; border: 1px solid #ffe083;
+                    border-radius: 8px; padding: 9px 12px;
+                    font-size: .78rem; color: #7a5c00; margin-top: 10px;
+                }
+                .vp-guide-tip i { color: #f4951e; margin-top: 2px; flex-shrink: 0; }
+
+                /* ── FAQ accordion ── */
+                .vp-guide-faq-item {
+                    background: #fff; border: 1px solid #e4eef5;
+                    border-radius: 10px; margin-bottom: 8px; overflow: hidden;
+                }
+                .vp-guide-faq-btn {
+                    width: 100%; background: none; border: none; text-align: left;
+                    padding: 14px 18px; font-size: .88rem; font-weight: 600;
+                    color: #0d3b5e; cursor: pointer;
+                    display: flex; align-items: center; justify-content: space-between;
+                    gap: 8px; transition: background .15s;
+                }
+                .vp-guide-faq-btn:hover { background: #f7fbfe; }
+                .vp-guide-faq-btn i.fa-chevron { transition: transform .2s; }
+                .vp-guide-faq-body {
+                    padding: 0 18px 14px;
+                    font-size: .83rem; color: #546e7a; line-height: 1.55;
+                }
+            </style>
+
+            <div class="vp-guide-wrap">
+
+                <!-- ── Hero ── -->
+                <div class="vp-guide-hero">
+                    <div class="vp-guide-hero-icon"><i class="fa fa-compass"/></div>
+                    <div style="z-index:1;">
+                        <h2>Guía de Uso del Portal</h2>
+                        <p>Todo lo que necesitas saber para gestionar la salud de tus mascotas en VitalPet</p>
+                        <div class="vp-guide-quick-links">
+                            <a href="/my/pets"           class="vp-guide-qlink"><i class="fa fa-paw"/> Mascotas</a>
+                            <a href="/my/appointments"   class="vp-guide-qlink"><i class="fa fa-calendar"/> Citas</a>
+                            <a href="/my/medical_records" class="vp-guide-qlink"><i class="fa fa-stethoscope"/> Historia</a>
+                            <a href="/my/prescriptions"  class="vp-guide-qlink"><i class="fa fa-medkit"/> Recetas</a>
+                            <a href="/my/invoices_vet"   class="vp-guide-qlink"><i class="fa fa-file-text-o"/> Facturas</a>
+                            <a href="/my/account"        class="vp-guide-qlink"><i class="fa fa-user-circle"/> Perfil</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Primeros Pasos ── -->
+                <div class="vp-guide-qs">
+                    <div class="vp-guide-qs-title">Primeros Pasos</div>
+                    <div class="vp-guide-steps">
+                        <div class="vp-guide-step">
+                            <div class="vp-guide-step-num">1</div>
+                            <div class="vp-guide-step-text">
+                                <strong>Completa tu perfil</strong>
+                                Ve a <em>Mi Perfil</em> y actualiza tu foto, teléfono y dirección para que podamos contactarte fácilmente.
+                            </div>
+                        </div>
+                        <div class="vp-guide-step">
+                            <div class="vp-guide-step-num">2</div>
+                            <div class="vp-guide-step-text">
+                                <strong>Conoce a tus mascotas</strong>
+                                En <em>Mis Mascotas</em> encontrarás la ficha completa de cada uno: vacunas, historia clínica y recetas.
+                            </div>
+                        </div>
+                        <div class="vp-guide-step">
+                            <div class="vp-guide-step-num">3</div>
+                            <div class="vp-guide-step-text">
+                                <strong>Revisa tus citas</strong>
+                                Consulta en <em>Mis Citas</em> las próximas visitas y agrega observaciones al veterinario antes de cada consulta.
+                            </div>
+                        </div>
+                        <div class="vp-guide-step">
+                            <div class="vp-guide-step-num">4</div>
+                            <div class="vp-guide-step-text">
+                                <strong>Gestiona tus facturas</strong>
+                                En <em>Mis Facturas</em> puedes descargar comprobantes en PDF y pagar en línea con PayPal desde cualquier dispositivo.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Sección: Atención Clínica ── -->
+                <div class="vp-guide-section-label">Atención Clínica</div>
+                <div class="row g-3 mb-2">
+
+                    <!-- Mis Mascotas -->
+                    <div class="col-md-6 col-lg-4">
+                        <div class="vp-guide-card">
+                            <div class="vp-guide-card-hdr">
+                                <div class="vp-guide-card-icon" style="background:#2E86AB;">
+                                    <i class="fa fa-paw"/>
+                                </div>
+                                <div class="vp-guide-card-hdr-text">
+                                    <h6>Mis Mascotas</h6>
+                                    <p>Ficha completa de cada mascota</p>
+                                </div>
+                            </div>
+                            <div class="vp-guide-card-body">
+                                <div class="vp-guide-can-label">Qué puedes ver</div>
+                                <ul class="vp-guide-can-list">
+                                    <li><i class="fa fa-check-circle"/> Lista de todas tus mascotas registradas</li>
+                                    <li><i class="fa fa-check-circle"/> Información: especie, raza, fecha de nacimiento, peso</li>
+                                    <li><i class="fa fa-check-circle"/> Historial completo de vacunas con estado al día / atrasado</li>
+                                    <li><i class="fa fa-check-circle"/> Historia clínica, recetas y consultas vinculadas</li>
+                                </ul>
+                                <div class="vp-guide-how-label">Cómo usarlo</div>
+                                <ol class="vp-guide-how-list">
+                                    <li>Haz clic en una tarjeta de mascota para abrir su ficha detallada</li>
+                                    <li>Usa las pestañas <strong>Información / Vacunas / Historia / Recetas</strong> para navegar</li>
+                                    <li>Para subir una foto, haz clic en "Cambiar foto" dentro del detalle</li>
+                                    <li>Para descargar el carnet de vacunas en PDF, haz clic en el botón azul "Descargar Carnet"</li>
+                                </ol>
+                                <div class="vp-guide-tip">
+                                    <i class="fa fa-lightbulb-o"/>
+                                    El badge de color en cada tarjeta indica el estado de vacunación de tu mascota.
+                                </div>
+                            </div>
+                            <div class="vp-guide-card-footer">
+                                <a href="/my/pets" class="vp-guide-go-btn"
+                                   style="background:#2E86AB;color:#fff;">
+                                    <i class="fa fa-arrow-right"/> Ir a Mis Mascotas
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mis Citas -->
+                    <div class="col-md-6 col-lg-4">
+                        <div class="vp-guide-card">
+                            <div class="vp-guide-card-hdr">
+                                <div class="vp-guide-card-icon" style="background:#06A77D;">
+                                    <i class="fa fa-calendar"/>
+                                </div>
+                                <div class="vp-guide-card-hdr-text">
+                                    <h6>Mis Citas</h6>
+                                    <p>Próximas y pasadas consultas</p>
+                                </div>
+                            </div>
+                            <div class="vp-guide-card-body">
+                                <div class="vp-guide-can-label">Qué puedes ver</div>
+                                <ul class="vp-guide-can-list">
+                                    <li><i class="fa fa-check-circle"/> Citas próximas ordenadas por fecha</li>
+                                    <li><i class="fa fa-check-circle"/> Historial de citas pasadas con estado color-codificado</li>
+                                    <li><i class="fa fa-check-circle"/> Veterinario, servicio y motivo de cada consulta</li>
+                                    <li><i class="fa fa-check-circle"/> Observaciones propias enviadas al veterinario</li>
+                                </ul>
+                                <div class="vp-guide-how-label">Cómo usarlo</div>
+                                <ol class="vp-guide-how-list">
+                                    <li>Las <strong>citas próximas</strong> aparecen en la parte superior con borde azul</li>
+                                    <li>Para agregar una observación, escribe en el campo de texto de la cita y guarda</li>
+                                    <li>El color del borde izquierdo indica el estado: azul = programada, verde = completada, rojo = cancelada</li>
+                                    <li>Las citas pasadas se muestran más abajo, separadas por sección</li>
+                                </ol>
+                                <div class="vp-guide-tip">
+                                    <i class="fa fa-lightbulb-o"/>
+                                    Puedes dejar notas de síntomas para que el veterinario las revise antes de la consulta.
+                                </div>
+                            </div>
+                            <div class="vp-guide-card-footer">
+                                <a href="/my/appointments" class="vp-guide-go-btn"
+                                   style="background:#06A77D;color:#fff;">
+                                    <i class="fa fa-arrow-right"/> Ir a Mis Citas
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Historia Clínica -->
+                    <div class="col-md-6 col-lg-4">
+                        <div class="vp-guide-card">
+                            <div class="vp-guide-card-hdr">
+                                <div class="vp-guide-card-icon" style="background:#7b5ea7;">
+                                    <i class="fa fa-stethoscope"/>
+                                </div>
+                                <div class="vp-guide-card-hdr-text">
+                                    <h6>Historia Clínica</h6>
+                                    <p>Expediente médico completo</p>
+                                </div>
+                            </div>
+                            <div class="vp-guide-card-body">
+                                <div class="vp-guide-can-label">Qué puedes ver</div>
+                                <ul class="vp-guide-can-list">
+                                    <li><i class="fa fa-check-circle"/> Expediente médico de cada mascota en una sola vista</li>
+                                    <li><i class="fa fa-check-circle"/> Tipo de sangre, peso, alergias y condiciones crónicas</li>
+                                    <li><i class="fa fa-check-circle"/> Línea de tiempo de todas las consultas con diagnóstico</li>
+                                    <li><i class="fa fa-check-circle"/> Recetas emitidas con medicamentos y dosis</li>
+                                </ul>
+                                <div class="vp-guide-how-label">Cómo usarlo</div>
+                                <ol class="vp-guide-how-list">
+                                    <li>Cada mascota tiene su propia tarjeta de historia clínica</li>
+                                    <li>Haz clic en la pestaña <strong>Información Médica</strong> para ver datos de salud</li>
+                                    <li>Ve a la pestaña <strong>Consultas</strong> para ver el historial de visitas</li>
+                                    <li>En la pestaña <strong>Recetas</strong> encuentras los medicamentos recetados</li>
+                                </ol>
+                                <div class="vp-guide-tip">
+                                    <i class="fa fa-lightbulb-o"/>
+                                    La historia clínica se crea automáticamente cuando se registra la primera cita.
+                                </div>
+                            </div>
+                            <div class="vp-guide-card-footer">
+                                <a href="/my/medical_records" class="vp-guide-go-btn"
+                                   style="background:#7b5ea7;color:#fff;">
+                                    <i class="fa fa-arrow-right"/> Ir a Historia Clínica
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recetas Médicas -->
+                    <div class="col-md-6 col-lg-4">
+                        <div class="vp-guide-card">
+                            <div class="vp-guide-card-hdr">
+                                <div class="vp-guide-card-icon" style="background:#e8567a;">
+                                    <i class="fa fa-medkit"/>
+                                </div>
+                                <div class="vp-guide-card-hdr-text">
+                                    <h6>Recetas Médicas</h6>
+                                    <p>Prescripciones del veterinario</p>
+                                </div>
+                            </div>
+                            <div class="vp-guide-card-body">
+                                <div class="vp-guide-can-label">Qué puedes ver</div>
+                                <ul class="vp-guide-can-list">
+                                    <li><i class="fa fa-check-circle"/> Todas las recetas emitidas en formato médico</li>
+                                    <li><i class="fa fa-check-circle"/> Diagnóstico e instrucciones del veterinario</li>
+                                    <li><i class="fa fa-check-circle"/> Lista de medicamentos con dosis, frecuencia y duración</li>
+                                    <li><i class="fa fa-check-circle"/> Estado de cada receta: borrador o finalizada</li>
+                                </ul>
+                                <div class="vp-guide-how-label">Cómo usarlo</div>
+                                <ol class="vp-guide-how-list">
+                                    <li>Cada receta muestra un número de referencia y la fecha de emisión</li>
+                                    <li>El símbolo <strong>℞</strong> precede la lista de medicamentos de cada prescripción</li>
+                                    <li>Las fichas de posología muestran: dosis, frecuencia y días de tratamiento</li>
+                                    <li>Las instrucciones adicionales aparecen con borde ámbar al pie de la receta</li>
+                                </ol>
+                                <div class="vp-guide-tip">
+                                    <i class="fa fa-lightbulb-o"/>
+                                    Solo las recetas en estado "Finalizada" son oficiales y han sido revisadas por el veterinario.
+                                </div>
+                            </div>
+                            <div class="vp-guide-card-footer">
+                                <a href="/my/prescriptions" class="vp-guide-go-btn"
+                                   style="background:#e8567a;color:#fff;">
+                                    <i class="fa fa-arrow-right"/> Ir a Recetas
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mis Facturas -->
+                    <div class="col-md-6 col-lg-4">
+                        <div class="vp-guide-card">
+                            <div class="vp-guide-card-hdr">
+                                <div class="vp-guide-card-icon" style="background:#f4951e;">
+                                    <i class="fa fa-file-text-o"/>
+                                </div>
+                                <div class="vp-guide-card-hdr-text">
+                                    <h6>Mis Facturas</h6>
+                                    <p>Pagos y comprobantes veterinarios</p>
+                                </div>
+                            </div>
+                            <div class="vp-guide-card-body">
+                                <div class="vp-guide-can-label">Qué puedes ver</div>
+                                <ul class="vp-guide-can-list">
+                                    <li><i class="fa fa-check-circle"/> Todas tus facturas con estado: pagada, pendiente, cancelada</li>
+                                    <li><i class="fa fa-check-circle"/> Monto total de cada factura con banda de color por estado</li>
+                                    <li><i class="fa fa-check-circle"/> Detalle de servicios: fecha, mascota, veterinario, líneas</li>
+                                    <li><i class="fa fa-check-circle"/> Pago en línea con PayPal y descarga de PDF</li>
+                                </ul>
+                                <div class="vp-guide-how-label">Cómo usarlo</div>
+                                <ol class="vp-guide-how-list">
+                                    <li>Las facturas con borde verde están pagadas; naranja indica pendiente de pago</li>
+                                    <li>Haz clic en <strong>Ver detalle</strong> para ver el desglose completo de servicios</li>
+                                    <li>Usa el botón <strong>PDF</strong> para descargar el comprobante en formato PDF</li>
+                                    <li>Si la factura está pendiente, el botón <strong>Pagar con PayPal</strong> te redirige al pago seguro</li>
+                                </ol>
+                                <div class="vp-guide-tip">
+                                    <i class="fa fa-lightbulb-o"/>
+                                    El botón de pago con PayPal solo aparece en facturas con estado "Pendiente".
+                                </div>
+                            </div>
+                            <div class="vp-guide-card-footer">
+                                <a href="/my/invoices_vet" class="vp-guide-go-btn"
+                                   style="background:#f4951e;color:#fff;">
+                                    <i class="fa fa-arrow-right"/> Ir a Mis Facturas
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- /row atención -->
+
+                <!-- ── Sección: Mi Cuenta ── -->
+                <div class="vp-guide-section-label">Mi Cuenta</div>
+                <div class="row g-3 mb-4">
+
+                    <!-- Mi Perfil -->
+                    <div class="col-md-6">
+                        <div class="vp-guide-card">
+                            <div class="vp-guide-card-hdr">
+                                <div class="vp-guide-card-icon" style="background:#4b7bec;">
+                                    <i class="fa fa-user-circle"/>
+                                </div>
+                                <div class="vp-guide-card-hdr-text">
+                                    <h6>Mi Perfil</h6>
+                                    <p>Datos personales y foto de cuenta</p>
+                                </div>
+                            </div>
+                            <div class="vp-guide-card-body">
+                                <div class="vp-guide-can-label">Qué puedes hacer</div>
+                                <ul class="vp-guide-can-list">
+                                    <li><i class="fa fa-check-circle"/> Actualizar nombre, teléfono y dirección de contacto</li>
+                                    <li><i class="fa fa-check-circle"/> Subir o cambiar tu foto de perfil</li>
+                                    <li><i class="fa fa-check-circle"/> Mantener tus datos actualizados para comunicaciones de la clínica</li>
+                                </ul>
+                                <div class="vp-guide-how-label">Cómo usarlo</div>
+                                <ol class="vp-guide-how-list">
+                                    <li>Edita los campos del formulario con tu información actualizada</li>
+                                    <li>Para cambiar la foto, haz clic en "Seleccionar archivo" en la sección de foto</li>
+                                    <li>Haz clic en <strong>Guardar</strong> para aplicar los cambios</li>
+                                </ol>
+                            </div>
+                            <div class="vp-guide-card-footer">
+                                <a href="/my/account" class="vp-guide-go-btn"
+                                   style="background:#4b7bec;color:#fff;">
+                                    <i class="fa fa-arrow-right"/> Ir a Mi Perfil
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Seguridad -->
+                    <div class="col-md-6">
+                        <div class="vp-guide-card">
+                            <div class="vp-guide-card-hdr">
+                                <div class="vp-guide-card-icon" style="background:#546e7a;">
+                                    <i class="fa fa-shield"/>
+                                </div>
+                                <div class="vp-guide-card-hdr-text">
+                                    <h6>Seguridad</h6>
+                                    <p>Contraseña y acceso a tu cuenta</p>
+                                </div>
+                            </div>
+                            <div class="vp-guide-card-body">
+                                <div class="vp-guide-can-label">Qué puedes hacer</div>
+                                <ul class="vp-guide-can-list">
+                                    <li><i class="fa fa-check-circle"/> Cambiar tu contraseña de acceso al portal</li>
+                                    <li><i class="fa fa-check-circle"/> Eliminar tu cuenta (acción permanente e irreversible)</li>
+                                </ul>
+                                <div class="vp-guide-how-label">Cómo usarlo</div>
+                                <ol class="vp-guide-how-list">
+                                    <li>Ingresa tu contraseña actual y la nueva en los campos correspondientes</li>
+                                    <li>Confirma la nueva contraseña en el segundo campo y haz clic en <strong>Guardar Cambios</strong></li>
+                                    <li>Para eliminar la cuenta, haz clic en "Eliminar mi cuenta" y sigue los pasos de confirmación</li>
+                                </ol>
+                                <div class="vp-guide-tip">
+                                    <i class="fa fa-lightbulb-o"/>
+                                    La eliminación de cuenta requiere ingresar tu contraseña y tu usuario exacto para confirmar.
+                                </div>
+                            </div>
+                            <div class="vp-guide-card-footer">
+                                <a href="/my/security" class="vp-guide-go-btn"
+                                   style="background:#546e7a;color:#fff;">
+                                    <i class="fa fa-arrow-right"/> Ir a Seguridad
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- /row cuenta -->
+
+                <!-- ── Preguntas Frecuentes ── -->
+                <div class="vp-guide-section-label">Preguntas Frecuentes</div>
+                <div id="vp-guide-faq">
+
+                    <div class="vp-guide-faq-item">
+                        <button class="vp-guide-faq-btn" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#faq1">
+                            <span><i class="fa fa-question-circle" style="color:#2E86AB;margin-right:8px;"/>
+                                ¿Cómo descargo el carnet de vacunación de mi mascota?
+                            </span>
+                            <i class="fa fa-chevron-down fa-chevron"/>
+                        </button>
+                        <div id="faq1" class="collapse vp-guide-faq-body">
+                            Ve a <strong>Mis Mascotas</strong>, haz clic en la mascota deseada y dentro de su ficha
+                            encontrarás el botón <strong>"Descargar Carnet"</strong> en la sección de vacunas.
+                            El PDF se descargará automáticamente con el historial oficial de vacunación.
+                        </div>
+                    </div>
+
+                    <div class="vp-guide-faq-item">
+                        <button class="vp-guide-faq-btn" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#faq2">
+                            <span><i class="fa fa-question-circle" style="color:#2E86AB;margin-right:8px;"/>
+                                ¿Por qué no veo el botón de pago en mis facturas?
+                            </span>
+                            <i class="fa fa-chevron-down fa-chevron"/>
+                        </button>
+                        <div id="faq2" class="collapse vp-guide-faq-body">
+                            El botón de pago con PayPal solo aparece en facturas con estado <strong>Pendiente</strong>
+                            (borde naranja). Si tu factura ya está pagada o fue cancelada, el botón no se muestra.
+                            Si crees que hay un error, comunícate con la clínica.
+                        </div>
+                    </div>
+
+                    <div class="vp-guide-faq-item">
+                        <button class="vp-guide-faq-btn" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#faq3">
+                            <span><i class="fa fa-question-circle" style="color:#2E86AB;margin-right:8px;"/>
+                                ¿Cómo agendo una nueva cita veterinaria?
+                            </span>
+                            <i class="fa fa-chevron-down fa-chevron"/>
+                        </button>
+                        <div id="faq3" class="collapse vp-guide-faq-body">
+                            El agendamiento de citas se realiza directamente en la clínica o por los canales de
+                            comunicación de VitalPet (teléfono, WhatsApp). Una vez agendada por el personal,
+                            la cita aparecerá automáticamente en tu sección <strong>Mis Citas</strong>.
+                        </div>
+                    </div>
+
+                    <div class="vp-guide-faq-item">
+                        <button class="vp-guide-faq-btn" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#faq4">
+                            <span><i class="fa fa-question-circle" style="color:#2E86AB;margin-right:8px;"/>
+                                ¿Qué hago si olvidé mi contraseña?
+                            </span>
+                            <i class="fa fa-chevron-down fa-chevron"/>
+                        </button>
+                        <div id="faq4" class="collapse vp-guide-faq-body">
+                            En la pantalla de inicio de sesión, haz clic en
+                            <strong>"¿Olvidaste tu contraseña?"</strong>. Ingresa tu correo electrónico registrado
+                            y recibirás un enlace para restablecerla. Si tienes problemas, comunícate con el
+                            personal de VitalPet.
+                        </div>
+                    </div>
+
+                    <div class="vp-guide-faq-item">
+                        <button class="vp-guide-faq-btn" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#faq5">
+                            <span><i class="fa fa-question-circle" style="color:#2E86AB;margin-right:8px;"/>
+                                ¿Por qué no aparece la historia clínica de mi mascota?
+                            </span>
+                            <i class="fa fa-chevron-down fa-chevron"/>
+                        </button>
+                        <div id="faq5" class="collapse vp-guide-faq-body">
+                            La historia clínica se genera automáticamente cuando se registra la
+                            <strong>primera cita</strong> de tu mascota en el sistema. Si tu mascota está registrada
+                            pero aún no ha tenido ninguna consulta, la sección aparecerá vacía hasta que se
+                            complete la primera visita.
+                        </div>
+                    </div>
+
+                </div><!-- /faq -->
+
+                <!-- Volver al inicio -->
+                <div class="mt-4">
+                    <a href="/my/" class="btn btn-light rounded-3">
+                        <i class="fa fa-home" style="margin-right:6px;"/> Volver al Inicio
+                    </a>
+                </div>
+
+            </div><!-- /vp-guide-wrap -->
         </t>
     </template>
 
