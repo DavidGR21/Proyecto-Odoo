@@ -1713,51 +1713,103 @@
                 </div>
             </t>
 
-            <!-- Citas pasadas (tabla compacta) -->
-            <div class="apt-section">Citas pasadas</div>
+                <!-- ── Historial de citas ─────────────────────────── -->
+                <div class="vp-apt-sec">
+                    <div class="vp-apt-sec-icon" style="background:#546e7a;">
+                        <i class="fa fa-history"/>
+                    </div>
+                    Historial de citas
+                    <t t-if="past">
+                        <span class="badge rounded-pill ms-1 px-2"
+                              style="background:#546e7a; font-size:11px;">
+                            <t t-out="len(past)"/>
+                        </span>
+                    </t>
+                </div>
+
             <t t-if="not past">
-                <div class="alert alert-light text-center py-3">Sin citas pasadas registradas.</div>
+                    <div class="vp-apt-empty">
+                        <i class="fa fa-history"/>
+                        <p>Sin citas pasadas registradas.</p>
+                    </div>
             </t>
             <t t-if="past">
-                <div class="table-responsive">
-                    <table class="table table-sm align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Fecha</th>
-                                <th>Mascota</th>
-                                <th>Veterinario</th>
-                                <th>Motivo</th>
-                                <th>Observaciones</th>
-                                <th>Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr t-foreach="past" t-as="c">
-                                <td class="small text-nowrap" t-out="c.fecha_hora"/>
-                                <td t-out="c.paciente_id.name"/>
-                                <td t-out="c.veterinario_id.name or '-'"/>
-                                <td class="small" t-out="c.motivo or '-'"/>
-                                <td class="small text-muted fst-italic"
-                                    t-out="obs_past.get(c.id, '') or '—'"/>
-                                <td>
+                    <div class="d-flex flex-column gap-3 pb-5">
+                        <t t-foreach="past" t-as="c">
+                            <t t-set="apt_class"
+                               t-value="'vp-apt-completed' if c.estado == 'completada' else ('vp-apt-cancelled' if c.estado in ('cancelada','no_asistio') else 'vp-apt-past-def')"/>
+                            <div t-attf-class="vp-apt-card #{apt_class}">
+                                <div class="d-flex">
+                                    <!-- Bloque de fecha -->
+                                    <div class="vp-apt-datebox">
+                                        <span class="vp-apt-day"
+                                              t-out="str(c.fecha_hora)[:10].split('-')[2] if c.fecha_hora else '-'"/>
+                                        <span class="vp-apt-month"
+                                              t-out="['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][int(str(c.fecha_hora)[:10].split('-')[1])] if c.fecha_hora else ''"/>
+                                        <span class="vp-apt-time"
+                                              style="background:#f0f0f0; color:#546e7a;"
+                                              t-out="str(c.fecha_hora)[11:16] if c.fecha_hora else ''"/>
+                                    </div>
+                                    <!-- Contenido -->
+                                    <div class="flex-1 p-3 p-md-4" style="flex:1; min-width:0;">
+                                        <div class="d-flex align-items-start justify-content-between gap-2 flex-wrap mb-3">
+                                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                                <!-- Badge de estado con color -->
                                     <t t-if="c.estado == 'completada'">
-                                        <span class="badge bg-success"
-                                              t-out="dict(c._fields['estado'].selection).get(c.estado,'')"/>
+                                                    <span class="vp-apt-badge vp-badge-done">
+                                                        <i class="fa fa-check-circle" style="font-size:10px;"/>
+                                                        <t t-out="dict(c._fields['estado'].selection).get(c.estado,'')"/>
+                                                    </span>
                                     </t>
-                                    <t t-elif="c.estado in ('cancelada', 'no_asistio')">
-                                        <span class="badge bg-danger"
-                                              t-out="dict(c._fields['estado'].selection).get(c.estado,'')"/>
+                                                <t t-elif="c.estado in ('cancelada','no_asistio')">
+                                                    <span class="vp-apt-badge vp-badge-cancel">
+                                                        <i class="fa fa-times-circle" style="font-size:10px;"/>
+                                                        <t t-out="dict(c._fields['estado'].selection).get(c.estado,'')"/>
+                                                    </span>
                                     </t>
                                     <t t-else="">
-                                        <span class="badge bg-secondary"
-                                              t-out="dict(c._fields['estado'].selection).get(c.estado,'')"/>
+                                                    <span class="vp-apt-badge vp-badge-other">
+                                                        <t t-out="dict(c._fields['estado'].selection).get(c.estado,'')"/>
+                                                    </span>
                                     </t>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                                            </div>
+                                        </div>
+                                        <div class="row g-2">
+                                            <div class="col-6 col-md-3">
+                                                <p class="vp-apt-lbl">Mascota</p>
+                                                <p class="vp-apt-val">
+                                                    <a t-attf-href="/my/pets/#{c.paciente_id.id}"
+                                                       class="text-decoration-none"
+                                                       style="color:#2E86AB;"
+                                                       t-out="c.paciente_id.name"/>
+                                                </p>
+                                            </div>
+                                            <div class="col-6 col-md-3">
+                                                <p class="vp-apt-lbl">Veterinario</p>
+                                                <p class="vp-apt-val" t-out="c.veterinario_id.name or '-'"/>
+                                            </div>
+                                            <div class="col-6 col-md-3">
+                                                <p class="vp-apt-lbl">Servicio</p>
+                                                <p class="vp-apt-val" t-out="c.servicio_id.name or '-'"/>
+                                            </div>
+                                            <div class="col-6 col-md-3">
+                                                <p class="vp-apt-lbl">Motivo</p>
+                                                <p class="vp-apt-val" t-out="c.motivo or '-'"/>
+                                            </div>
+                                        </div>
+                                        <t t-if="obs_past.get(c.id)">
+                                            <div class="vp-apt-obs-ro">
+                                                <i class="fa fa-comment-o me-1"/>
+                                                <t t-out="obs_past.get(c.id)"/>
                 </div>
             </t>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </t>
+            </div>
         </t>
     </template>
 
