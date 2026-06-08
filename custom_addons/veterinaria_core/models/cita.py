@@ -97,6 +97,13 @@ class Cita(models.Model):
     condiciones_cronicas = fields.Text('Condiciones Crónicas')
     peso = fields.Float('Peso (kg)')
     
+    # Observaciones del propietario antes de la cita
+    observaciones_cliente = fields.Text(
+        'Observaciones del Propietario',
+        help='Notas o síntomas nuevos reportados por el propietario antes de la cita. '
+             'Solo editable por el cliente en citas programadas.',
+    )
+
     # Recordatorio
     recordatorio_enviado = fields.Boolean('Recordatorio Enviado', default=False)
 
@@ -345,9 +352,11 @@ class Cita(models.Model):
     # ==================================================================
     def _send_confirmacion_email(self):
         """Envía email de confirmación al crear una cita"""
-        template = self.env.ref('veterinaria_core.mail_template_cita_confirmacion', raise_if_not_found=False)
-        if not template:
+        template_id = self.env['ir.model.data'].sudo()._xmlid_to_res_id('veterinaria_core.mail_template_cita_confirmacion')
+        if not template_id:
+            _logger.warning("No se encontró la plantilla de confirmación de cita en la base de datos.")
             return
+        template = self.env['mail.template'].sudo().browse(template_id)
         for record in self:
             # Enviar al propietario
             if record.propietario_id and record.propietario_id.email and record.estado == 'programada':
@@ -382,24 +391,29 @@ class Cita(models.Model):
                     
     def _send_completada_email(self):
         """Envía resumen post-consulta al completar la cita"""
-        template = self.env.ref('veterinaria_core.mail_template_cita_completada', raise_if_not_found=False)
-        if not template:
+        template_id = self.env['ir.model.data'].sudo()._xmlid_to_res_id('veterinaria_core.mail_template_cita_completada')
+        if not template_id:
+            _logger.warning("No se encontró la plantilla de cita completada en la base de datos.")
             return
+        template = self.env['mail.template'].sudo().browse(template_id)
         for record in self:
-            if record.propietario_id and record.propietario_id.email:
-                try:
-                    template.send_mail(record.id, force_send=True)
-                    _logger.info('Email de consulta completada enviado para cita %s', record.name)
-                except Exception as e:
-                    _logger.warning('No se pudo enviar email post-consulta para cita %s: %s', record.name, e)
+            if not record.propietario_id or not record.propietario_id.email:
+                _logger.warning("Cita %s: El propietario no tiene email registrado.", record.name)
+                continue
+            try:
+                template.send_mail(record.id, force_send=True)
+                _logger.info('Email de consulta completada enviado para cita %s', record.name)
+            except Exception as e:
+                _logger.error('Error al enviar email post-consulta para cita %s: %s', record.name, e)
 
     @api.model
     def _cron_enviar_recordatorios(self):
         """Cron: Envía recordatorio de citas en las próximas 24h"""
-        template = self.env.ref('veterinaria_core.mail_template_cita_recordatorio', raise_if_not_found=False)
-        if not template:
-            _logger.warning('Plantilla de recordatorio no encontrada')
+        template_id = self.env['ir.model.data'].sudo()._xmlid_to_res_id('veterinaria_core.mail_template_cita_recordatorio')
+        if not template_id:
+            _logger.warning('Plantilla de recordatorio no encontrada en la base de datos')
             return
+        template = self.env['mail.template'].sudo().browse(template_id)
 
         now = fields.Datetime.now()
         en_24h = now + timedelta(hours=24)
@@ -416,7 +430,7 @@ class Cita(models.Model):
         for cita in citas:
             if cita.propietario_id and cita.propietario_id.email:
                 try:
-                    template.send_mail(cita.id, force_send=True)
+                    template.sudo().send_mail(cita.id, force_send=True)
                     cita.write({'recordatorio_enviado': True})
                     _logger.info('Recordatorio enviado para cita %s', cita.name)
                 except Exception as e:
@@ -512,4 +526,24 @@ class Cita(models.Model):
             'context': {
                 'default_cita_id': self.id,
             }
+        }
+
+    def action_show_mis_citas(self):
+        return {
+            'name': 'Mis Citas',
+            'type': 'ir.actions.act_window',
+            'res_model': 'veterinaria.cita',
+            'view_mode': 'list,calendar,form',
+            'domain': [('veterinario_id.user_id', '=', self.env.uid)],
+            'context': {'default_estado': 'programada', 'default_duracion': '1.0'},
+        }
+
+    def action_show_todas_citas(self):
+        return {
+            'name': 'Todas las Citas',
+            'type': 'ir.actions.act_window',
+            'res_model': 'veterinaria.cita',
+            'view_mode': 'list,calendar,form',
+            'domain': [],
+            'context': {'default_estado': 'programada', 'default_duracion': '1.0'},
         }

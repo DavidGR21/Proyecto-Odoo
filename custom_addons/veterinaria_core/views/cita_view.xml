@@ -69,6 +69,13 @@
                             <field name="sintoma_ids" widget="many2many_tags" options="{'no_create_edit': False}"/>
                         </group>
 
+                        <group string="Observaciones del Propietario (solo editable desde el portal)">
+                            <field name="observaciones_cliente" nolabel="1"
+                                   readonly="1"
+                                   placeholder="El propietario registra síntomas o notas desde su portal antes de la cita..."
+                                   widget="text"/>
+                        </group>
+
                         <group>
                             <group string="Historia Clínica Relacionada">
                                 <field name="historia_clinica_id" readonly="1"/>
@@ -92,7 +99,8 @@
                     <field name="veterinario_id"/>
                     <field name="servicio_id" optional="show"/>
                     <field name="motivo"/>
-                    <field name="estado" decoration-success="estado == 'completada'" 
+                    <field name="observaciones_cliente" optional="show" string="Obs. Propietario" readonly="1"/>
+                    <field name="estado" decoration-success="estado == 'completada'"
                         decoration-danger="estado == 'cancelada'"/>
                 </list>
             </field>
@@ -132,10 +140,6 @@
                     <field name="propietario_id" string="Buscar por Propietario"/>
                     <field name="motivo" string="Buscar por Motivo"/>
                     <separator/>
-                    <!-- #8: Filtro para que cada veterinario vea solo sus citas -->
-                    <filter name="mis_citas" string="🩺 Mis Citas"
-                            domain="[('veterinario_id.user_id', '=', uid)]"/>
-                    <separator/>
                     <!-- Filtros por estado -->
                     <filter name="programadas" string="📋 Programadas" domain="[('estado', '=', 'programada')]"/>
                     <!-- #10: Filtro para mostrar citas completadas -->
@@ -171,12 +175,35 @@
             </field>
         </record>
 
-        <!-- Acción para Cita (list primero para mejor navegación #6) -->
+        <!-- Acción para Cita Original -->
         <record id="action_veterinaria_cita" model="ir.actions.act_window">
             <field name="name">Citas</field>
             <field name="res_model">veterinaria.cita</field>
             <field name="view_mode">list,calendar,form</field>
             <field name="context">{'default_estado': 'programada', 'default_duracion': '1.0'}</field>
+        </record>
+
+        <!-- Acción base para Cita (usada por el Server Action) -->
+        <record id="action_veterinaria_cita_base" model="ir.actions.act_window">
+            <field name="name">Citas</field>
+            <field name="res_model">veterinaria.cita</field>
+            <field name="view_mode">list,calendar,form</field>
+            <field name="context">{'default_estado': 'programada', 'default_duracion': '1.0'}</field>
+        </record>
+
+        <!-- Server Action para enrutar Citas según el usuario y bloquear la vista a Veterinarios -->
+        <record id="action_veterinaria_cita_server" model="ir.actions.server">
+            <field name="name">Citas</field>
+            <field name="model_id" ref="veterinaria_core.model_veterinaria_cita"/>
+            <field name="state">code</field>
+            <field name="code">
+action = env.ref('veterinaria_core.action_veterinaria_cita_base').sudo().read()[0]
+# Si es un veterinario y no es administrador, FORZAMOS el dominio para que no pueda ver ni buscar otras citas
+if env.user.has_group('veterinaria_core.group_veterinaria_veterinario') and not env.user.has_group('veterinaria_core.group_veterinaria_admin'):
+    action['domain'] = [('veterinario_id.user_id', '=', env.uid)]
+
+action_res = action
+            </field>
         </record>
     </data>
 </odoo>

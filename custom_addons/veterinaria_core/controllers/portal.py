@@ -4,7 +4,16 @@ import logging
 from werkzeug.utils import redirect as werkzeug_redirect
 from odoo import http, fields
 from odoo.http import request
-from odoo.addons.portal.controllers.portal import CustomerPortal, get_error
+from odoo.addons.portal.controllers.portal import CustomerPortal
+
+try:
+    from odoo.addons.portal.controllers.portal import get_error
+except ImportError:
+    # get_error fue removido en Odoo 18; definimos un fallback minimal
+    def get_error(e='', msg=''):
+        if isinstance(e, dict):
+            return e.get(msg, '')
+        return str(msg or e)
 
 _logger = logging.getLogger(__name__)
 
@@ -42,6 +51,15 @@ class VeterinariaPortal(CustomerPortal):
             # Eliminar la clave para no romper la validación estándar
             post.pop('image_1920', None)
         return super().account(redirect=redirect, **post)
+
+    # ------------------------------------------------------------------
+    # /my/guia — Guía de Uso del portal
+    # ------------------------------------------------------------------
+    @http.route('/my/guia', type='http', auth='user', website=True)
+    def portal_my_guide(self, **kw):
+        values = self._prepare_portal_layout_values()
+        values['page_name'] = 'guide'
+        return request.render('veterinaria_core.portal_my_guide', values)
 
     # ------------------------------------------------------------------
     # /my/security simplificado para Cliente Veterinaria
@@ -138,17 +156,50 @@ class VeterinariaPortal(CustomerPortal):
         }
         return request.render('veterinaria_core.portal_my_pets', values)
 
-    @http.route(['/my/pets/<int:pet_id>'], type='http', auth='user', website=True)
+    @http.route(['/my/pets/<int:pet_id>'], type='http', auth='user',
+                website=True, methods=['GET', 'POST'])
     def portal_my_pet_detail(self, pet_id, **kw):
+        """Detalle de mascota. POST procesa el cambio de foto del cliente."""
         pet = self._check_pet_access(pet_id)
         if not pet:
             return request.redirect('/my/pets')
+        if request.httprequest.method == 'POST':
+            # En Odoo 18 los archivos van a request.httprequest.files, NO a **kw
+            foto_file = request.httprequest.files.get('foto')
+            if foto_file and foto_file.filename:
+                content = foto_file.read()
+                if content:
+                    try:
+                        pet.sudo().write({'foto': base64.b64encode(content)})
+                    except Exception as e:
+                        _logger.error('Error al guardar foto mascota %s: %s', pet_id, e)
+            return request.redirect(f'/my/pets/{pet_id}')
         values = {
             'pet': pet,
             'page_name': 'pet_detail',
             'default_url': '/my/pets',
         }
         return request.render('veterinaria_core.portal_my_pet_detail', values)
+
+    # ------------------------------------------------------------------
+    # /my/appointments/<id>/observations — guardar obs. del propietario
+    # ------------------------------------------------------------------
+    @http.route(['/my/appointments/<int:cita_id>/observations'], type='http',
+                auth='user', website=True, methods=['POST'])
+    def portal_appointment_observations(self, cita_id, **kw):
+        """Guarda las observaciones del propietario en una cita programada."""
+        partner = request.env.user.partner_id
+        # Validación estricta: solo citas propias en estado programada
+        cita = request.env['veterinaria.cita'].search([
+            ('id', '=', int(cita_id)),
+            ('paciente_id.propietario_id', '=', partner.id),
+            ('estado', '=', 'programada'),
+        ], limit=1)
+        if not cita:
+            return request.redirect('/my/appointments')
+        texto = (kw.get('observaciones_cliente') or '').strip()
+        cita.sudo().write({'observaciones_cliente': texto or False})
+        return request.redirect('/my/appointments')
 
     # ------------------------------------------------------------------
     # /my/appointments — citas pasadas y futuras
@@ -168,10 +219,25 @@ class VeterinariaPortal(CustomerPortal):
             ('fecha_hora', '<', now),
         ], order='fecha_hora DESC', limit=50)
 
+        # Acceso seguro a observaciones_cliente.
+        # La columna puede no existir si el módulo aún no fue actualizado (-u).
+        # El try/except permite que la página cargue de todas formas.
+        obs_upcoming, obs_past = {}, {}
+        try:
+            obs_upcoming = {c.id: c.observaciones_cliente or '' for c in upcoming}
+            obs_past = {c.id: c.observaciones_cliente or '' for c in past}
+        except Exception:
+            _logger.warning(
+                'observaciones_cliente no disponible en BD. '
+                'Ejecute: ./odoo-bin -u veterinaria_core'
+            )
+
         values = {
             'upcoming': upcoming,
             'past': past,
             'page_name': 'appointments',
+            'obs_upcoming': obs_upcoming,
+            'obs_past': obs_past,
         }
         return request.render('veterinaria_core.portal_my_appointments', values)
 
@@ -456,12 +522,30 @@ class VeterinariaPortal(CustomerPortal):
     # ------------------------------------------------------------------
     @http.route(['/my/prescriptions'], type='http', auth='user', website=True)
     def portal_my_prescriptions(self, **kw):
+        from datetime import timedelta
         partner = request.env.user.partner_id
         recetas = request.env['veterinaria.receta'].search([
             ('propietario_id', '=', partner.id),
         ], order='fecha_emision DESC')
+
+        today = fields.Date.today()
+        receta_status = {}
+        for r in recetas:
+            if r.state == 'finalizada':
+                receta_status[r.id] = 'facturada'
+            elif r.linea_ids:
+                max_dias = max((l.duracion_dias for l in r.linea_ids), default=0)
+                if r.fecha_emision and max_dias > 0:
+                    fecha_fin = r.fecha_emision.date() + timedelta(days=max_dias)
+                    receta_status[r.id] = 'activa' if fecha_fin >= today else 'terminada'
+                else:
+                    receta_status[r.id] = 'activa'
+            else:
+                receta_status[r.id] = 'activa'
+
         values = {
             'recetas': recetas,
+            'receta_status': receta_status,
             'page_name': 'prescriptions',
         }
         return request.render('veterinaria_core.portal_my_prescriptions', values)
@@ -474,11 +558,16 @@ class VeterinariaPortal(CustomerPortal):
         pet = self._check_pet_access(pet_id)
         if not pet:
             return request.redirect('/my/pets')
-        # Renderiza el reporte QWeb-PDF definido en reports/carnet_vacunas_report.xml
-        report_ref = 'veterinaria_core.action_report_carnet_vacunas'
-        pdf, _content_type = request.env['ir.actions.report'].sudo()._render_qweb_pdf(
-            report_ref, [pet.id]
-        )
+        try:
+            # En Odoo 18 _render_qweb_pdf busca primero por report_name, luego por xmlid.
+            # Usar el report_name directamente es más robusto.
+            pdf, _content_type = request.env['ir.actions.report'].sudo()._render_qweb_pdf(
+                'veterinaria_core.report_carnet_vacunas_template',
+                [pet.id]
+            )
+        except Exception as e:
+            _logger.error('Error generando carnet de vacunas para mascota %s: %s', pet_id, e)
+            return request.redirect('/my/pets/%s' % pet_id)
         pdfhttpheaders = [
             ('Content-Type', 'application/pdf'),
             ('Content-Length', len(pdf)),

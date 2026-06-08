@@ -47,3 +47,20 @@ vitalpet-web-data/
 # Project specific
 *.log
 .coverage
+
+# Node.js
+node_modules/
+tests/node_modules/
+
+# Cypress
+cypress/videos/
+cypress/screenshots/
+tests/cypress/videos/
+tests/cypress/screenshots/
+tests/downloads/
+
+# Environment overrides
+.env
+.env.*
+tests/.env
+tests/.env.*

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Acción del reporte: factura veterinaria -->
     <record id="action_report_factura_veterinaria" model="ir.actions.report">
         <field name="name">Factura Veterinaria</field>
         <field name="model">veterinaria.facturacion</field>
@@ -13,112 +12,446 @@
         <field name="binding_type">report</field>
     </record>
 
-    <!-- Plantilla del documento -->
     <template id="report_factura_veterinaria_document">
         <t t-call="web.external_layout">
             <div class="page">
                 <style>
-                    .fv-header { border-bottom: 3px solid #2E86AB; padding-bottom: 10px; margin-bottom: 20px; }
-                    .fv-header h2 { color: #2E86AB; margin: 0; }
-                    .fv-pill { display:inline-block; padding:3px 10px; border-radius:12px; font-size:11px; font-weight:bold; }
-                    .fv-pill-borrador { background:#fff3cd; color:#856404; }
-                    .fv-pill-validado { background:#d4edda; color:#155724; }
-                    .fv-pill-cancelado { background:#f8d7da; color:#721c24; }
-                    .fv-info-table th { background:#f0f8ff; padding:4px 8px; text-align:left; width:30%; }
-                    .fv-info-table td { padding:4px 8px; }
-                    .fv-line-table { width:100%; border-collapse:collapse; margin-top:14px; }
-                    .fv-line-table thead th { background:#2E86AB; color:#fff; padding:8px; font-size:12px; text-align:left; }
-                    .fv-line-table tbody td { border-bottom:1px solid #ddd; padding:6px 8px; font-size:12px; }
-                    .fv-totals { margin-top:20px; width:50%; margin-left:auto; }
-                    .fv-totals td { padding:4px 8px; font-size:13px; }
-                    .fv-totals .fv-total-row td { border-top:2px solid #2E86AB; font-weight:bold; font-size:15px; color:#2E86AB; }
+                    /* Remove top spacing so content starts right at the top */
+                    .page { margin-top: 0 !important; padding-top: 0 !important; }
+
+                    /* ── Invoice header banner ── */
+                    .fv-banner {
+                        background-color: #0d3b5e;
+                        border-radius: 14px;
+                        padding: 22px 26px;
+                        color: #fff;
+                        margin-bottom: 20px;
+                        position: relative;
+                        overflow: hidden;
+                    }
+                    .fv-banner-deco {
+                        position: absolute;
+                        right: -15px;
+                        top: -30px;
+                        font-size: 130px;
+                        opacity: 0.06;
+                        color: #fff;
+                        line-height: 1;
+                    }
+                    .fv-clinic-name {
+                        font-size: 19px;
+                        font-weight: bold;
+                        letter-spacing: 0.02em;
+                        margin-bottom: 3px;
+                    }
+                    .fv-clinic-sub {
+                        font-size: 10px;
+                        opacity: 0.7;
+                        text-transform: uppercase;
+                        letter-spacing: 0.08em;
+                    }
+                    .fv-inv-number {
+                        font-size: 26px;
+                        font-weight: bold;
+                        letter-spacing: 0.03em;
+                        line-height: 1.1;
+                    }
+                    .fv-inv-label {
+                        font-size: 9.5px;
+                        opacity: 0.65;
+                        text-transform: uppercase;
+                        letter-spacing: 0.08em;
+                        margin-bottom: 4px;
+                    }
+                    /* Status badges */
+                    .fv-badge {
+                        display: inline-block;
+                        padding: 4px 12px;
+                        border-radius: 14px;
+                        font-size: 10.5px;
+                        font-weight: bold;
+                        text-transform: uppercase;
+                        letter-spacing: 0.04em;
+                        margin-top: 6px;
+                    }
+                    .fv-badge-borrador  { background-color: #1a5c8a; border: 1px solid #4a8ab0; }
+                    .fv-badge-validado  { background: #27ae60; }
+                    .fv-badge-cancelado { background: #e74c3c; }
+
+                    /* ── Info section (client + invoice meta) ── */
+                    .fv-info-wrap {
+                        border: 1px solid #e4eef5;
+                        border-radius: 10px;
+                        overflow: hidden;
+                        margin-bottom: 18px;
+                    }
+                    .fv-info-cell {
+                        padding: 14px 18px;
+                        vertical-align: top;
+                        width: 50%;
+                    }
+                    .fv-info-cell + .fv-info-cell {
+                        border-left: 1px solid #e4eef5;
+                        background: #f7fbfe;
+                    }
+                    .fv-info-title {
+                        font-size: 9.5px;
+                        font-weight: bold;
+                        text-transform: uppercase;
+                        letter-spacing: 0.08em;
+                        color: #2E86AB;
+                        margin-bottom: 9px;
+                        padding-bottom: 6px;
+                        border-bottom: 1px solid #e4eef5;
+                    }
+                    .fv-info-row {
+                        font-size: 11.5px;
+                        color: #2c3e50;
+                        margin-bottom: 4px;
+                    }
+                    .fv-info-lbl {
+                        color: #8e9fb0;
+                        font-size: 10px;
+                        width: 70px;
+                        display: inline-block;
+                    }
+                    .fv-client-name {
+                        font-size: 15px;
+                        font-weight: bold;
+                        color: #0d3b5e;
+                        margin-bottom: 8px;
+                    }
+
+                    /* ── Line items table ── */
+                    .fv-tbl {
+                        width: 100%;
+                        border-collapse: collapse;
+                        font-size: 11px;
+                        margin-bottom: 0;
+                    }
+                    .fv-tbl thead th {
+                        background: #0d3b5e;
+                        color: #fff;
+                        padding: 9px 10px;
+                        font-size: 10.5px;
+                        font-weight: bold;
+                        text-align: left;
+                    }
+                    .fv-tbl thead th.fv-r { text-align: right; }
+                    .fv-tbl tbody td {
+                        border-bottom: 1px solid #e4eef5;
+                        padding: 8px 10px;
+                        color: #2c3e50;
+                        vertical-align: top;
+                    }
+                    .fv-tbl tbody td.fv-r { text-align: right; }
+                    .fv-tbl tbody tr.fv-even td { background: #f7fbfe; }
+                    .fv-item-name { font-weight: 600; color: #0d3b5e; }
+                    .fv-item-sub  { font-size: 10px; color: #8e9fb0; margin-top: 2px; }
+                    .fv-type-chip {
+                        display: inline-block;
+                        background: #edf6fb;
+                        color: #2E86AB;
+                        border-radius: 8px;
+                        padding: 2px 8px;
+                        font-size: 9.5px;
+                        font-weight: bold;
+                    }
+                    .fv-tbl-wrap {
+                        border: 1px solid #e4eef5;
+                        border-radius: 10px;
+                        overflow: hidden;
+                        margin-bottom: 18px;
+                    }
+
+                    /* ── Totals block ── */
+                    .fv-totals-tbl {
+                        width: 52%;
+                        margin-left: auto;
+                        border-collapse: collapse;
+                        font-size: 12px;
+                    }
+                    .fv-totals-tbl td { padding: 5px 10px; color: #2c3e50; }
+                    .fv-totals-tbl td.fv-r { text-align: right; }
+                    .fv-totals-tbl .fv-tot-line td {
+                        border-top: 2px solid #2E86AB;
+                        font-size: 15px;
+                        font-weight: bold;
+                        color: #0d3b5e;
+                        padding-top: 8px;
+                    }
+                    .fv-totals-tbl .fv-sub-row td { color: #546e7a; }
+                    .fv-totals-wrap {
+                        border: 1px solid #e4eef5;
+                        border-radius: 10px;
+                        padding: 14px 16px;
+                        margin-bottom: 18px;
+                        background: #f7fbfe;
+                    }
+
+                    /* ── Payment confirmation strip ── */
+                    .fv-paid-strip {
+                        border: 2px solid #27ae60;
+                        border-radius: 10px;
+                        background: #f0faf4;
+                        padding: 12px 18px;
+                        margin-bottom: 16px;
+                    }
+                    .fv-paid-title {
+                        font-size: 14px;
+                        font-weight: bold;
+                        color: #27ae60;
+                        margin-bottom: 5px;
+                    }
+                    .fv-paid-detail { font-size: 11px; color: #546e7a; }
+
+                    /* ── Cancelled strip ── */
+                    .fv-cancelled-strip {
+                        border: 2px solid #e74c3c;
+                        border-radius: 10px;
+                        background: #fff5f5;
+                        padding: 12px 18px;
+                        margin-bottom: 16px;
+                        text-align: center;
+                    }
+                    .fv-cancelled-title {
+                        font-size: 15px;
+                        font-weight: bold;
+                        color: #e74c3c;
+                        letter-spacing: 0.08em;
+                        text-transform: uppercase;
+                    }
+
+                    /* ── Observations ── */
+                    .fv-obs {
+                        border-left: 4px solid #2E86AB;
+                        background: #f7fbfe;
+                        border-radius: 0 8px 8px 0;
+                        padding: 10px 14px;
+                        font-size: 11.5px;
+                        color: #546e7a;
+                        margin-bottom: 16px;
+                    }
+                    .fv-obs-label {
+                        font-size: 9.5px;
+                        font-weight: bold;
+                        text-transform: uppercase;
+                        letter-spacing: 0.07em;
+                        color: #2E86AB;
+                        margin-bottom: 4px;
+                    }
+
+                    /* ── Footer ── */
+                    .fv-footer {
+                        text-align: center;
+                        font-size: 10px;
+                        color: #8e9fb0;
+                        padding-top: 12px;
+                        border-top: 1px solid #e4eef5;
+                        margin-top: 20px;
+                    }
                 </style>
 
-                <div class="fv-header row">
-                    <div class="col-8">
-                        <h2>🐾 Factura Veterinaria</h2>
-                        <div class="text-muted">VitalPet - Clínica Veterinaria</div>
-                    </div>
-                    <div class="col-4 text-end">
-                        <h3 style="margin:0;" t-out="doc.name"/>
-                        <span t-attf-class="fv-pill fv-pill-#{doc.estado}"
-                              t-out="dict(doc._fields['estado'].selection).get(doc.estado, '')"/>
-                    </div>
-                </div>
-
-                <table class="fv-info-table" style="width:100%">
-                    <tr>
-                        <th>Cliente</th><td t-out="doc.propietario_id.name or '-'"/>
-                        <th>Fecha</th><td t-out="doc.fecha_factura or '-'"/>
-                    </tr>
-                    <tr>
-                        <th>Email</th><td t-out="doc.propietario_id.email or '-'"/>
-                        <th>Teléfono</th><td t-out="doc.propietario_id.phone or doc.propietario_id.mobile or '-'"/>
-                    </tr>
-                    <tr t-if="doc.propietario_id.street">
-                        <th>Dirección</th>
-                        <td colspan="3" t-out="(doc.propietario_id.street or '') + ' ' + (doc.propietario_id.city or '')"/>
-                    </tr>
-                </table>
-
-                <table class="fv-line-table">
-                    <thead>
+                <!-- ══════════════════ HEADER BANNER ══════════════════ -->
+                <div class="fv-banner">
+                    <div class="fv-banner-deco"><i class="fa fa-file-text-o"/></div>
+                    <table style="width:100%; border-collapse:collapse;">
                         <tr>
-                            <th>#</th>
-                            <th>Concepto</th>
-                            <th>Tipo</th>
-                            <th class="text-end">Cant.</th>
-                            <th class="text-end">Precio</th>
-                            <th class="text-end">Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr t-foreach="doc.linea_ids" t-as="l">
-                            <td t-out="l_index + 1"/>
-                            <td>
-                                <strong t-out="l.nombre_item or l.descripcion or '-'"/>
-                                <t t-if="l.cita_id and l.cita_id.paciente_id">
-                                    <br/><small class="text-muted">
-                                        Mascota: <t t-out="l.cita_id.paciente_id.name"/>
-                                    </small>
+                            <td style="vertical-align:top;">
+                                <div class="fv-clinic-name">
+                                    <i class="fa fa-paw" style="margin-right:7px;"/>VitalPet
+                                </div>
+                                <div class="fv-clinic-sub">Clinica Veterinaria — Factura de Servicios</div>
+                            </td>
+                            <td style="text-align:right; vertical-align:top;">
+                                <div class="fv-inv-label">Numero de Factura</div>
+                                <div class="fv-inv-number" t-out="doc.name or '-'"/>
+                                <t t-if="doc.estado == 'borrador'">
+                                    <span class="fv-badge fv-badge-borrador">Borrador</span>
+                                </t>
+                                <t t-elif="doc.estado == 'validado'">
+                                    <span class="fv-badge fv-badge-validado">
+                                        <i class="fa fa-check" style="margin-right:4px;"/>Validado
+                                    </span>
+                                </t>
+                                <t t-else="">
+                                    <span class="fv-badge fv-badge-cancelado">
+                                        <i class="fa fa-times" style="margin-right:4px;"/>Cancelado
+                                    </span>
                                 </t>
                             </td>
-                            <td t-out="dict(l._fields['tipo_linea'].selection).get(l.tipo_linea, '')"/>
-                            <td class="text-end" t-out="l.cantidad"/>
-                            <td class="text-end" t-out="'%.2f' % (l.precio_unitario or 0)"/>
-                            <td class="text-end" t-out="'%.2f' % (l.subtotal or 0)"/>
                         </tr>
-                    </tbody>
-                </table>
-
-                <table class="fv-totals">
-                    <tr>
-                        <td>Subtotal:</td>
-                        <td class="text-end" t-out="'%.2f' % (doc.subtotal or 0)"/>
-                    </tr>
-                    <tr>
-                        <td>Impuestos:</td>
-                        <td class="text-end" t-out="'%.2f' % (doc.impuesto_total or 0)"/>
-                    </tr>
-                    <tr class="fv-total-row">
-                        <td>TOTAL:</td>
-                        <td class="text-end" t-out="'%.2f' % (doc.total or 0)"/>
-                    </tr>
-                </table>
-
-                <div t-if="doc.observaciones" class="mt-4">
-                    <strong>Observaciones:</strong>
-                    <p t-out="doc.observaciones"/>
+                    </table>
                 </div>
 
-                <div class="mt-5 text-center text-muted" style="font-size:10px;">
-                    Gracias por confiar en VitalPet - Documento generado automáticamente
+                <!-- ══════════════════ CLIENT + META ══════════════════ -->
+                <div class="fv-info-wrap">
+                    <table style="width:100%; border-collapse:collapse;">
+                        <tr>
+                            <!-- Client data -->
+                            <td class="fv-info-cell">
+                                <div class="fv-info-title">
+                                    <i class="fa fa-user" style="margin-right:6px;"/>Datos del Cliente
+                                </div>
+                                <div class="fv-client-name" t-out="doc.propietario_id.name or '-'"/>
+                                <t t-if="doc.propietario_id.email">
+                                    <div class="fv-info-row">
+                                        <span class="fv-info-lbl">Email</span>
+                                        <t t-out="doc.propietario_id.email"/>
+                                    </div>
+                                </t>
+                                <t t-if="doc.propietario_id.phone or doc.propietario_id.mobile">
+                                    <div class="fv-info-row">
+                                        <span class="fv-info-lbl">Telefono</span>
+                                        <t t-out="doc.propietario_id.phone or doc.propietario_id.mobile"/>
+                                    </div>
+                                </t>
+                                <t t-if="doc.propietario_id.street">
+                                    <div class="fv-info-row">
+                                        <span class="fv-info-lbl">Direccion</span>
+                                        <t t-out="(doc.propietario_id.street or '')"/>
+                                        <t t-if="doc.propietario_id.city">
+                                            , <t t-out="doc.propietario_id.city"/>
+                                        </t>
+                                    </div>
+                                </t>
+                            </td>
+                            <!-- Invoice meta -->
+                            <td class="fv-info-cell">
+                                <div class="fv-info-title">
+                                    <i class="fa fa-calendar" style="margin-right:6px;"/>Datos de la Factura
+                                </div>
+                                <div class="fv-info-row">
+                                    <span class="fv-info-lbl">Numero</span>
+                                    <strong t-out="doc.name or '-'"/>
+                                </div>
+                                <div class="fv-info-row">
+                                    <span class="fv-info-lbl">Fecha</span>
+                                    <t t-out="doc.fecha_factura or '-'"/>
+                                </div>
+                                <div class="fv-info-row">
+                                    <span class="fv-info-lbl">Estado</span>
+                                    <strong t-out="dict(doc._fields['estado'].selection).get(doc.estado, '-')"/>
+                                </div>
+                                <t t-if="doc.pagado and doc.fecha_pago">
+                                    <div class="fv-info-row">
+                                        <span class="fv-info-lbl">Pagado el</span>
+                                        <t t-out="str(doc.fecha_pago)[:10]"/>
+                                    </div>
+                                </t>
+                                <t t-if="doc.payment_reference">
+                                    <div class="fv-info-row">
+                                        <span class="fv-info-lbl">Ref. pago</span>
+                                        <t t-out="doc.payment_reference"/>
+                                    </div>
+                                </t>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- ══════════════════ LINE ITEMS ══════════════════ -->
+                <div class="fv-tbl-wrap">
+                    <table class="fv-tbl">
+                        <thead>
+                            <tr>
+                                <th style="width:4%;">#</th>
+                                <th style="width:38%;">Concepto</th>
+                                <th style="width:12%;">Tipo</th>
+                                <th class="fv-r" style="width:8%;">Cant.</th>
+                                <th class="fv-r" style="width:12%;">Precio Unit.</th>
+                                <th class="fv-r" style="width:10%;">Impuesto</th>
+                                <th class="fv-r" style="width:12%;">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="doc.linea_ids" t-as="l"
+                                t-attf-class="#{'' if l_index % 2 == 0 else 'fv-even'}">
+                                <td t-out="l_index + 1" style="color:#8e9fb0;"/>
+                                <td>
+                                    <div class="fv-item-name"
+                                         t-out="l.nombre_item or l.descripcion or '-'"/>
+                                    <t t-if="l.cita_id and l.cita_id.paciente_id">
+                                        <div class="fv-item-sub">
+                                            <i class="fa fa-paw" style="margin-right:3px;"/>
+                                            <t t-out="l.cita_id.paciente_id.name"/>
+                                        </div>
+                                    </t>
+                                </td>
+                                <td>
+                                    <span class="fv-type-chip"
+                                          t-out="dict(l._fields['tipo_linea'].selection).get(l.tipo_linea, '-')"/>
+                                </td>
+                                <td class="fv-r" t-out="'%.0f' % (l.cantidad or 0)"/>
+                                <td class="fv-r" t-out="'$%.2f' % (l.precio_unitario or 0)"/>
+                                <td class="fv-r" t-out="'$%.2f' % (l.impuesto_linea or 0)"/>
+                                <td class="fv-r"><strong t-out="'$%.2f' % (l.subtotal or 0)"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- ══════════════════ TOTALS ══════════════════ -->
+                <div class="fv-totals-wrap">
+                    <table class="fv-totals-tbl">
+                        <tr class="fv-sub-row">
+                            <td>Subtotal servicios:</td>
+                            <td class="fv-r" t-out="'$%.2f' % (doc.subtotal or 0)"/>
+                        </tr>
+                        <tr class="fv-sub-row">
+                            <td>Impuestos:</td>
+                            <td class="fv-r" t-out="'$%.2f' % (doc.impuesto_total or 0)"/>
+                        </tr>
+                        <tr class="fv-tot-line">
+                            <td>TOTAL A PAGAR:</td>
+                            <td class="fv-r" t-out="'$%.2f' % (doc.total or 0)"/>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- ══════════════════ PAYMENT STATUS ══════════════════ -->
+                <t t-if="doc.pagado">
+                    <div class="fv-paid-strip">
+                        <div class="fv-paid-title">
+                            <i class="fa fa-check-circle" style="margin-right:7px;"/>Pago Confirmado
+                        </div>
+                        <div class="fv-paid-detail">
+                            <t t-if="doc.fecha_pago">
+                                Pagado el <strong t-out="str(doc.fecha_pago)[:10]"/>.
+                            </t>
+                            <t t-if="doc.payment_reference">
+                                Referencia PayPal: <strong t-out="doc.payment_reference"/>.
+                            </t>
+                            Gracias por su pago.
+                        </div>
+                    </div>
+                </t>
+
+                <t t-if="doc.estado == 'cancelado'">
+                    <div class="fv-cancelled-strip">
+                        <div class="fv-cancelled-title">
+                            <i class="fa fa-ban" style="margin-right:8px;"/>Factura Cancelada
+                        </div>
+                    </div>
+                </t>
+
+                <!-- ══════════════════ OBSERVATIONS ══════════════════ -->
+                <t t-if="doc.observaciones">
+                    <div class="fv-obs">
+                        <div class="fv-obs-label">Observaciones</div>
+                        <t t-out="doc.observaciones"/>
+                    </div>
+                </t>
+
+                <!-- ══════════════════ FOOTER ══════════════════ -->
+                <div class="fv-footer">
+                    Gracias por confiar en VitalPet - Clinica Veterinaria<br/>
+                    Documento generado automaticamente
                 </div>
             </div>
         </t>
     </template>
 
-    <!-- Template raíz -->
     <template id="report_factura_veterinaria_template">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="doc">

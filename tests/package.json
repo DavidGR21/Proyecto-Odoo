@@ -1,0 +1,17 @@
+{
+  "name": "vitalpet-tests",
+  "version": "1.0.0",
+  "description": "Functional and UI tests for VitalPet Odoo module",
+  "main": "index.js",
+  "scripts": {
+    "test:cypress": "cypress run",
+    "test:cypress:open": "cypress open",
+    "test:stagehand": "node stagehand/run_stagehand.js"
+  },
+  "devDependencies": {
+    "cypress": "^13.0.0",
+    "@browserbasehq/stagehand": "^1.0.0",
+    "playwright": "^1.39.0",
+    "dotenv": "^16.3.1"
+  }
+}
