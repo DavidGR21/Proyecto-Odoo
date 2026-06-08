@@ -1492,101 +1492,197 @@
     </template>
 
     <!-- =====================================================
-         /my/appointments — Citas pasadas y futuras
+         /my/appointments — Citas (rediseñado v2)
          ===================================================== -->
     <template id="portal_my_appointments" name="Mis Citas">
         <t t-call="portal.portal_layout">
             <style>
-                .apt-card {
-                    border: 1.5px solid #e4eef5;
-                    border-left: 5px solid #2E86AB;
-                    border-radius: 12px;
-                    background: #fff;
-                    box-shadow: 0 2px 8px rgba(0,0,0,.04);
-                    transition: box-shadow .2s;
+                /* === VitalPet · Mis Citas ================================== */
+                .vp-apt-wrap { font-family:'Inter','Segoe UI',sans-serif; }
+
+                /* Divisor de sección */
+                .vp-apt-sec {
+                    font-size:11px; font-weight:700; text-transform:uppercase;
+                    letter-spacing:.8px; color:#8e9fb0;
+                    margin:28px 0 14px 0;
+                    display:flex; align-items:center; gap:10px;
                 }
-                .apt-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,.09); }
-                .apt-label { font-size: 10px; font-weight: 700; text-transform: uppercase;
-                             letter-spacing: .5px; color: #8e9fb0; margin-bottom: 2px; }
-                .apt-value { font-size: 14px; color: #1a2d3d; font-weight: 500; }
-                .apt-obs-box { background: #f7fbfe; border-radius: 8px; padding: 12px 14px; }
-                .apt-obs-box .form-control:focus { border-color: #2E86AB; box-shadow: 0 0 0 .2rem rgba(46,134,171,.2); }
-                .apt-section {
-                    font-size: 11px; font-weight: 700; text-transform: uppercase;
-                    letter-spacing: .8px; color: #8e9fb0;
-                    margin: 24px 0 12px 0; padding-left: 2px;
-                    display: flex; align-items: center; gap: 8px;
+                .vp-apt-sec::after { content:''; flex:1; height:1px; background:#e9ecef; }
+                .vp-apt-sec-icon {
+                    width:28px; height:28px; border-radius:8px;
+                    display:flex; align-items:center; justify-content:center;
+                    font-size:13px; color:#fff;
                 }
-                .apt-section::after { content:''; flex:1; height:1px; background:#e9ecef; }
+
+                /* Card base */
+                .vp-apt-card {
+                    background:#fff; border:1.5px solid #e4eef5;
+                    border-radius:16px; overflow:hidden;
+                    box-shadow:0 2px 10px rgba(0,0,0,.04);
+                    transition:box-shadow .2s, transform .15s;
+                }
+                .vp-apt-card:hover {
+                    box-shadow:0 8px 28px rgba(0,0,0,.09);
+                    transform:translateY(-2px);
+                }
+                /* Acento izquierdo por estado */
+                .vp-apt-upcoming  { border-left:5px solid #2E86AB; }
+                .vp-apt-completed { border-left:5px solid #27ae60; }
+                .vp-apt-cancelled { border-left:5px solid #e74c3c; }
+                .vp-apt-past-def  { border-left:5px solid #8e9fb0; }
+
+                /* Bloque de fecha */
+                .vp-apt-datebox {
+                    display:flex; flex-direction:column;
+                    align-items:center; justify-content:center;
+                    min-width:72px; padding:16px 14px;
+                    border-right:1px solid #f0f0f0; flex-shrink:0;
+                }
+                .vp-apt-day   { font-size:28px; font-weight:800; line-height:1; color:#0d3b5e; }
+                .vp-apt-month { font-size:11px; font-weight:700; text-transform:uppercase;
+                                letter-spacing:.6px; color:#8e9fb0; margin-top:2px; }
+                .vp-apt-time  { font-size:11px; color:#2E86AB; font-weight:700; margin-top:6px;
+                                background:#e3f0f8; padding:2px 8px; border-radius:8px; }
+
+                /* Color de datebox por estado */
+                .vp-apt-upcoming  .vp-apt-datebox { background:#f0f8ff; }
+                .vp-apt-completed .vp-apt-datebox { background:#f0faf5; }
+                .vp-apt-cancelled .vp-apt-datebox { background:#fff5f5; }
+                .vp-apt-past-def  .vp-apt-datebox { background:#f8f9fa; }
+
+                /* Label / valor en la card */
+                .vp-apt-lbl { font-size:10px; font-weight:700; text-transform:uppercase;
+                              letter-spacing:.5px; color:#8e9fb0; margin:0 0 2px 0; }
+                .vp-apt-val { font-size:13.5px; color:#1a2d3d; font-weight:500; margin:0; }
+
+                /* Badges de estado */
+                .vp-apt-badge {
+                    display:inline-flex; align-items:center; gap:5px;
+                    padding:4px 11px; border-radius:20px;
+                    font-size:11px; font-weight:700;
+                }
+                .vp-badge-prog  { background:#e3f0f8; color:#0d3b5e; }
+                .vp-badge-done  { background:#e8f5e9; color:#1b5e20; }
+                .vp-badge-cancel{ background:#fdeaea; color:#c0392b; }
+                .vp-badge-other { background:#f0f0f0; color:#546e7a; }
+
+                /* Caja de observaciones */
+                .vp-apt-obs {
+                    background:#f7fbfe; border-radius:10px; padding:14px;
+                    border:1.5px solid #e4eef5; height:100%;
+                }
+                .vp-apt-obs .form-control:focus {
+                    border-color:#2E86AB; box-shadow:0 0 0 .2rem rgba(46,134,171,.2);
+                }
+                /* Observación solo lectura (citas pasadas) */
+                .vp-apt-obs-ro {
+                    background:#f8fafc; border-radius:10px; padding:12px 14px;
+                    border-left:3px solid #8e9fb0; font-size:12.5px;
+                    color:#546e7a; font-style:italic; margin-top:10px;
+                }
+
+                /* Empty state */
+                .vp-apt-empty {
+                    text-align:center; padding:36px 20px; background:#f7fbfe;
+                    border-radius:14px; border:2px dashed #cde4f0;
+                }
+                .vp-apt-empty i { font-size:36px; opacity:.2; display:block; margin-bottom:10px; }
+                .vp-apt-empty p { font-size:13px; color:#8e9fb0; margin:0; }
             </style>
 
+            <div class="vp-apt-wrap">
             <!-- Header -->
-            <div class="d-flex align-items-center justify-content-between mt-3 mb-2 flex-wrap gap-2">
-                <h3 class="m-0">Mis Citas</h3>
+                <div class="d-flex align-items-center justify-content-between mt-3 mb-1 flex-wrap gap-2">
+                    <h3 class="m-0 fw-bold" style="color:#0d3b5e;">
+                        <i class="fa fa-calendar me-2" style="color:#2E86AB;"/>Mis Citas
+                    </h3>
                 <small class="text-muted">
                     <i class="fa fa-info-circle me-1"/>
-                    Puedes agregar observaciones en las citas programadas.
+                        Puedes añadir observaciones en tus citas programadas.
                 </small>
             </div>
 
-            <!-- Próximas citas (cards con form de observaciones) -->
-            <div class="apt-section">Próximas citas</div>
+                <!-- ── Próximas citas ─────────────────────────────── -->
+                <div class="vp-apt-sec">
+                    <div class="vp-apt-sec-icon" style="background:#2E86AB;">
+                        <i class="fa fa-clock-o"/>
+                    </div>
+                    Próximas citas
+                    <t t-if="upcoming">
+                        <span class="badge rounded-pill ms-1 px-2"
+                              style="background:#2E86AB; font-size:11px;">
+                            <t t-out="len(upcoming)"/>
+                        </span>
+                    </t>
+                </div>
+
             <t t-if="not upcoming">
-                <div class="alert alert-light text-center py-4">
-                    <i class="fa fa-calendar-o fa-2x text-muted d-block mb-2"/>
-                    No tiene citas programadas actualmente.
+                    <div class="vp-apt-empty">
+                        <i class="fa fa-calendar-o"/>
+                        <p>No tienes citas programadas actualmente.</p>
                 </div>
             </t>
             <t t-if="upcoming">
-                <div class="d-flex flex-column gap-3 mb-2">
+                    <div class="d-flex flex-column gap-3">
                     <t t-foreach="upcoming" t-as="c">
-                        <div class="apt-card">
-                            <div class="card-body p-3 p-md-4">
+                            <div class="vp-apt-card vp-apt-upcoming">
+                                <div class="d-flex">
+                                    <!-- Bloque de fecha -->
+                                    <div class="vp-apt-datebox">
+                                        <span class="vp-apt-day"
+                                              t-out="str(c.fecha_hora)[:10].split('-')[2] if c.fecha_hora else '-'"/>
+                                        <span class="vp-apt-month"
+                                              t-out="['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][int(str(c.fecha_hora)[:10].split('-')[1])] if c.fecha_hora else ''"/>
+                                        <span class="vp-apt-time"
+                                              t-out="str(c.fecha_hora)[11:16] if c.fecha_hora else ''"/>
+                                    </div>
+                                    <!-- Contenido -->
+                                    <div class="flex-1 p-3 p-md-4" style="flex:1; min-width:0;">
                                 <div class="row g-3">
-                                    <!-- Info principal -->
                                     <div class="col-md-7">
                                         <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
-                                            <span class="badge bg-primary">
-                                                <i class="fa fa-clock-o me-1"/>
-                                                <t t-out="c.fecha_hora"/>
-                                            </span>
-                                            <span t-attf-class="badge #{'bg-info' if c.estado == 'programada' else 'bg-secondary'}">
+                                                    <span class="vp-apt-badge vp-badge-prog">
+                                                        <i class="fa fa-circle" style="font-size:7px;"/>
                                                 <t t-out="dict(c._fields['estado'].selection).get(c.estado,'')"/>
                                             </span>
+                                                    <t t-if="c.duracion_horas">
                                             <span class="text-muted small">
+                                                            <i class="fa fa-clock-o me-1"/>
                                                 <t t-out="c.duracion_horas"/> h
                                             </span>
+                                                    </t>
                                         </div>
                                         <div class="row g-2">
                                             <div class="col-6">
-                                                <div class="apt-label">Mascota</div>
-                                                <div class="apt-value">
+                                                        <p class="vp-apt-lbl">Mascota</p>
+                                                        <p class="vp-apt-val">
                                                     <a t-attf-href="/my/pets/#{c.paciente_id.id}"
                                                        class="text-decoration-none fw-semibold"
+                                                               style="color:#2E86AB;"
                                                        t-out="c.paciente_id.name"/>
-                                                </div>
+                                                        </p>
                                             </div>
                                             <div class="col-6">
-                                                <div class="apt-label">Veterinario</div>
-                                                <div class="apt-value" t-out="c.veterinario_id.name or '-'"/>
+                                                        <p class="vp-apt-lbl">Veterinario</p>
+                                                        <p class="vp-apt-val" t-out="c.veterinario_id.name or '-'"/>
                                             </div>
                                             <div class="col-6">
-                                                <div class="apt-label">Servicio</div>
-                                                <div class="apt-value" t-out="c.servicio_id.name or '-'"/>
+                                                        <p class="vp-apt-lbl">Servicio</p>
+                                                        <p class="vp-apt-val" t-out="c.servicio_id.name or '-'"/>
                                             </div>
                                             <div class="col-6">
-                                                <div class="apt-label">Motivo</div>
-                                                <div class="apt-value" t-out="c.motivo or '-'"/>
+                                                        <p class="vp-apt-lbl">Motivo</p>
+                                                        <p class="vp-apt-val" t-out="c.motivo or '-'"/>
                                             </div>
                                         </div>
                                     </div>
-                                    <!-- Observaciones del propietario -->
+                                            <!-- Observaciones -->
                                     <div class="col-md-5">
-                                        <div class="apt-obs-box h-100">
-                                            <div class="apt-label mb-2">
+                                                <div class="vp-apt-obs">
+                                                    <p class="vp-apt-lbl mb-2">
                                                 <i class="fa fa-pencil me-1"/>
                                                 Observaciones / nuevos síntomas
-                                            </div>
+                                                    </p>
                                             <t t-if="c.estado == 'programada'">
                                                 <form t-attf-action="/my/appointments/#{c.id}/observations"
                                                       method="post">
@@ -1595,22 +1691,24 @@
                                                     <textarea name="observaciones_cliente"
                                                               class="form-control form-control-sm mb-2"
                                                               rows="3"
-                                                              placeholder="Ej: tiene fiebre desde ayer, no quiere comer, cojea de la pata derecha..."><t t-out="obs_upcoming.get(c.id, '')"/></textarea>
+                                                                      placeholder="Ej: tiene fiebre, no quiere comer..."><t t-out="obs_upcoming.get(c.id, '')"/></textarea>
                                                     <button type="submit"
-                                                            class="btn btn-primary btn-sm w-100">
-                                                        <i class="fa fa-save me-1"/> Guardar observacion
+                                                                    class="btn btn-sm w-100"
+                                                                    style="background:#2E86AB; color:#fff; font-weight:600;">
+                                                                <i class="fa fa-save me-1"/>Guardar
                                                     </button>
                                                 </form>
                                             </t>
                                             <t t-else="">
-                                                <p class="small text-muted mb-0 fst-italic"
-                                                   t-out="obs_upcoming.get(c.id, '') or 'Sin observaciones registradas.'"/>
+                                                        <p class="small text-muted fst-italic mb-0"
+                                                           t-out="obs_upcoming.get(c.id,'') or 'Sin observaciones.'"/>
                                             </t>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                            </div>
                     </t>
                 </div>
             </t>
