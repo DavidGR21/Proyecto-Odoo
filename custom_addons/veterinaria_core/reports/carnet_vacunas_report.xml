@@ -12,140 +12,308 @@
         <field name="binding_type">report</field>
     </record>
 
-    <!--
-        Estructura identica al template original que funcionaba.
-        Solo se mejoran los valores de CSS (colores, tipografia, espaciado).
-        Sin t-attf-class en filas, sin context_today(), sin emoji,
-        sin reglas globales de tabla. Bootstrap row/col como el original.
-    -->
     <template id="report_carnet_vacunas_document">
         <t t-call="web.external_layout">
             <t t-set="doc" t-value="doc.with_context(lang=(doc.propietario_id.lang or 'es_ES'))"/>
             <div class="page">
                 <style>
-                    .vet-hdr         { background-color:#0d3b5e; padding:12px 16px; margin-bottom:12px; }
-                    .vet-hdr h2      { color:#fff; margin:0 0 3px 0; font-size:17px; font-weight:bold; }
-                    .vet-hdr p       { color:#b0c8d8; margin:0; font-size:10px; }
-                    .vet-badge       { padding:4px 12px; font-size:10px; font-weight:bold; color:#fff; }
-                    .vet-b-ok        { background-color:#27ae60; }
-                    .vet-b-bad       { background-color:#e74c3c; }
-                    .vet-b-no        { background-color:#7f8c8d; }
-                    .vet-card        { border:1px solid #cde4f0; border-radius:6px; padding:14px; margin-bottom:12px; background-color:#f7fbfe; }
-                    .vet-pet-name    { font-size:16px; font-weight:bold; color:#0d3b5e; margin:0 0 10px 0; padding-bottom:7px; border-bottom:2px solid #cde4f0; }
-                    .vet-info-row    { width:100%; margin-top:8px; border-collapse:collapse; }
-                    .vet-info-row th { background-color:#e3f0f8; padding:4px 8px; text-align:left; width:35%; font-size:11px; color:#0d3b5e; font-weight:bold; }
-                    .vet-info-row td { padding:4px 8px; font-size:12px; color:#2c3e50; }
-                    .vet-pet-photo   { width:110px; height:110px; border:3px solid #2E86AB; }
-                    .vet-sec-title   { font-size:11px; font-weight:bold; color:#0d3b5e; background-color:#edf6fb; border-left:4px solid #2E86AB; padding:4px 0 4px 10px; margin:12px 0 8px 0; text-transform:uppercase; }
-                    .vet-table       { width:100%; border-collapse:collapse; margin-top:0; font-size:11px; }
-                    .vet-table th    { background-color:#0d3b5e; color:#fff; padding:7px 8px; font-size:11px; }
-                    .vet-table td    { border-bottom:1px solid #daeaf5; padding:6px 8px; color:#2c3e50; }
-                    .vet-vac-name    { font-weight:bold; color:#0d3b5e; }
-                    .vet-next-date   { color:#27ae60; font-weight:bold; }
-                    .vet-empty       { color:#999; font-style:italic; padding:12px; }
-                    .vet-footer      { margin-top:16px; text-align:center; }
-                    .vet-footer p    { font-size:10px; color:#888; margin:0; }
+                    /* Remove top padding so content starts right at the top */
+                    .page { margin-top: 0 !important; padding-top: 0 !important; }
+
+                    /* ── Passport cover card ── */
+                    .vp-passport {
+                        background-color: #0d3b5e;
+                        border-radius: 18px;
+                        padding: 26px 30px 0 30px;
+                        color: #fff;
+                        position: relative;
+                        overflow: hidden;
+                    }
+                    .vp-paw-bg {
+                        position: absolute;
+                        right: -15px;
+                        top: -45px;
+                        font-size: 220px;
+                        opacity: 0.07;
+                        color: #fff;
+                        line-height: 1;
+                    }
+                    .vp-brand-name {
+                        font-size: 20px;
+                        font-weight: bold;
+                        letter-spacing: 0.02em;
+                        margin-bottom: 3px;
+                    }
+                    .vp-brand-sub {
+                        font-size: 9.5px;
+                        opacity: 0.72;
+                        text-transform: uppercase;
+                        letter-spacing: 0.1em;
+                    }
+                    .vp-badge {
+                        display: inline-block;
+                        padding: 5px 14px;
+                        border-radius: 20px;
+                        font-size: 10.5px;
+                        font-weight: bold;
+                        text-transform: uppercase;
+                        letter-spacing: 0.05em;
+                    }
+                    .vp-badge-ok   { background: #27ae60; }
+                    .vp-badge-bad  { background: #e74c3c; }
+                    .vp-badge-none { background-color: #1a5c8a; border: 1px solid #4a8ab0; }
+                    .vp-photo-box {
+                        width: 148px;
+                        height: 148px;
+                        border-radius: 14px;
+                        overflow: hidden;
+                        border: 3px solid #4a8ab0;
+                        background-color: #1a5c8a;
+                        text-align: center;
+                        vertical-align: middle;
+                    }
+                    .vp-pet-name {
+                        font-size: 30px;
+                        font-weight: bold;
+                        margin: 0 0 13px 0;
+                        line-height: 1.15;
+                    }
+                    .vp-data-tbl { width: 100%; border-collapse: collapse; }
+                    .vp-data-tbl tr { border-bottom: 1px solid rgba(255,255,255,0.12); }
+                    .vp-data-tbl td { padding: 5px 0; font-size: 12px; vertical-align: middle; }
+                    .vp-lbl {
+                        width: 90px;
+                        font-size: 9.5px;
+                        text-transform: uppercase;
+                        letter-spacing: 0.04em;
+                        opacity: 0.65;
+                        padding-right: 6px;
+                    }
+                    .vp-val { font-weight: 600; }
+                    .vp-allergy-strip {
+                        background-color: #4a1a1a;
+                        border: 1px solid #e74c3c;
+                        border-radius: 8px;
+                        padding: 9px 14px;
+                        margin-top: 14px;
+                        font-size: 11px;
+                    }
+                    .vp-allergy-label {
+                        display: block;
+                        font-size: 9px;
+                        text-transform: uppercase;
+                        letter-spacing: 0.07em;
+                        opacity: 0.7;
+                        margin-bottom: 3px;
+                    }
+                    .vp-passport-footer {
+                        background-color: #092840;
+                        padding: 11px 30px;
+                        margin: 20px -30px 0 -30px;
+                        font-size: 11px;
+                    }
+
+                    /* ── Vaccine table page ── */
+                    .vp-vac-hdr {
+                        background-color: #0d3b5e;
+                        border-radius: 8px;
+                        padding: 10px 16px;
+                        color: #fff;
+                        font-size: 13px;
+                        font-weight: bold;
+                        margin-bottom: 16px;
+                    }
+                    .vp-vac-tbl { width: 100%; border-collapse: collapse; font-size: 11px; }
+                    .vp-vac-tbl thead th {
+                        background: #0d3b5e;
+                        color: #fff;
+                        padding: 9px 10px;
+                        text-align: left;
+                        font-size: 10.5px;
+                        font-weight: bold;
+                    }
+                    .vp-vac-tbl tbody td {
+                        border-bottom: 1px solid #e4eef5;
+                        padding: 8px 10px;
+                        color: #2c3e50;
+                        vertical-align: top;
+                    }
+                    .vp-vac-tbl tbody tr.vp-even td { background: #f7fbfe; }
+                    .vp-vac-name { font-weight: bold; color: #0d3b5e; }
+                    .vp-next-date { color: #06A77D; font-weight: bold; }
+                    .vp-empty {
+                        text-align: center;
+                        color: #8e9fb0;
+                        font-style: italic;
+                        padding: 30px;
+                        border: 1px dashed #e4eef5;
+                        border-radius: 8px;
+                        margin: 10px 0;
+                    }
+                    .vp-doc-footer {
+                        text-align: center;
+                        font-size: 10px;
+                        color: #8e9fb0;
+                        margin-top: 30px;
+                        padding-top: 12px;
+                        border-top: 1px solid #e4eef5;
+                    }
                 </style>
 
-                <!-- Cabecera con badge de estado (float:right compatible con wkhtmltopdf) -->
-                <div class="vet-hdr">
-                    <t t-if="doc.estado_vacunacion == 'al_dia'">
-                        <span class="vet-badge vet-b-ok" style="float:right; margin-top:4px;">AL DIA</span>
-                    </t>
-                    <t t-elif="doc.estado_vacunacion == 'atrasado'">
-                        <span class="vet-badge vet-b-bad" style="float:right; margin-top:4px;">ATRASADO</span>
-                    </t>
-                    <t t-else="">
-                        <span class="vet-badge vet-b-no" style="float:right; margin-top:4px;">SIN VACUNAS</span>
-                    </t>
-                    <h2>CARNET DE VACUNACION</h2>
-                    <p>VitalPet - Clinica Veterinaria - Documento Oficial de Salud Animal</p>
-                </div>
+                <!-- ══════════════════ COVER / PASSPORT ══════════════════ -->
+                <div class="vp-passport">
 
-                <!-- Datos de la mascota — estructura identica al original -->
-                <div class="vet-card">
-                    <div class="row">
-                        <div class="col-3 text-center">
-                            <t t-if="doc.foto">
-                                <img t-att-src="image_data_uri(doc.foto)"
-                                     class="vet-pet-photo" alt="Foto"/>
-                            </t>
-                            <t t-else="">
-                                <span class="fa fa-paw fa-4x" style="color:#2E86AB;"/>
-                            </t>
+                    <!-- Decorative background paw -->
+                    <div class="vp-paw-bg"><i class="fa fa-paw"/></div>
+
+                    <!-- Clinic brand + vaccination status -->
+                    <table style="width:100%; border-collapse:collapse; margin-bottom:20px;">
+                        <tr>
+                            <td style="vertical-align:top;">
+                                <div class="vp-brand-name">
+                                    <i class="fa fa-paw" style="margin-right:7px;"/>VitalPet
+                                </div>
+                                <div class="vp-brand-sub">Pasaporte Sanitario de Mascota</div>
+                            </td>
+                            <td style="text-align:right; vertical-align:top;">
+                                <t t-if="doc.estado_vacunacion == 'al_dia'">
+                                    <span class="vp-badge vp-badge-ok">
+                                        <i class="fa fa-check" style="margin-right:4px;"/>Al dia
+                                    </span>
+                                </t>
+                                <t t-elif="doc.estado_vacunacion == 'atrasado'">
+                                    <span class="vp-badge vp-badge-bad">
+                                        <i class="fa fa-exclamation-triangle" style="margin-right:4px;"/>Atrasado
+                                    </span>
+                                </t>
+                                <t t-else="">
+                                    <span class="vp-badge vp-badge-none">Sin vacunas</span>
+                                </t>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- Pet photo + data columns -->
+                    <table style="width:100%; border-collapse:collapse;">
+                        <tr>
+                            <!-- Photo -->
+                            <td style="width:158px; vertical-align:top;">
+                                <t t-if="doc.foto">
+                                    <div class="vp-photo-box"
+                                         t-attf-style="background-image:url('#{image_data_uri(doc.foto)}'); background-size:cover; background-position:center; background-repeat:no-repeat; width:148px; height:148px; border-radius:14px; border:3px solid #4a8ab0;"/>
+                                </t>
+                                <t t-else="">
+                                    <div class="vp-photo-box" style="width:148px; height:148px; line-height:148px;">
+                                        <i class="fa fa-paw" style="font-size:52px; opacity:0.4; vertical-align:middle;"/>
+                                    </div>
+                                </t>
+                            </td>
+                            <!-- Info -->
+                            <td style="padding-left:26px; vertical-align:top;">
+                                <div class="vp-pet-name" t-out="doc.name"/>
+                                <table class="vp-data-tbl">
+                                    <tr>
+                                        <td class="vp-lbl">Especie</td>
+                                        <td class="vp-val"
+                                            t-out="dict(doc._fields['especie'].selection).get(doc.especie, '-')"/>
+                                    </tr>
+                                    <tr>
+                                        <td class="vp-lbl">Raza</td>
+                                        <td class="vp-val" t-out="doc.raza or '-'"/>
+                                    </tr>
+                                    <tr>
+                                        <td class="vp-lbl">Nacimiento</td>
+                                        <td class="vp-val" t-out="doc.fecha_nacimiento or '-'"/>
+                                    </tr>
+                                    <tr>
+                                        <td class="vp-lbl">Peso</td>
+                                        <td class="vp-val"><t t-out="doc.peso or 0"/> kg</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="vp-lbl">Microchip</td>
+                                        <td class="vp-val" t-out="doc.microchip or '-'"/>
+                                    </tr>
+                                    <tr>
+                                        <td class="vp-lbl">Propietario</td>
+                                        <td class="vp-val" t-out="doc.propietario_id.name or '-'"/>
+                                    </tr>
+                                    <tr>
+                                        <td class="vp-lbl">Contacto</td>
+                                        <td class="vp-val"
+                                            t-out="doc.propietario_id.phone or doc.propietario_id.mobile or '-'"/>
+                                    </tr>
+                                    <tr>
+                                        <td class="vp-lbl">Vacunas</td>
+                                        <td class="vp-val">
+                                            <t t-out="len(doc.vacuna_aplicada_ids)"/> registrada(s)
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- Allergies strip (only if set) -->
+                    <t t-if="doc.alergias">
+                        <div class="vp-allergy-strip">
+                            <span class="vp-allergy-label">
+                                <i class="fa fa-exclamation-circle" style="margin-right:4px;"/>Alergias registradas
+                            </span>
+                            <t t-out="doc.alergias"/>
                         </div>
-                        <div class="col-9">
-                            <p class="vet-pet-name" t-out="doc.name"/>
-                            <table class="vet-info-row">
-                                <tr>
-                                    <th>Especie</th>
-                                    <td t-out="dict(doc._fields['especie'].selection).get(doc.especie, '')"/>
-                                </tr>
-                                <tr>
-                                    <th>Raza</th>
-                                    <td t-out="doc.raza or '-'"/>
-                                </tr>
-                                <tr>
-                                    <th>Fecha de nacimiento</th>
-                                    <td t-out="doc.fecha_nacimiento or '-'"/>
-                                </tr>
-                                <tr>
-                                    <th>Microchip</th>
-                                    <td t-out="doc.microchip or '-'"/>
-                                </tr>
-                                <tr>
-                                    <th>Peso</th>
-                                    <td><t t-out="doc.peso or 0"/> kg</td>
-                                </tr>
-                                <tr>
-                                    <th>Propietario</th>
-                                    <td t-out="doc.propietario_id.name or '-'"/>
-                                </tr>
-                                <tr>
-                                    <th>Contacto</th>
-                                    <td t-out="doc.propietario_id.phone or doc.propietario_id.mobile or '-'"/>
-                                </tr>
-                                <tr>
-                                    <th>Alergias</th>
-                                    <td t-out="doc.alergias or 'Ninguna registrada'"/>
-                                </tr>
-                            </table>
-                        </div>
+                    </t>
+
+                    <!-- Footer bar -->
+                    <div class="vp-passport-footer">
+                        <span>ID Mascota: PET-<t t-out="'%06d' % doc.id"/></span>
+                        <span style="float:right;">VitalPet - Clinica Veterinaria</span>
                     </div>
                 </div>
+                <!-- END cover -->
 
-                <!-- Vacunas — estructura identica al original, sin t-attf-class -->
-                <div class="vet-sec-title">Historial de Vacunas Aplicadas</div>
+                <!-- Force vaccine history to a new page -->
+                <div style="page-break-before: always;"/>
+
+                <!-- ══════════════════ VACCINE HISTORY ══════════════════ -->
+                <div class="vp-vac-hdr">
+                    <i class="fa fa-medkit" style="margin-right:8px;"/>
+                    Historial de Vacunacion — <t t-out="doc.name"/>
+                </div>
+
                 <t t-if="doc.vacuna_aplicada_ids">
-                    <table class="vet-table">
+                    <table class="vp-vac-tbl">
                         <thead>
                             <tr>
-                                <th style="width:22%">Vacuna</th>
-                                <th style="width:14%">Fecha Aplic.</th>
-                                <th style="width:17%">Veterinario</th>
-                                <th style="width:10%">Lote</th>
-                                <th style="width:13%">Proxima Dosis</th>
+                                <th style="width:22%;">Vacuna</th>
+                                <th style="width:13%;">Fecha Aplic.</th>
+                                <th style="width:17%;">Veterinario</th>
+                                <th style="width:10%;">Lote</th>
+                                <th style="width:13%;">Proxima Dosis</th>
                                 <th>Observaciones</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr t-foreach="doc.vacuna_aplicada_ids" t-as="v">
-                                <td><span class="vet-vac-name" t-out="v.vacuna_id.name"/></td>
+                            <tr t-foreach="doc.vacuna_aplicada_ids" t-as="v"
+                                t-attf-class="#{'' if v_index % 2 == 0 else 'vp-even'}">
+                                <td><span class="vp-vac-name" t-out="v.vacuna_id.name"/></td>
                                 <td t-out="v.fecha_aplicacion"/>
                                 <td t-out="v.veterinario_id.name or '-'"/>
                                 <td t-out="v.lote or '-'"/>
-                                <td><span class="vet-next-date" t-out="v.proxima_dosis or '-'"/></td>
+                                <td><span class="vp-next-date" t-out="v.proxima_dosis or '-'"/></td>
                                 <td t-out="v.observaciones or '-'"/>
                             </tr>
                         </tbody>
                     </table>
                 </t>
                 <t t-else="">
-                    <p class="vet-empty">Sin vacunas aplicadas registradas.</p>
+                    <div class="vp-empty">
+                        <i class="fa fa-info-circle" style="margin-right:6px;"/>
+                        Sin vacunas aplicadas registradas para esta mascota.
+                    </div>
                 </t>
 
-                <div class="vet-footer">
-                    <p>Documento generado por VitalPet - Clinica Veterinaria</p>
+                <div class="vp-doc-footer">
+                    Documento generado por VitalPet - Clinica Veterinaria
                 </div>
             </div>
         </t>
