@@ -99,22 +99,24 @@
                 <div class="text-center mb-3">
                     <t t-if="partner.image_1920">
                         <img t-attf-src="/web/image/res.partner/#{partner.id}/image_1920"
-                             class="rounded-circle"
-                             style="width:120px;height:120px;object-fit:cover;border:3px solid #2E86AB;"
-                             alt="Foto de perfil"/>
+                             style="width:70px;height:70px;object-fit:cover;border-radius:50%;border:3px solid #2E86AB;"
+                             alt="Foto de perfil" class="mb-2"/>
                     </t>
                     <t t-else="">
-                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center"
-                             style="width:120px;height:120px;background:#e9ecef;border:3px solid #2E86AB;">
-                            <i class="fa fa-user fa-3x text-secondary"/>
+                        <div style="width:70px;height:70px;border-radius:50%;background:#cde4f0;border:3px solid #2E86AB;display:inline-flex;align-items:center;justify-content:center;" class="mb-2">
+                            <i class="fa fa-camera fa-lg" style="color:#2E86AB;"/>
                         </div>
                     </t>
+                    <p style="font-weight:600;font-size:.88rem;color:#0d3b5e;margin:4px 0 2px;">
+                        Foto de Perfil
+                    </p>
+                    <p style="font-size:.78rem;color:#8e9fb0;margin:0 0 8px;">
+                        Imagen cuadrada recomendada
+                    </p>
+                    <input type="file" name="image_1920" id="image_1920"
+                           class="form-control" accept="image/*"
+                           style="max-width:280px;margin:auto;display:block;"/>
                 </div>
-                <label for="image_1920" class="form-label fw-bold">
-                    Cambiar foto de perfil
-                </label>
-                <input type="file" name="image_1920" id="image_1920"
-                       class="form-control" accept="image/*"/>
             </div>
         </xpath>
     </template>
