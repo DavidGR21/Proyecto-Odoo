@@ -3237,9 +3237,7 @@
                 }
                 .vp-guide-hero h2 { font-size: 1.35rem; font-weight: 700; margin: 0 0 5px; }
                 .vp-guide-hero p  { font-size: .88rem; opacity: .8; margin: 0 0 14px; }
-                .vp-guide-quick-links {
-                    display: flex; gap: 8px; flex-wrap: wrap;
-                }
+                .vp-guide-quick-links { display: flex; gap: 8px; flex-wrap: wrap; }
                 .vp-guide-qlink {
                     display: inline-flex; align-items: center; gap: 5px;
                     background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.3);
@@ -3276,7 +3274,7 @@
                 .vp-guide-step-text { font-size: .85rem; color: #2c3e50; line-height: 1.45; }
                 .vp-guide-step-text strong { color: #0d3b5e; display: block; margin-bottom: 2px; }
 
-                /* ── Section cards ── */
+                /* ── Section label ── */
                 .vp-guide-section-label {
                     font-size: .73rem; font-weight: 700; text-transform: uppercase;
                     letter-spacing: .07em; color: #8e9fb0;
@@ -3284,30 +3282,44 @@
                 }
                 .vp-guide-section-label::after { content: ''; flex: 1; height: 1px; background: #e4eef5; }
 
+                /* ── Accordion guide cards ── */
                 .vp-guide-card {
                     background: #fff; border-radius: 14px;
                     border: 1px solid #e4eef5;
                     box-shadow: 0 2px 10px rgba(46,134,171,.06);
-                    overflow: hidden; height: 100%;
-                    display: flex; flex-direction: column;
+                    overflow: hidden;
                 }
+                /* Header is now a toggle button */
                 .vp-guide-card-hdr {
-                    padding: 14px 18px 12px;
+                    width: 100%; background: none; border: none; text-align: left;
+                    padding: 14px 18px;
                     display: flex; align-items: center; gap: 12px;
-                    border-bottom: 1px solid #f0f4f8;
+                    cursor: pointer; transition: background .15s;
                 }
+                .vp-guide-card-hdr:hover { background: #f7fbfe; }
                 .vp-guide-card-icon {
                     width: 40px; height: 40px; border-radius: 11px;
                     display: flex; align-items: center; justify-content: center;
                     font-size: .95rem; color: #fff; flex-shrink: 0;
                 }
+                .vp-guide-card-hdr-text { flex: 1; min-width: 0; }
                 .vp-guide-card-hdr-text h6 {
                     font-size: .93rem; font-weight: 700; color: #0d3b5e; margin: 0 0 2px;
                 }
-                .vp-guide-card-hdr-text p {
-                    font-size: .76rem; color: #8e9fb0; margin: 0;
+                .vp-guide-card-hdr-text p { font-size: .76rem; color: #8e9fb0; margin: 0; }
+                /* Chevron indicator */
+                .vp-guide-chevron {
+                    font-size: .8rem; color: #8e9fb0; flex-shrink: 0;
+                    transition: transform .25s ease;
                 }
-                .vp-guide-card-body { padding: 16px 18px; flex: 1; }
+                .vp-guide-card-hdr[aria-expanded="true"] .vp-guide-chevron {
+                    transform: rotate(180deg);
+                }
+                /* Collapsed body */
+                .vp-guide-card-body {
+                    padding: 16px 18px;
+                    border-top: 1px solid #f0f4f8;
+                }
                 .vp-guide-can-label {
                     font-size: .7rem; font-weight: 700; text-transform: uppercase;
                     letter-spacing: .05em; color: #8e9fb0; margin-bottom: 7px;
@@ -3315,8 +3327,7 @@
                 .vp-guide-can-list { list-style: none; padding: 0; margin: 0 0 14px; }
                 .vp-guide-can-list li {
                     display: flex; align-items: flex-start; gap: 7px;
-                    font-size: .83rem; color: #2c3e50; padding: 3px 0;
-                    line-height: 1.4;
+                    font-size: .83rem; color: #2c3e50; padding: 3px 0; line-height: 1.4;
                 }
                 .vp-guide-can-list li i {
                     color: #27ae60; font-size: .7rem; margin-top: 4px; flex-shrink: 0;
@@ -3325,7 +3336,9 @@
                     font-size: .7rem; font-weight: 700; text-transform: uppercase;
                     letter-spacing: .05em; color: #8e9fb0; margin-bottom: 7px;
                 }
-                .vp-guide-how-list { list-style: none; padding: 0; margin: 0; counter-reset: step-c; }
+                .vp-guide-how-list {
+                    list-style: none; padding: 0; margin: 0; counter-reset: step-c;
+                }
                 .vp-guide-how-list li {
                     display: flex; align-items: flex-start; gap: 8px;
                     font-size: .82rem; color: #546e7a; padding: 3px 0;
@@ -3374,11 +3387,24 @@
                     gap: 8px; transition: background .15s;
                 }
                 .vp-guide-faq-btn:hover { background: #f7fbfe; }
-                .vp-guide-faq-btn i.fa-chevron { transition: transform .2s; }
+                .vp-guide-faq-btn .vp-guide-chevron { margin-left: auto; }
+                .vp-guide-faq-btn[aria-expanded="true"] .vp-guide-chevron {
+                    transform: rotate(180deg);
+                }
                 .vp-guide-faq-body {
                     padding: 0 18px 14px;
                     font-size: .83rem; color: #546e7a; line-height: 1.55;
+                    border-top: 1px solid #f0f4f8;
                 }
+                /* Notice box for branch-only actions */
+                .vp-guide-notice {
+                    display: flex; align-items: flex-start; gap: 10px;
+                    background: #edf6fb; border: 1px solid #b8ddf0;
+                    border-left: 4px solid #2E86AB;
+                    border-radius: 8px; padding: 12px 14px;
+                    font-size: .83rem; color: #0d3b5e; margin-top: 4px;
+                }
+                .vp-guide-notice i { color: #2E86AB; margin-top: 2px; flex-shrink: 0; }
             </style>
 
             <div class="vp-guide-wrap">
@@ -3390,12 +3416,12 @@
                         <h2>Guía de Uso del Portal</h2>
                         <p>Todo lo que necesitas saber para gestionar la salud de tus mascotas en VitalPet</p>
                         <div class="vp-guide-quick-links">
-                            <a href="/my/pets"           class="vp-guide-qlink"><i class="fa fa-paw"/> Mascotas</a>
-                            <a href="/my/appointments"   class="vp-guide-qlink"><i class="fa fa-calendar"/> Citas</a>
+                            <a href="/my/pets"            class="vp-guide-qlink"><i class="fa fa-paw"/> Mascotas</a>
+                            <a href="/my/appointments"    class="vp-guide-qlink"><i class="fa fa-calendar"/> Citas</a>
                             <a href="/my/medical_records" class="vp-guide-qlink"><i class="fa fa-stethoscope"/> Historia</a>
-                            <a href="/my/prescriptions"  class="vp-guide-qlink"><i class="fa fa-medkit"/> Recetas</a>
-                            <a href="/my/invoices_vet"   class="vp-guide-qlink"><i class="fa fa-file-text-o"/> Facturas</a>
-                            <a href="/my/account"        class="vp-guide-qlink"><i class="fa fa-user-circle"/> Perfil</a>
+                            <a href="/my/prescriptions"   class="vp-guide-qlink"><i class="fa fa-medkit"/> Recetas</a>
+                            <a href="/my/invoices_vet"    class="vp-guide-qlink"><i class="fa fa-file-text-o"/> Facturas</a>
+                            <a href="/my/account"         class="vp-guide-qlink"><i class="fa fa-user-circle"/> Perfil</a>
                         </div>
                     </div>
                 </div>
@@ -3442,7 +3468,10 @@
                     <!-- Mis Mascotas -->
                     <div class="col-md-6 col-lg-4">
                         <div class="vp-guide-card">
-                            <div class="vp-guide-card-hdr">
+                            <button class="vp-guide-card-hdr" type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#guide-pets"
+                                    aria-expanded="false">
                                 <div class="vp-guide-card-icon" style="background:#2E86AB;">
                                     <i class="fa fa-paw"/>
                                 </div>
@@ -3450,32 +3479,34 @@
                                     <h6>Mis Mascotas</h6>
                                     <p>Ficha completa de cada mascota</p>
                                 </div>
-                            </div>
-                            <div class="vp-guide-card-body">
-                                <div class="vp-guide-can-label">Qué puedes ver</div>
-                                <ul class="vp-guide-can-list">
-                                    <li><i class="fa fa-check-circle"/> Lista de todas tus mascotas registradas</li>
-                                    <li><i class="fa fa-check-circle"/> Información: especie, raza, fecha de nacimiento, peso</li>
-                                    <li><i class="fa fa-check-circle"/> Historial completo de vacunas con estado al día / atrasado</li>
-                                    <li><i class="fa fa-check-circle"/> Historia clínica, recetas y consultas vinculadas</li>
-                                </ul>
-                                <div class="vp-guide-how-label">Cómo usarlo</div>
-                                <ol class="vp-guide-how-list">
-                                    <li>Haz clic en una tarjeta de mascota para abrir su ficha detallada</li>
-                                    <li>Usa las pestañas <strong>Información / Vacunas / Historia / Recetas</strong> para navegar</li>
-                                    <li>Para subir una foto, haz clic en "Cambiar foto" dentro del detalle</li>
-                                    <li>Para descargar el carnet de vacunas en PDF, haz clic en el botón azul "Descargar Carnet"</li>
-                                </ol>
-                                <div class="vp-guide-tip">
-                                    <i class="fa fa-lightbulb-o"/>
-                                    El badge de color en cada tarjeta indica el estado de vacunación de tu mascota.
+                                <i class="fa fa-chevron-down vp-guide-chevron"/>
+                            </button>
+                            <div id="guide-pets" class="collapse">
+                                <div class="vp-guide-card-body">
+                                    <div class="vp-guide-can-label">Qué puedes ver</div>
+                                    <ul class="vp-guide-can-list">
+                                        <li><i class="fa fa-check-circle"/> Lista de todas tus mascotas registradas</li>
+                                        <li><i class="fa fa-check-circle"/> Información: especie, raza, fecha de nacimiento, peso</li>
+                                        <li><i class="fa fa-check-circle"/> Historial completo de vacunas con estado al día / atrasado</li>
+                                        <li><i class="fa fa-check-circle"/> Historia clínica, recetas y consultas vinculadas</li>
+                                    </ul>
+                                    <div class="vp-guide-how-label">Cómo usarlo</div>
+                                    <ol class="vp-guide-how-list">
+                                        <li>Haz clic en una tarjeta de mascota para abrir su ficha detallada</li>
+                                        <li>Usa las pestañas <strong>Información / Vacunas / Historia / Recetas</strong> para navegar</li>
+                                        <li>Para subir una foto, haz clic en "Cambiar foto" dentro del detalle</li>
+                                        <li>Para descargar el carnet en PDF, haz clic en el botón azul "Descargar Carnet"</li>
+                                    </ol>
+                                    <div class="vp-guide-tip">
+                                        <i class="fa fa-lightbulb-o"/>
+                                        El badge de color en cada tarjeta indica el estado de vacunación de tu mascota.
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="vp-guide-card-footer">
-                                <a href="/my/pets" class="vp-guide-go-btn"
-                                   style="background:#2E86AB;color:#fff;">
-                                    <i class="fa fa-arrow-right"/> Ir a Mis Mascotas
-                                </a>
+                                <div class="vp-guide-card-footer">
+                                    <a href="/my/pets" class="vp-guide-go-btn" style="background:#2E86AB;color:#fff;">
+                                        <i class="fa fa-arrow-right"/> Ir a Mis Mascotas
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -3483,7 +3514,10 @@
                     <!-- Mis Citas -->
                     <div class="col-md-6 col-lg-4">
                         <div class="vp-guide-card">
-                            <div class="vp-guide-card-hdr">
+                            <button class="vp-guide-card-hdr" type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#guide-appts"
+                                    aria-expanded="false">
                                 <div class="vp-guide-card-icon" style="background:#06A77D;">
                                     <i class="fa fa-calendar"/>
                                 </div>
@@ -3491,32 +3525,34 @@
                                     <h6>Mis Citas</h6>
                                     <p>Próximas y pasadas consultas</p>
                                 </div>
-                            </div>
-                            <div class="vp-guide-card-body">
-                                <div class="vp-guide-can-label">Qué puedes ver</div>
-                                <ul class="vp-guide-can-list">
-                                    <li><i class="fa fa-check-circle"/> Citas próximas ordenadas por fecha</li>
-                                    <li><i class="fa fa-check-circle"/> Historial de citas pasadas con estado color-codificado</li>
-                                    <li><i class="fa fa-check-circle"/> Veterinario, servicio y motivo de cada consulta</li>
-                                    <li><i class="fa fa-check-circle"/> Observaciones propias enviadas al veterinario</li>
-                                </ul>
-                                <div class="vp-guide-how-label">Cómo usarlo</div>
-                                <ol class="vp-guide-how-list">
-                                    <li>Las <strong>citas próximas</strong> aparecen en la parte superior con borde azul</li>
-                                    <li>Para agregar una observación, escribe en el campo de texto de la cita y guarda</li>
-                                    <li>El color del borde izquierdo indica el estado: azul = programada, verde = completada, rojo = cancelada</li>
-                                    <li>Las citas pasadas se muestran más abajo, separadas por sección</li>
-                                </ol>
-                                <div class="vp-guide-tip">
-                                    <i class="fa fa-lightbulb-o"/>
-                                    Puedes dejar notas de síntomas para que el veterinario las revise antes de la consulta.
+                                <i class="fa fa-chevron-down vp-guide-chevron"/>
+                            </button>
+                            <div id="guide-appts" class="collapse">
+                                <div class="vp-guide-card-body">
+                                    <div class="vp-guide-can-label">Qué puedes ver</div>
+                                    <ul class="vp-guide-can-list">
+                                        <li><i class="fa fa-check-circle"/> Citas próximas ordenadas por fecha</li>
+                                        <li><i class="fa fa-check-circle"/> Historial de citas pasadas con estado color-codificado</li>
+                                        <li><i class="fa fa-check-circle"/> Veterinario, servicio y motivo de cada consulta</li>
+                                        <li><i class="fa fa-check-circle"/> Observaciones propias enviadas al veterinario</li>
+                                    </ul>
+                                    <div class="vp-guide-how-label">Cómo usarlo</div>
+                                    <ol class="vp-guide-how-list">
+                                        <li>Las <strong>citas próximas</strong> aparecen en la parte superior con borde azul</li>
+                                        <li>Para agregar una observación, escribe en el campo de texto y guarda</li>
+                                        <li>El color del borde izquierdo indica el estado: azul = programada, verde = completada, rojo = cancelada</li>
+                                        <li>Las citas pasadas se muestran más abajo, separadas por sección</li>
+                                    </ol>
+                                    <div class="vp-guide-tip">
+                                        <i class="fa fa-lightbulb-o"/>
+                                        Puedes dejar notas de síntomas para que el veterinario las revise antes de la consulta.
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="vp-guide-card-footer">
-                                <a href="/my/appointments" class="vp-guide-go-btn"
-                                   style="background:#06A77D;color:#fff;">
-                                    <i class="fa fa-arrow-right"/> Ir a Mis Citas
-                                </a>
+                                <div class="vp-guide-card-footer">
+                                    <a href="/my/appointments" class="vp-guide-go-btn" style="background:#06A77D;color:#fff;">
+                                        <i class="fa fa-arrow-right"/> Ir a Mis Citas
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -3524,7 +3560,10 @@
                     <!-- Historia Clínica -->
                     <div class="col-md-6 col-lg-4">
                         <div class="vp-guide-card">
-                            <div class="vp-guide-card-hdr">
+                            <button class="vp-guide-card-hdr" type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#guide-hc"
+                                    aria-expanded="false">
                                 <div class="vp-guide-card-icon" style="background:#7b5ea7;">
                                     <i class="fa fa-stethoscope"/>
                                 </div>
@@ -3532,32 +3571,34 @@
                                     <h6>Historia Clínica</h6>
                                     <p>Expediente médico completo</p>
                                 </div>
-                            </div>
-                            <div class="vp-guide-card-body">
-                                <div class="vp-guide-can-label">Qué puedes ver</div>
-                                <ul class="vp-guide-can-list">
-                                    <li><i class="fa fa-check-circle"/> Expediente médico de cada mascota en una sola vista</li>
-                                    <li><i class="fa fa-check-circle"/> Tipo de sangre, peso, alergias y condiciones crónicas</li>
-                                    <li><i class="fa fa-check-circle"/> Línea de tiempo de todas las consultas con diagnóstico</li>
-                                    <li><i class="fa fa-check-circle"/> Recetas emitidas con medicamentos y dosis</li>
-                                </ul>
-                                <div class="vp-guide-how-label">Cómo usarlo</div>
-                                <ol class="vp-guide-how-list">
-                                    <li>Cada mascota tiene su propia tarjeta de historia clínica</li>
-                                    <li>Haz clic en la pestaña <strong>Información Médica</strong> para ver datos de salud</li>
-                                    <li>Ve a la pestaña <strong>Consultas</strong> para ver el historial de visitas</li>
-                                    <li>En la pestaña <strong>Recetas</strong> encuentras los medicamentos recetados</li>
-                                </ol>
-                                <div class="vp-guide-tip">
-                                    <i class="fa fa-lightbulb-o"/>
-                                    La historia clínica se crea automáticamente cuando se registra la primera cita.
+                                <i class="fa fa-chevron-down vp-guide-chevron"/>
+                            </button>
+                            <div id="guide-hc" class="collapse">
+                                <div class="vp-guide-card-body">
+                                    <div class="vp-guide-can-label">Qué puedes ver</div>
+                                    <ul class="vp-guide-can-list">
+                                        <li><i class="fa fa-check-circle"/> Expediente médico de cada mascota en una sola vista</li>
+                                        <li><i class="fa fa-check-circle"/> Tipo de sangre, peso, alergias y condiciones crónicas</li>
+                                        <li><i class="fa fa-check-circle"/> Línea de tiempo de todas las consultas con diagnóstico</li>
+                                        <li><i class="fa fa-check-circle"/> Recetas emitidas con medicamentos y dosis</li>
+                                    </ul>
+                                    <div class="vp-guide-how-label">Cómo usarlo</div>
+                                    <ol class="vp-guide-how-list">
+                                        <li>Cada mascota tiene su propia tarjeta de historia clínica</li>
+                                        <li>Haz clic en la pestaña <strong>Información Médica</strong> para ver datos de salud</li>
+                                        <li>Ve a la pestaña <strong>Consultas</strong> para ver el historial de visitas</li>
+                                        <li>En la pestaña <strong>Recetas</strong> encuentras los medicamentos recetados</li>
+                                    </ol>
+                                    <div class="vp-guide-tip">
+                                        <i class="fa fa-lightbulb-o"/>
+                                        La historia clínica se crea automáticamente cuando se registra la primera cita.
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="vp-guide-card-footer">
-                                <a href="/my/medical_records" class="vp-guide-go-btn"
-                                   style="background:#7b5ea7;color:#fff;">
-                                    <i class="fa fa-arrow-right"/> Ir a Historia Clínica
-                                </a>
+                                <div class="vp-guide-card-footer">
+                                    <a href="/my/medical_records" class="vp-guide-go-btn" style="background:#7b5ea7;color:#fff;">
+                                        <i class="fa fa-arrow-right"/> Ir a Historia Clínica
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -3565,7 +3606,10 @@
                     <!-- Recetas Médicas -->
                     <div class="col-md-6 col-lg-4">
                         <div class="vp-guide-card">
-                            <div class="vp-guide-card-hdr">
+                            <button class="vp-guide-card-hdr" type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#guide-rx"
+                                    aria-expanded="false">
                                 <div class="vp-guide-card-icon" style="background:#e8567a;">
                                     <i class="fa fa-medkit"/>
                                 </div>
@@ -3573,32 +3617,34 @@
                                     <h6>Recetas Médicas</h6>
                                     <p>Prescripciones del veterinario</p>
                                 </div>
-                            </div>
-                            <div class="vp-guide-card-body">
-                                <div class="vp-guide-can-label">Qué puedes ver</div>
-                                <ul class="vp-guide-can-list">
-                                    <li><i class="fa fa-check-circle"/> Todas las recetas emitidas en formato médico</li>
-                                    <li><i class="fa fa-check-circle"/> Diagnóstico e instrucciones del veterinario</li>
-                                    <li><i class="fa fa-check-circle"/> Lista de medicamentos con dosis, frecuencia y duración</li>
-                                    <li><i class="fa fa-check-circle"/> Estado de cada receta: borrador o finalizada</li>
-                                </ul>
-                                <div class="vp-guide-how-label">Cómo usarlo</div>
-                                <ol class="vp-guide-how-list">
-                                    <li>Cada receta muestra un número de referencia y la fecha de emisión</li>
-                                    <li>El símbolo <strong>℞</strong> precede la lista de medicamentos de cada prescripción</li>
-                                    <li>Las fichas de posología muestran: dosis, frecuencia y días de tratamiento</li>
-                                    <li>Las instrucciones adicionales aparecen con borde ámbar al pie de la receta</li>
-                                </ol>
-                                <div class="vp-guide-tip">
-                                    <i class="fa fa-lightbulb-o"/>
-                                    Solo las recetas en estado "Finalizada" son oficiales y han sido revisadas por el veterinario.
+                                <i class="fa fa-chevron-down vp-guide-chevron"/>
+                            </button>
+                            <div id="guide-rx" class="collapse">
+                                <div class="vp-guide-card-body">
+                                    <div class="vp-guide-can-label">Qué puedes ver</div>
+                                    <ul class="vp-guide-can-list">
+                                        <li><i class="fa fa-check-circle"/> Todas las recetas emitidas en formato médico</li>
+                                        <li><i class="fa fa-check-circle"/> Diagnóstico e instrucciones del veterinario</li>
+                                        <li><i class="fa fa-check-circle"/> Lista de medicamentos con dosis, frecuencia y duración</li>
+                                        <li><i class="fa fa-check-circle"/> Estado de cada receta: borrador o finalizada</li>
+                                    </ul>
+                                    <div class="vp-guide-how-label">Cómo usarlo</div>
+                                    <ol class="vp-guide-how-list">
+                                        <li>Cada receta muestra un número de referencia y la fecha de emisión</li>
+                                        <li>El símbolo <strong>℞</strong> precede la lista de medicamentos de cada prescripción</li>
+                                        <li>Las fichas de posología muestran: dosis, frecuencia y días de tratamiento</li>
+                                        <li>Las instrucciones adicionales aparecen con borde ámbar al pie de la receta</li>
+                                    </ol>
+                                    <div class="vp-guide-tip">
+                                        <i class="fa fa-lightbulb-o"/>
+                                        Solo las recetas en estado "Finalizada" son oficiales y revisadas por el veterinario.
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="vp-guide-card-footer">
-                                <a href="/my/prescriptions" class="vp-guide-go-btn"
-                                   style="background:#e8567a;color:#fff;">
-                                    <i class="fa fa-arrow-right"/> Ir a Recetas
-                                </a>
+                                <div class="vp-guide-card-footer">
+                                    <a href="/my/prescriptions" class="vp-guide-go-btn" style="background:#e8567a;color:#fff;">
+                                        <i class="fa fa-arrow-right"/> Ir a Recetas
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -3606,7 +3652,10 @@
                     <!-- Mis Facturas -->
                     <div class="col-md-6 col-lg-4">
                         <div class="vp-guide-card">
-                            <div class="vp-guide-card-hdr">
+                            <button class="vp-guide-card-hdr" type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#guide-inv"
+                                    aria-expanded="false">
                                 <div class="vp-guide-card-icon" style="background:#f4951e;">
                                     <i class="fa fa-file-text-o"/>
                                 </div>
@@ -3614,32 +3663,34 @@
                                     <h6>Mis Facturas</h6>
                                     <p>Pagos y comprobantes veterinarios</p>
                                 </div>
-                            </div>
-                            <div class="vp-guide-card-body">
-                                <div class="vp-guide-can-label">Qué puedes ver</div>
-                                <ul class="vp-guide-can-list">
-                                    <li><i class="fa fa-check-circle"/> Todas tus facturas con estado: pagada, pendiente, cancelada</li>
-                                    <li><i class="fa fa-check-circle"/> Monto total de cada factura con banda de color por estado</li>
-                                    <li><i class="fa fa-check-circle"/> Detalle de servicios: fecha, mascota, veterinario, líneas</li>
-                                    <li><i class="fa fa-check-circle"/> Pago en línea con PayPal y descarga de PDF</li>
-                                </ul>
-                                <div class="vp-guide-how-label">Cómo usarlo</div>
-                                <ol class="vp-guide-how-list">
-                                    <li>Las facturas con borde verde están pagadas; naranja indica pendiente de pago</li>
-                                    <li>Haz clic en <strong>Ver detalle</strong> para ver el desglose completo de servicios</li>
-                                    <li>Usa el botón <strong>PDF</strong> para descargar el comprobante en formato PDF</li>
-                                    <li>Si la factura está pendiente, el botón <strong>Pagar con PayPal</strong> te redirige al pago seguro</li>
-                                </ol>
-                                <div class="vp-guide-tip">
-                                    <i class="fa fa-lightbulb-o"/>
-                                    El botón de pago con PayPal solo aparece en facturas con estado "Pendiente".
+                                <i class="fa fa-chevron-down vp-guide-chevron"/>
+                            </button>
+                            <div id="guide-inv" class="collapse">
+                                <div class="vp-guide-card-body">
+                                    <div class="vp-guide-can-label">Qué puedes ver</div>
+                                    <ul class="vp-guide-can-list">
+                                        <li><i class="fa fa-check-circle"/> Todas tus facturas con estado: pagada, pendiente, cancelada</li>
+                                        <li><i class="fa fa-check-circle"/> Monto total de cada factura con banda de color por estado</li>
+                                        <li><i class="fa fa-check-circle"/> Detalle de servicios: fecha, mascota, veterinario, líneas</li>
+                                        <li><i class="fa fa-check-circle"/> Pago en línea con PayPal y descarga de PDF</li>
+                                    </ul>
+                                    <div class="vp-guide-how-label">Cómo usarlo</div>
+                                    <ol class="vp-guide-how-list">
+                                        <li>Las facturas con borde verde están pagadas; naranja indica pendiente de pago</li>
+                                        <li>Haz clic en <strong>Ver detalle</strong> para ver el desglose completo de servicios</li>
+                                        <li>Usa el botón <strong>PDF</strong> para descargar el comprobante en formato PDF</li>
+                                        <li>Si la factura está pendiente, el botón <strong>Pagar con PayPal</strong> te redirige al pago seguro</li>
+                                    </ol>
+                                    <div class="vp-guide-tip">
+                                        <i class="fa fa-lightbulb-o"/>
+                                        El botón de pago con PayPal solo aparece en facturas con estado "Pendiente".
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="vp-guide-card-footer">
-                                <a href="/my/invoices_vet" class="vp-guide-go-btn"
-                                   style="background:#f4951e;color:#fff;">
-                                    <i class="fa fa-arrow-right"/> Ir a Mis Facturas
-                                </a>
+                                <div class="vp-guide-card-footer">
+                                    <a href="/my/invoices_vet" class="vp-guide-go-btn" style="background:#f4951e;color:#fff;">
+                                        <i class="fa fa-arrow-right"/> Ir a Mis Facturas
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -3653,7 +3704,10 @@
                     <!-- Mi Perfil -->
                     <div class="col-md-6">
                         <div class="vp-guide-card">
-                            <div class="vp-guide-card-hdr">
+                            <button class="vp-guide-card-hdr" type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#guide-profile"
+                                    aria-expanded="false">
                                 <div class="vp-guide-card-icon" style="background:#4b7bec;">
                                     <i class="fa fa-user-circle"/>
                                 </div>
@@ -3661,26 +3715,28 @@
                                     <h6>Mi Perfil</h6>
                                     <p>Datos personales y foto de cuenta</p>
                                 </div>
-                            </div>
-                            <div class="vp-guide-card-body">
-                                <div class="vp-guide-can-label">Qué puedes hacer</div>
-                                <ul class="vp-guide-can-list">
-                                    <li><i class="fa fa-check-circle"/> Actualizar nombre, teléfono y dirección de contacto</li>
-                                    <li><i class="fa fa-check-circle"/> Subir o cambiar tu foto de perfil</li>
-                                    <li><i class="fa fa-check-circle"/> Mantener tus datos actualizados para comunicaciones de la clínica</li>
-                                </ul>
-                                <div class="vp-guide-how-label">Cómo usarlo</div>
-                                <ol class="vp-guide-how-list">
-                                    <li>Edita los campos del formulario con tu información actualizada</li>
-                                    <li>Para cambiar la foto, haz clic en "Seleccionar archivo" en la sección de foto</li>
-                                    <li>Haz clic en <strong>Guardar</strong> para aplicar los cambios</li>
-                                </ol>
-                            </div>
-                            <div class="vp-guide-card-footer">
-                                <a href="/my/account" class="vp-guide-go-btn"
-                                   style="background:#4b7bec;color:#fff;">
-                                    <i class="fa fa-arrow-right"/> Ir a Mi Perfil
-                                </a>
+                                <i class="fa fa-chevron-down vp-guide-chevron"/>
+                            </button>
+                            <div id="guide-profile" class="collapse">
+                                <div class="vp-guide-card-body">
+                                    <div class="vp-guide-can-label">Qué puedes hacer</div>
+                                    <ul class="vp-guide-can-list">
+                                        <li><i class="fa fa-check-circle"/> Actualizar nombre, teléfono y dirección de contacto</li>
+                                        <li><i class="fa fa-check-circle"/> Subir o cambiar tu foto de perfil</li>
+                                        <li><i class="fa fa-check-circle"/> Mantener tus datos actualizados para comunicaciones de la clínica</li>
+                                    </ul>
+                                    <div class="vp-guide-how-label">Cómo usarlo</div>
+                                    <ol class="vp-guide-how-list">
+                                        <li>Edita los campos del formulario con tu información actualizada</li>
+                                        <li>Para cambiar la foto, haz clic en "Seleccionar archivo" en la sección de foto</li>
+                                        <li>Haz clic en <strong>Guardar</strong> para aplicar los cambios</li>
+                                    </ol>
+                                </div>
+                                <div class="vp-guide-card-footer">
+                                    <a href="/my/account" class="vp-guide-go-btn" style="background:#4b7bec;color:#fff;">
+                                        <i class="fa fa-arrow-right"/> Ir a Mi Perfil
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -3688,7 +3744,10 @@
                     <!-- Seguridad -->
                     <div class="col-md-6">
                         <div class="vp-guide-card">
-                            <div class="vp-guide-card-hdr">
+                            <button class="vp-guide-card-hdr" type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#guide-security"
+                                    aria-expanded="false">
                                 <div class="vp-guide-card-icon" style="background:#546e7a;">
                                     <i class="fa fa-shield"/>
                                 </div>
@@ -3696,29 +3755,31 @@
                                     <h6>Seguridad</h6>
                                     <p>Contraseña y acceso a tu cuenta</p>
                                 </div>
-                            </div>
-                            <div class="vp-guide-card-body">
-                                <div class="vp-guide-can-label">Qué puedes hacer</div>
-                                <ul class="vp-guide-can-list">
-                                    <li><i class="fa fa-check-circle"/> Cambiar tu contraseña de acceso al portal</li>
-                                    <li><i class="fa fa-check-circle"/> Eliminar tu cuenta (acción permanente e irreversible)</li>
-                                </ul>
-                                <div class="vp-guide-how-label">Cómo usarlo</div>
-                                <ol class="vp-guide-how-list">
-                                    <li>Ingresa tu contraseña actual y la nueva en los campos correspondientes</li>
-                                    <li>Confirma la nueva contraseña en el segundo campo y haz clic en <strong>Guardar Cambios</strong></li>
-                                    <li>Para eliminar la cuenta, haz clic en "Eliminar mi cuenta" y sigue los pasos de confirmación</li>
-                                </ol>
-                                <div class="vp-guide-tip">
-                                    <i class="fa fa-lightbulb-o"/>
-                                    La eliminación de cuenta requiere ingresar tu contraseña y tu usuario exacto para confirmar.
+                                <i class="fa fa-chevron-down vp-guide-chevron"/>
+                            </button>
+                            <div id="guide-security" class="collapse">
+                                <div class="vp-guide-card-body">
+                                    <div class="vp-guide-can-label">Qué puedes hacer</div>
+                                    <ul class="vp-guide-can-list">
+                                        <li><i class="fa fa-check-circle"/> Cambiar tu contraseña de acceso al portal</li>
+                                        <li><i class="fa fa-check-circle"/> Eliminar tu cuenta (acción permanente e irreversible)</li>
+                                    </ul>
+                                    <div class="vp-guide-how-label">Cómo usarlo</div>
+                                    <ol class="vp-guide-how-list">
+                                        <li>Ingresa tu contraseña actual y la nueva en los campos correspondientes</li>
+                                        <li>Confirma la nueva contraseña en el segundo campo y haz clic en <strong>Guardar Cambios</strong></li>
+                                        <li>Para eliminar la cuenta, haz clic en "Eliminar mi cuenta" y sigue los pasos de confirmación</li>
+                                    </ol>
+                                    <div class="vp-guide-tip">
+                                        <i class="fa fa-lightbulb-o"/>
+                                        La eliminación de cuenta requiere ingresar tu contraseña y tu usuario exacto para confirmar.
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="vp-guide-card-footer">
-                                <a href="/my/security" class="vp-guide-go-btn"
-                                   style="background:#546e7a;color:#fff;">
-                                    <i class="fa fa-arrow-right"/> Ir a Seguridad
-                                </a>
+                                <div class="vp-guide-card-footer">
+                                    <a href="/my/security" class="vp-guide-go-btn" style="background:#546e7a;color:#fff;">
+                                        <i class="fa fa-arrow-right"/> Ir a Seguridad
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -3731,13 +3792,37 @@
 
                     <div class="vp-guide-faq-item">
                         <button class="vp-guide-faq-btn" type="button"
-                                data-bs-toggle="collapse" data-bs-target="#faq1">
-                            <span><i class="fa fa-question-circle" style="color:#2E86AB;margin-right:8px;"/>
-                                ¿Cómo descargo el carnet de vacunación de mi mascota?
+                                data-bs-toggle="collapse" data-bs-target="#faq1" aria-expanded="false">
+                            <span>
+                                <i class="fa fa-question-circle" style="color:#2E86AB;margin-right:8px;"/>
+                                ¿Cómo registro una nueva mascota o agendo una cita?
                             </span>
-                            <i class="fa fa-chevron-down fa-chevron"/>
+                            <i class="fa fa-chevron-down vp-guide-chevron"/>
                         </button>
                         <div id="faq1" class="collapse vp-guide-faq-body">
+                            <div class="vp-guide-notice">
+                                <i class="fa fa-map-marker fa-lg"/>
+                                <div>
+                                    <strong>Debes acercarte a nuestro local o sucursal.</strong>
+                                    El registro de nuevas mascotas y el agendamiento de citas se realizan
+                                    <strong>exclusivamente de forma presencial</strong>. Nuestro equipo de recepción
+                                    se encargará de crear el expediente de tu mascota o agendar la consulta en el sistema.
+                                    Una vez registrado, toda la información aparecerá automáticamente en tu portal.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vp-guide-faq-item">
+                        <button class="vp-guide-faq-btn" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#faq2" aria-expanded="false">
+                            <span>
+                                <i class="fa fa-question-circle" style="color:#2E86AB;margin-right:8px;"/>
+                                ¿Cómo descargo el carnet de vacunación de mi mascota?
+                            </span>
+                            <i class="fa fa-chevron-down vp-guide-chevron"/>
+                        </button>
+                        <div id="faq2" class="collapse vp-guide-faq-body">
                             Ve a <strong>Mis Mascotas</strong>, haz clic en la mascota deseada y dentro de su ficha
                             encontrarás el botón <strong>"Descargar Carnet"</strong> en la sección de vacunas.
                             El PDF se descargará automáticamente con el historial oficial de vacunación.
@@ -3746,13 +3831,14 @@
 
                     <div class="vp-guide-faq-item">
                         <button class="vp-guide-faq-btn" type="button"
-                                data-bs-toggle="collapse" data-bs-target="#faq2">
-                            <span><i class="fa fa-question-circle" style="color:#2E86AB;margin-right:8px;"/>
+                                data-bs-toggle="collapse" data-bs-target="#faq3" aria-expanded="false">
+                            <span>
+                                <i class="fa fa-question-circle" style="color:#2E86AB;margin-right:8px;"/>
                                 ¿Por qué no veo el botón de pago en mis facturas?
                             </span>
-                            <i class="fa fa-chevron-down fa-chevron"/>
+                            <i class="fa fa-chevron-down vp-guide-chevron"/>
                         </button>
-                        <div id="faq2" class="collapse vp-guide-faq-body">
+                        <div id="faq3" class="collapse vp-guide-faq-body">
                             El botón de pago con PayPal solo aparece en facturas con estado <strong>Pendiente</strong>
                             (borde naranja). Si tu factura ya está pagada o fue cancelada, el botón no se muestra.
                             Si crees que hay un error, comunícate con la clínica.
@@ -3761,26 +3847,12 @@
 
                     <div class="vp-guide-faq-item">
                         <button class="vp-guide-faq-btn" type="button"
-                                data-bs-toggle="collapse" data-bs-target="#faq3">
-                            <span><i class="fa fa-question-circle" style="color:#2E86AB;margin-right:8px;"/>
-                                ¿Cómo agendo una nueva cita veterinaria?
-                            </span>
-                            <i class="fa fa-chevron-down fa-chevron"/>
-                        </button>
-                        <div id="faq3" class="collapse vp-guide-faq-body">
-                            El agendamiento de citas se realiza directamente en la clínica o por los canales de
-                            comunicación de VitalPet (teléfono, WhatsApp). Una vez agendada por el personal,
-                            la cita aparecerá automáticamente en tu sección <strong>Mis Citas</strong>.
-                        </div>
-                    </div>
-
-                    <div class="vp-guide-faq-item">
-                        <button class="vp-guide-faq-btn" type="button"
-                                data-bs-toggle="collapse" data-bs-target="#faq4">
-                            <span><i class="fa fa-question-circle" style="color:#2E86AB;margin-right:8px;"/>
+                                data-bs-toggle="collapse" data-bs-target="#faq4" aria-expanded="false">
+                            <span>
+                                <i class="fa fa-question-circle" style="color:#2E86AB;margin-right:8px;"/>
                                 ¿Qué hago si olvidé mi contraseña?
                             </span>
-                            <i class="fa fa-chevron-down fa-chevron"/>
+                            <i class="fa fa-chevron-down vp-guide-chevron"/>
                         </button>
                         <div id="faq4" class="collapse vp-guide-faq-body">
                             En la pantalla de inicio de sesión, haz clic en
@@ -3792,11 +3864,12 @@
 
                     <div class="vp-guide-faq-item">
                         <button class="vp-guide-faq-btn" type="button"
-                                data-bs-toggle="collapse" data-bs-target="#faq5">
-                            <span><i class="fa fa-question-circle" style="color:#2E86AB;margin-right:8px;"/>
+                                data-bs-toggle="collapse" data-bs-target="#faq5" aria-expanded="false">
+                            <span>
+                                <i class="fa fa-question-circle" style="color:#2E86AB;margin-right:8px;"/>
                                 ¿Por qué no aparece la historia clínica de mi mascota?
                             </span>
-                            <i class="fa fa-chevron-down fa-chevron"/>
+                            <i class="fa fa-chevron-down vp-guide-chevron"/>
                         </button>
                         <div id="faq5" class="collapse vp-guide-faq-body">
                             La historia clínica se genera automáticamente cuando se registra la
