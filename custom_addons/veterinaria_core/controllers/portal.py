@@ -53,6 +53,15 @@ class VeterinariaPortal(CustomerPortal):
         return super().account(redirect=redirect, **post)
 
     # ------------------------------------------------------------------
+    # /my/guia — Guía de Uso del portal
+    # ------------------------------------------------------------------
+    @http.route('/my/guia', type='http', auth='user', website=True)
+    def portal_my_guide(self, **kw):
+        values = self._prepare_portal_layout_values()
+        values['page_name'] = 'guide'
+        return request.render('veterinaria_core.portal_my_guide', values)
+
+    # ------------------------------------------------------------------
     # /my/security simplificado para Cliente Veterinaria
     # ------------------------------------------------------------------
     @http.route('/my/security', type='http', auth='user', website=True,
