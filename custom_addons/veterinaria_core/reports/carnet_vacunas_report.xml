@@ -17,304 +17,350 @@
             <t t-set="doc" t-value="doc.with_context(lang=(doc.propietario_id.lang or 'es_ES'))"/>
             <div class="page">
                 <style>
-                    /* Remove top padding so content starts right at the top */
                     .page { margin-top: 0 !important; padding-top: 0 !important; }
 
-                    /* ── Passport cover card ── */
-                    .vp-passport {
+                    /* ── Header bar ── */
+                    .cv-header {
                         background-color: #0d3b5e;
-                        border-radius: 18px;
-                        padding: 26px 30px 0 30px;
                         color: #fff;
+                        padding: 13px 18px;
+                        border-radius: 0 0 10px 10px;
+                        margin-bottom: 12px;
                         position: relative;
                         overflow: hidden;
                     }
-                    .vp-paw-bg {
+                    .cv-header-paw {
                         position: absolute;
-                        right: -15px;
-                        top: -45px;
-                        font-size: 220px;
-                        opacity: 0.07;
-                        color: #fff;
+                        right: 14px;
+                        top: -8px;
+                        font-size: 70px;
+                        color: #1a5c8a;
                         line-height: 1;
                     }
-                    .vp-brand-name {
-                        font-size: 20px;
-                        font-weight: bold;
-                        letter-spacing: 0.02em;
-                        margin-bottom: 3px;
-                    }
-                    .vp-brand-sub {
-                        font-size: 9.5px;
-                        opacity: 0.72;
-                        text-transform: uppercase;
-                        letter-spacing: 0.1em;
-                    }
-                    .vp-badge {
+                    .cv-brand { font-size: 17px; font-weight: bold; letter-spacing: .02em; }
+                    .cv-sub   { font-size: 9px; text-transform: uppercase; letter-spacing: .1em; color: #7ab0d0; margin-top: 2px; }
+                    .cv-badge {
                         display: inline-block;
                         padding: 5px 14px;
-                        border-radius: 20px;
-                        font-size: 10.5px;
+                        border-radius: 14px;
+                        font-size: 11px;
                         font-weight: bold;
                         text-transform: uppercase;
-                        letter-spacing: 0.05em;
+                        letter-spacing: .05em;
                     }
-                    .vp-badge-ok   { background: #27ae60; }
-                    .vp-badge-bad  { background: #e74c3c; }
-                    .vp-badge-none { background-color: #1a5c8a; border: 1px solid #4a8ab0; }
-                    .vp-photo-box {
-                        width: 148px;
-                        height: 148px;
-                        border-radius: 14px;
+                    .cv-badge-ok   { background-color: #27ae60; color: #fff; }
+                    .cv-badge-bad  { background-color: #e74c3c; color: #fff; }
+                    .cv-badge-none { background-color: #546e7a; color: #fff; }
+
+                    /* ── Pet profile block ── */
+                    .cv-profile {
+                        border: 1px solid #d0e8f5;
+                        border-radius: 10px;
+                        background-color: #f7fbfe;
+                        padding: 14px 16px;
+                        margin-bottom: 12px;
+                    }
+                    /* Left accent stripe changes by vaccination status via modifier class */
+                    .cv-profile-al_dia    { border-left: 5px solid #27ae60; }
+                    .cv-profile-atrasado  { border-left: 5px solid #e74c3c; }
+                    .cv-profile-sin_vacunas { border-left: 5px solid #546e7a; }
+
+                    /* ── Photo ── */
+                    .cv-photo-wrap {
+                        width: 115px;
+                        height: 115px;
+                        border-radius: 12px;
                         overflow: hidden;
-                        border: 3px solid #4a8ab0;
+                        border: 3px solid #2E86AB;
                         background-color: #1a5c8a;
                         text-align: center;
-                        vertical-align: middle;
+                        line-height: 109px;
                     }
-                    .vp-pet-name {
-                        font-size: 30px;
+                    .cv-pet-name {
+                        font-size: 22px;
                         font-weight: bold;
-                        margin: 0 0 13px 0;
-                        line-height: 1.15;
-                    }
-                    .vp-data-tbl { width: 100%; border-collapse: collapse; }
-                    .vp-data-tbl tr { border-bottom: 1px solid rgba(255,255,255,0.12); }
-                    .vp-data-tbl td { padding: 5px 0; font-size: 12px; vertical-align: middle; }
-                    .vp-lbl {
-                        width: 90px;
-                        font-size: 9.5px;
-                        text-transform: uppercase;
-                        letter-spacing: 0.04em;
-                        opacity: 0.65;
-                        padding-right: 6px;
-                    }
-                    .vp-val { font-weight: 600; }
-                    .vp-allergy-strip {
-                        background-color: #4a1a1a;
-                        border: 1px solid #e74c3c;
-                        border-radius: 8px;
-                        padding: 9px 14px;
-                        margin-top: 14px;
-                        font-size: 11px;
-                    }
-                    .vp-allergy-label {
-                        display: block;
-                        font-size: 9px;
-                        text-transform: uppercase;
-                        letter-spacing: 0.07em;
-                        opacity: 0.7;
-                        margin-bottom: 3px;
-                    }
-                    .vp-passport-footer {
-                        background-color: #092840;
-                        padding: 11px 30px;
-                        margin: 20px -30px 0 -30px;
-                        font-size: 11px;
+                        color: #0d3b5e;
+                        margin: 0 0 10px 0;
+                        line-height: 1.1;
                     }
 
-                    /* ── Vaccine table page ── */
-                    .vp-vac-hdr {
+                    /* ── Stat boxes ── */
+                    .cv-stat-tbl { width: 100%; border-collapse: collapse; }
+                    .cv-stat-tbl td { padding: 3px 3px 3px 0; vertical-align: top; }
+                    .cv-stat-box {
+                        background-color: #fff;
+                        border: 1px solid #d0e8f5;
+                        border-left: 3px solid #2E86AB;
+                        border-radius: 0 7px 7px 0;
+                        padding: 6px 9px;
+                    }
+                    .cv-stat-lbl {
+                        font-size: 7.5px;
+                        text-transform: uppercase;
+                        letter-spacing: .07em;
+                        color: #2E86AB;
+                        font-weight: bold;
+                        display: block;
+                        margin-bottom: 2px;
+                    }
+                    .cv-stat-val { font-size: 11.5px; font-weight: 600; color: #0d3b5e; }
+                    /* Vaccination count box — accent color matches status */
+                    .cv-vbox-ok   { border-left-color: #27ae60; }
+                    .cv-vbox-ok   .cv-stat-lbl { color: #27ae60; }
+                    .cv-vbox-bad  { border-left-color: #e74c3c; }
+                    .cv-vbox-bad  .cv-stat-lbl { color: #e74c3c; }
+                    .cv-vbox-none { border-left-color: #546e7a; }
+                    .cv-vbox-none .cv-stat-lbl { color: #546e7a; }
+
+                    /* ── Allergy strip ── */
+                    .cv-allergy {
+                        background-color: #4a1a1a;
+                        border: 1px solid #e74c3c;
+                        border-radius: 6px;
+                        padding: 6px 12px;
+                        margin-top: 8px;
+                        font-size: 10px;
+                        color: #fff;
+                    }
+                    .cv-allergy-lbl {
+                        font-size: 7.5px;
+                        text-transform: uppercase;
+                        letter-spacing: .07em;
+                        color: #ff9999;
+                        font-weight: bold;
+                        display: block;
+                        margin-bottom: 2px;
+                    }
+
+                    /* ── Vaccine section ── */
+                    .cv-vac-section { border: 1px solid #d0e8f5; border-radius: 10px; overflow: hidden; }
+                    .cv-vac-hdr {
                         background-color: #0d3b5e;
-                        border-radius: 8px;
-                        padding: 10px 16px;
                         color: #fff;
-                        font-size: 13px;
+                        padding: 9px 14px;
+                        font-size: 11.5px;
                         font-weight: bold;
-                        margin-bottom: 16px;
                     }
-                    .vp-vac-tbl { width: 100%; border-collapse: collapse; font-size: 11px; }
-                    .vp-vac-tbl thead th {
-                        background: #0d3b5e;
+                    .cv-vac-tbl { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+                    .cv-vac-tbl thead th {
+                        background-color: #1a5c8a;
                         color: #fff;
-                        padding: 9px 10px;
+                        padding: 7px 9px;
                         text-align: left;
-                        font-size: 10.5px;
+                        font-size: 9.5px;
                         font-weight: bold;
                     }
-                    .vp-vac-tbl tbody td {
+                    .cv-vac-tbl tbody td {
                         border-bottom: 1px solid #e4eef5;
-                        padding: 8px 10px;
+                        padding: 6px 9px;
                         color: #2c3e50;
                         vertical-align: top;
                     }
-                    .vp-vac-tbl tbody tr.vp-even td { background: #f7fbfe; }
-                    .vp-vac-name { font-weight: bold; color: #0d3b5e; }
-                    .vp-next-date { color: #06A77D; font-weight: bold; }
-                    .vp-empty {
+                    .cv-vac-tbl tbody tr.cv-even td { background-color: #f7fbfe; }
+                    .cv-vac-name  { font-weight: bold; color: #0d3b5e; }
+                    .cv-next-date { color: #27ae60; font-weight: bold; }
+                    .cv-empty {
                         text-align: center;
                         color: #8e9fb0;
                         font-style: italic;
-                        padding: 30px;
-                        border: 1px dashed #e4eef5;
-                        border-radius: 8px;
-                        margin: 10px 0;
+                        padding: 20px;
                     }
-                    .vp-doc-footer {
+
+                    /* ── Footer ── */
+                    .cv-footer {
                         text-align: center;
-                        font-size: 10px;
+                        font-size: 9px;
                         color: #8e9fb0;
-                        margin-top: 30px;
-                        padding-top: 12px;
+                        padding-top: 9px;
                         border-top: 1px solid #e4eef5;
+                        margin-top: 11px;
                     }
                 </style>
 
-                <!-- ══════════════════ COVER / PASSPORT ══════════════════ -->
-                <div class="vp-passport">
-
-                    <!-- Decorative background paw -->
-                    <div class="vp-paw-bg"><i class="fa fa-paw"/></div>
-
-                    <!-- Clinic brand + vaccination status -->
-                    <table style="width:100%; border-collapse:collapse; margin-bottom:20px;">
+                <!-- ══════════════════ HEADER ══════════════════ -->
+                <div class="cv-header">
+                    <div class="cv-header-paw"><i class="fa fa-paw"/></div>
+                    <table style="width:100%; border-collapse:collapse;">
                         <tr>
-                            <td style="vertical-align:top;">
-                                <div class="vp-brand-name">
-                                    <i class="fa fa-paw" style="margin-right:7px;"/>VitalPet
+                            <td style="vertical-align:middle;">
+                                <div class="cv-brand">
+                                    <i class="fa fa-paw" style="margin-right:6px;"/>VitalPet
                                 </div>
-                                <div class="vp-brand-sub">Pasaporte Sanitario de Mascota</div>
+                                <div class="cv-sub">Pasaporte Sanitario de Mascota</div>
                             </td>
-                            <td style="text-align:right; vertical-align:top;">
+                            <td style="text-align:right; vertical-align:middle;">
                                 <t t-if="doc.estado_vacunacion == 'al_dia'">
-                                    <span class="vp-badge vp-badge-ok">
-                                        <i class="fa fa-check" style="margin-right:4px;"/>Al dia
+                                    <span class="cv-badge cv-badge-ok">
+                                        <i class="fa fa-check" style="margin-right:5px;"/>Vacunas al dia
                                     </span>
                                 </t>
                                 <t t-elif="doc.estado_vacunacion == 'atrasado'">
-                                    <span class="vp-badge vp-badge-bad">
-                                        <i class="fa fa-exclamation-triangle" style="margin-right:4px;"/>Atrasado
+                                    <span class="cv-badge cv-badge-bad">
+                                        <i class="fa fa-exclamation-triangle" style="margin-right:5px;"/>Vacunas atrasadas
                                     </span>
                                 </t>
                                 <t t-else="">
-                                    <span class="vp-badge vp-badge-none">Sin vacunas</span>
+                                    <span class="cv-badge cv-badge-none">
+                                        <i class="fa fa-minus-circle" style="margin-right:5px;"/>Sin vacunas
+                                    </span>
                                 </t>
                             </td>
                         </tr>
                     </table>
+                </div>
 
-                    <!-- Pet photo + data columns -->
+                <!-- ══════════════════ PET PROFILE ══════════════════ -->
+                <!-- t-attf-class applies status-based left border color -->
+                <div t-attf-class="cv-profile cv-profile-#{doc.estado_vacunacion}">
                     <table style="width:100%; border-collapse:collapse;">
                         <tr>
-                            <!-- Photo -->
-                            <td style="width:158px; vertical-align:top;">
+                            <!-- Photo column -->
+                            <td style="width:130px; vertical-align:top; padding-right:16px;">
                                 <t t-if="doc.foto">
-                                    <div class="vp-photo-box"
-                                         t-attf-style="background-image:url('#{image_data_uri(doc.foto)}'); background-size:cover; background-position:center; background-repeat:no-repeat; width:148px; height:148px; border-radius:14px; border:3px solid #4a8ab0;"/>
+                                    <div class="cv-photo-wrap"
+                                         t-attf-style="background-image:url('#{image_data_uri(doc.foto)}'); background-size:cover; background-position:center; background-repeat:no-repeat; width:115px; height:115px; border-radius:12px; border:3px solid #2E86AB;"/>
                                 </t>
                                 <t t-else="">
-                                    <div class="vp-photo-box" style="width:148px; height:148px; line-height:148px;">
-                                        <i class="fa fa-paw" style="font-size:52px; opacity:0.4; vertical-align:middle;"/>
+                                    <div class="cv-photo-wrap">
+                                        <i class="fa fa-paw" style="font-size:46px; color:#4a8ab0; vertical-align:middle;"/>
                                     </div>
                                 </t>
+                                <!-- Species label under photo -->
+                                <div style="text-align:center; margin-top:7px; font-size:9px; color:#546e7a; font-weight:bold; text-transform:uppercase; letter-spacing:.05em;"
+                                     t-out="dict(doc._fields['especie'].selection).get(doc.especie, '')"/>
                             </td>
-                            <!-- Info -->
-                            <td style="padding-left:26px; vertical-align:top;">
-                                <div class="vp-pet-name" t-out="doc.name"/>
-                                <table class="vp-data-tbl">
+
+                            <!-- Info column -->
+                            <td style="vertical-align:top;">
+                                <div class="cv-pet-name" t-out="doc.name"/>
+
+                                <!-- Row 1 of stat boxes: biological data -->
+                                <table class="cv-stat-tbl" style="margin-bottom:5px;">
                                     <tr>
-                                        <td class="vp-lbl">Especie</td>
-                                        <td class="vp-val"
-                                            t-out="dict(doc._fields['especie'].selection).get(doc.especie, '-')"/>
-                                    </tr>
-                                    <tr>
-                                        <td class="vp-lbl">Raza</td>
-                                        <td class="vp-val" t-out="doc.raza or '-'"/>
-                                    </tr>
-                                    <tr>
-                                        <td class="vp-lbl">Nacimiento</td>
-                                        <td class="vp-val" t-out="doc.fecha_nacimiento or '-'"/>
-                                    </tr>
-                                    <tr>
-                                        <td class="vp-lbl">Peso</td>
-                                        <td class="vp-val"><t t-out="doc.peso or 0"/> kg</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="vp-lbl">Microchip</td>
-                                        <td class="vp-val" t-out="doc.microchip or '-'"/>
-                                    </tr>
-                                    <tr>
-                                        <td class="vp-lbl">Propietario</td>
-                                        <td class="vp-val" t-out="doc.propietario_id.name or '-'"/>
-                                    </tr>
-                                    <tr>
-                                        <td class="vp-lbl">Contacto</td>
-                                        <td class="vp-val"
-                                            t-out="doc.propietario_id.phone or doc.propietario_id.mobile or '-'"/>
-                                    </tr>
-                                    <tr>
-                                        <td class="vp-lbl">Vacunas</td>
-                                        <td class="vp-val">
-                                            <t t-out="len(doc.vacuna_aplicada_ids)"/> registrada(s)
+                                        <td>
+                                            <div class="cv-stat-box">
+                                                <span class="cv-stat-lbl">Raza</span>
+                                                <span class="cv-stat-val" t-out="doc.raza or '-'"/>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="cv-stat-box">
+                                                <span class="cv-stat-lbl">Nacimiento</span>
+                                                <span class="cv-stat-val" t-out="doc.fecha_nacimiento or '-'"/>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="cv-stat-box">
+                                                <span class="cv-stat-lbl">Peso</span>
+                                                <span class="cv-stat-val"><t t-out="'%.1f' % (doc.peso or 0)"/> kg</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="cv-stat-box">
+                                                <span class="cv-stat-lbl">Microchip</span>
+                                                <span class="cv-stat-val" t-out="doc.microchip or '-'"/>
+                                            </div>
                                         </td>
                                     </tr>
                                 </table>
+
+                                <!-- Row 2 of stat boxes: owner data + vaccination count -->
+                                <table class="cv-stat-tbl">
+                                    <tr>
+                                        <td>
+                                            <div class="cv-stat-box">
+                                                <span class="cv-stat-lbl">Propietario</span>
+                                                <span class="cv-stat-val" t-out="doc.propietario_id.name or '-'"/>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="cv-stat-box">
+                                                <span class="cv-stat-lbl">Contacto</span>
+                                                <span class="cv-stat-val"
+                                                      t-out="doc.propietario_id.phone or doc.propietario_id.mobile or '-'"/>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="cv-stat-box">
+                                                <span class="cv-stat-lbl">Registro</span>
+                                                <span class="cv-stat-val"
+                                                      t-out="str(doc.fecha_registro)[:10] if doc.fecha_registro else '-'"/>
+                                            </div>
+                                        </td>
+                                        <!-- Vaccination count — accent color matches status -->
+                                        <td>
+                                            <div t-attf-class="cv-stat-box #{'cv-vbox-ok' if doc.estado_vacunacion == 'al_dia' else ('cv-vbox-bad' if doc.estado_vacunacion == 'atrasado' else 'cv-vbox-none')}">
+                                                <span class="cv-stat-lbl">Vacunas</span>
+                                                <span class="cv-stat-val">
+                                                    <t t-out="len(doc.vacuna_aplicada_ids)"/> aplicada(s)
+                                                </span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <!-- Allergy strip — only if set -->
+                                <t t-if="doc.alergias">
+                                    <div class="cv-allergy">
+                                        <span class="cv-allergy-lbl">
+                                            <i class="fa fa-exclamation-circle" style="margin-right:3px;"/>Alergias registradas
+                                        </span>
+                                        <t t-out="doc.alergias"/>
+                                    </div>
+                                </t>
                             </td>
                         </tr>
                     </table>
-
-                    <!-- Allergies strip (only if set) -->
-                    <t t-if="doc.alergias">
-                        <div class="vp-allergy-strip">
-                            <span class="vp-allergy-label">
-                                <i class="fa fa-exclamation-circle" style="margin-right:4px;"/>Alergias registradas
-                            </span>
-                            <t t-out="doc.alergias"/>
-                        </div>
-                    </t>
-
-                    <!-- Footer bar -->
-                    <div class="vp-passport-footer">
-                        <span>ID Mascota: PET-<t t-out="'%06d' % doc.id"/></span>
-                        <span style="float:right;">VitalPet - Clinica Veterinaria</span>
-                    </div>
                 </div>
-                <!-- END cover -->
-
-                <!-- Force vaccine history to a new page -->
-                <div style="page-break-before: always;"/>
 
                 <!-- ══════════════════ VACCINE HISTORY ══════════════════ -->
-                <div class="vp-vac-hdr">
-                    <i class="fa fa-medkit" style="margin-right:8px;"/>
-                    Historial de Vacunacion — <t t-out="doc.name"/>
-                </div>
-
-                <t t-if="doc.vacuna_aplicada_ids">
-                    <table class="vp-vac-tbl">
-                        <thead>
-                            <tr>
-                                <th style="width:22%;">Vacuna</th>
-                                <th style="width:13%;">Fecha Aplic.</th>
-                                <th style="width:17%;">Veterinario</th>
-                                <th style="width:10%;">Lote</th>
-                                <th style="width:13%;">Proxima Dosis</th>
-                                <th>Observaciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr t-foreach="doc.vacuna_aplicada_ids" t-as="v"
-                                t-attf-class="#{'' if v_index % 2 == 0 else 'vp-even'}">
-                                <td><span class="vp-vac-name" t-out="v.vacuna_id.name"/></td>
-                                <td t-out="v.fecha_aplicacion"/>
-                                <td t-out="v.veterinario_id.name or '-'"/>
-                                <td t-out="v.lote or '-'"/>
-                                <td><span class="vp-next-date" t-out="v.proxima_dosis or '-'"/></td>
-                                <td t-out="v.observaciones or '-'"/>
-                            </tr>
-                        </tbody>
-                    </table>
-                </t>
-                <t t-else="">
-                    <div class="vp-empty">
-                        <i class="fa fa-info-circle" style="margin-right:6px;"/>
-                        Sin vacunas aplicadas registradas para esta mascota.
+                <div class="cv-vac-section">
+                    <div class="cv-vac-hdr">
+                        <i class="fa fa-medkit" style="margin-right:7px;"/>
+                        Historial de Vacunacion
+                        <span style="font-weight:normal; font-size:10px; color:#7ab0d0; margin-left:8px;"
+                              t-out="doc.name"/>
                     </div>
-                </t>
 
-                <div class="vp-doc-footer">
-                    Documento generado por VitalPet - Clinica Veterinaria
+                    <t t-if="doc.vacuna_aplicada_ids">
+                        <table class="cv-vac-tbl">
+                            <thead>
+                                <tr>
+                                    <th style="width:22%;">Vacuna</th>
+                                    <th style="width:12%;">Fecha Aplic.</th>
+                                    <th style="width:18%;">Veterinario</th>
+                                    <th style="width:9%;">Lote</th>
+                                    <th style="width:13%;">Proxima Dosis</th>
+                                    <th>Observaciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="doc.vacuna_aplicada_ids" t-as="v"
+                                    t-attf-class="#{'' if v_index % 2 == 0 else 'cv-even'}">
+                                    <td><span class="cv-vac-name" t-out="v.vacuna_id.name"/></td>
+                                    <td t-out="v.fecha_aplicacion"/>
+                                    <td t-out="v.veterinario_id.name or '-'"/>
+                                    <td t-out="v.lote or '-'"/>
+                                    <td><span class="cv-next-date" t-out="v.proxima_dosis or '-'"/></td>
+                                    <td t-out="v.observaciones or '-'"/>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </t>
+                    <t t-else="">
+                        <div class="cv-empty">
+                            <i class="fa fa-info-circle" style="margin-right:5px;"/>
+                            Sin vacunas aplicadas registradas.
+                        </div>
+                    </t>
                 </div>
+
+                <!-- ══════════════════ FOOTER ══════════════════ -->
+                <div class="cv-footer">
+                    ID Mascota: PET-<t t-out="'%06d' % doc.id"/>
+                    &#160;&#160;|&#160;&#160;VitalPet - Clinica Veterinaria&#160;&#160;|&#160;&#160;Documento oficial de salud animal
+                </div>
+
             </div>
         </t>
     </template>
