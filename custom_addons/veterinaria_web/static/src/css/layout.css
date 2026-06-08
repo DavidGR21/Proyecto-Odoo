@@ -51,18 +51,29 @@ img { max-width: 100%; }
 .navbar.o_main_navbar,
 #oe_main_menu_navbar { display: none !important; }
 
-/* Frontend website header — ocultar completamente */
-header#top,
-div#top,
-.o_header_fixed,
-.o_header_standard,
-.o_header_overlay {
+/* Frontend website header — ocultar en páginas públicas del website */
+/* En el portal (/my/*) se deja visible para mostrar la barra de sesión */
+body:not(.vp-portal-page) header#top,
+body:not(.vp-portal-page) div#top,
+body:not(.vp-portal-page) .o_header_fixed,
+body:not(.vp-portal-page) .o_header_standard,
+body:not(.vp-portal-page) .o_header_overlay {
     display: none !important;
     height: 0 !important;
     min-height: 0 !important;
     overflow: hidden !important;
     padding: 0 !important;
     margin: 0 !important;
+}
+
+/* En páginas del portal, mostrar el header nativo de Odoo normalmente */
+body.vp-portal-page header#top {
+    display: block !important;
+    height: auto !important;
+    min-height: unset !important;
+    overflow: visible !important;
+    padding: unset !important;
+    margin: unset !important;
 }
 
 /* Evitar que Odoo agregue padding-top al body por el header fijo */

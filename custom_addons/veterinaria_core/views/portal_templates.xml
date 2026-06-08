@@ -147,21 +147,33 @@
 
                 <style>
                 /* ── VitalPet Portal Dashboard ─────────────────────────── */
-                .vp-dash { font-family: 'Inter', 'Segoe UI', sans-serif; }
+                .vp-dash {
+                    font-family: 'Inter', 'Segoe UI', sans-serif;
+                    display: block;
+                }
+                /* Evitar que el layout del portal estire el dashboard */
+                .o_portal_wrap .o_portal_my_home,
+                .o_portal_wrap .o_portal_page_content {
+                    align-items: flex-start !important;
+                    flex-direction: column !important;
+                }
 
                 /* Hero */
                 .vp-hero {
                     background: linear-gradient(135deg, #0d3b5e 0%, #1a5c8a 45%, #2E86AB 100%);
-                    border-radius: 18px; padding: 28px 32px;
-                    margin-bottom: 28px; color: #fff;
-                    box-shadow: 0 8px 32px rgba(13,59,94,.22);
-                    position: relative; overflow: hidden;
+                    border-radius: 16px;
+                    padding: 20px 24px;
+                    margin-bottom: 24px;
+                    color: #fff;
+                    box-shadow: 0 6px 24px rgba(13,59,94,.20);
+                    position: relative;
+                    overflow: hidden;
                 }
                 .vp-hero::after {
                     content: '🐾';
-                    position: absolute; right: 28px; top: 50%;
-                    transform: translateY(-50%);
-                    font-size: 80px; opacity: .1;
+                    position: absolute; right: 16px; bottom: 8px;
+                    font-size: 42px; opacity: .07;
+                    pointer-events: none; line-height: 1;
                 }
                 .vp-hero-name { font-size: 22px; font-weight: 700; margin: 0 0 4px 0; }
                 .vp-hero-sub  { margin: 0; opacity: .85; font-size: 14px; }
@@ -246,9 +258,10 @@
                 .vp-card:hover .vp-c6-b { border-color: #4b7bec; }
                 </style>
 
+                <div style="display:flow-root;width:100%;overflow:hidden;">
                 <div class="vp-dash">
                     <!-- Hero -->
-                    <div class="vp-hero">
+                    <div class="vp-hero" style="height:auto!important;min-height:0!important;flex:none!important;align-self:flex-start!important;width:100%!important;">
                         <div class="vp-hero-name">
                             Hola, <t t-out="vp_partner.name"/>
                         </div>
@@ -374,6 +387,7 @@
                         </div>
                     </div>
                 </div>
+                </div><!-- /flow-root wrapper -->
             </t>
         </xpath>
     </template>
