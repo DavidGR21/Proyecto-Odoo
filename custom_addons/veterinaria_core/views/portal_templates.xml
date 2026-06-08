@@ -1816,68 +1816,512 @@
     <!-- =====================================================
          /my/medical_records — Historia clínica
          ===================================================== -->
+    <!-- =====================================================
+         /my/medical_records — Historia Clínica (VitalPet style)
+         ===================================================== -->
     <template id="portal_my_medical_records" name="Historia Clínica">
         <t t-call="portal.portal_layout">
-            <h3 class="mt-3">Historia Clínica</h3>
-            <t t-if="not historias">
-                <div class="alert alert-light">No hay registros de historia clínica.</div>
-            </t>
-            <t t-if="historias">
-                <div class="accordion mt-3" id="accordionHistoria">
-                    <t t-foreach="historias" t-as="h">
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" t-attf-id="heading#{h.id}">
-                                <button class="accordion-button collapsed" type="button"
-                                        data-bs-toggle="collapse"
-                                        t-attf-data-bs-target="#collapse#{h.id}"
-                                        aria-expanded="false">
-                                    <strong t-out="h.paciente_id.name"/> -
-                                    <span class="ms-2 text-muted" t-out="h.fecha_apertura"/>
-                                </button>
-                            </h2>
-                            <div t-attf-id="collapse#{h.id}" class="accordion-collapse collapse"
-                                 data-bs-parent="#accordionHistoria">
-                                <div class="accordion-body">
-                                    <p><strong>Alergias:</strong> <t t-out="h.alergias or '-'"/></p>
-                                    <p><strong>Tipo de sangre:</strong>
-                                        <t t-out="dict(h._fields['tipo_sangre'].selection).get(h.tipo_sangre, '-')"/>
-                                    </p>
-                                    <p><strong>Peso:</strong> <t t-out="h.peso or 0"/> kg</p>
-                                    <p><strong>Condiciones crónicas:</strong> <t t-out="h.condiciones_cronicas or '-'"/></p>
-                                    <p><strong>Observaciones:</strong> <t t-out="h.observaciones or '-'"/></p>
+            <style>
+                /* VitalPet · Historia Clínica ========================== */
+                .vp-hc-wrap { font-family: 'Inter','Segoe UI',sans-serif; padding-bottom: 40px; }
 
-                                    <t t-if="h.cita_ids">
-                                        <h6 class="mt-3">Consultas asociadas</h6>
-                                        <ul>
-                                            <li t-foreach="h.cita_ids" t-as="c">
-                                                <t t-out="c.fecha_hora"/> -
-                                                Veterinario: <t t-out="c.veterinario_id.name or '-'"/> -
-                                                Motivo: <t t-out="c.motivo"/>
+                /* ── Page header ── */
+                .vp-hc-page-hdr {
+                    background: linear-gradient(135deg, #0d3b5e 0%, #2E86AB 100%);
+                    border-radius: 16px; padding: 22px 26px;
+                    display: flex; align-items: center; justify-content: space-between;
+                    color: #fff; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+                }
+                .vp-hc-page-hdr h3 { font-size: 1.2rem; font-weight: 700; margin: 0 0 3px; }
+                .vp-hc-page-hdr p  { font-size: .83rem; opacity: .75; margin: 0; }
+                .vp-hc-stat-pills { display: flex; gap: 10px; flex-wrap: wrap; }
+                .vp-hc-stat-pill {
+                    display: flex; align-items: center; gap: 6px;
+                    background: rgba(255,255,255,.18); border-radius: 20px;
+                    padding: 5px 14px; font-size: .8rem; font-weight: 600; white-space: nowrap;
+                }
+                .vp-hc-stat-pill span { font-size: 1rem; font-weight: 700; }
+
+                /* ── Historia card ── */
+                .vp-hc-card {
+                    background: #fff; border-radius: 16px;
+                    border: 1px solid #e4eef5;
+                    box-shadow: 0 3px 14px rgba(46,134,171,.08);
+                    margin-bottom: 24px; overflow: hidden;
+                }
+                /* Card header with pet info */
+                .vp-hc-card-hdr {
+                    background: linear-gradient(135deg, #f0f7fc 0%, #e4eef5 100%);
+                    padding: 18px 22px;
+                    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+                    border-bottom: 1px solid #d4e8f5;
+                }
+                .vp-hc-pet-photo {
+                    width: 68px; height: 68px; border-radius: 50%;
+                    border: 3px solid #2E86AB; object-fit: cover; flex-shrink: 0;
+                }
+                .vp-hc-pet-ph {
+                    width: 68px; height: 68px; border-radius: 50%;
+                    border: 3px solid #2E86AB; flex-shrink: 0;
+                    background: #cde4f0; display: inline-flex;
+                    align-items: center; justify-content: center;
+                }
+                .vp-hc-pet-name { font-size: 1.1rem; font-weight: 700; color: #0d3b5e; margin: 0 0 4px; }
+                .vp-hc-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
+                .vp-hc-chip {
+                    display: inline-flex; align-items: center; gap: 4px;
+                    background: rgba(46,134,171,.12); border-radius: 20px;
+                    padding: 2px 10px; font-size: .75rem; font-weight: 600; color: #1a5c8a;
+                }
+                .vp-hc-chip-vac-ok  { background: rgba(39,174,96,.12); color: #1e7e34; }
+                .vp-hc-chip-vac-bad { background: rgba(231,76,60,.12); color: #c0392b; }
+                .vp-hc-meta-row {
+                    display: flex; gap: 14px; flex-wrap: wrap;
+                    font-size: .8rem; color: #546e7a;
+                }
+                .vp-hc-meta-item { display: flex; align-items: center; gap: 4px; }
+                .vp-hc-meta-item i { color: #2E86AB; font-size: .75rem; }
+                .vp-hc-counts { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+                .vp-hc-count-pill {
+                    display: flex; align-items: center; gap: 5px;
+                    background: #fff; border: 1px solid #d4e8f5;
+                    border-radius: 20px; padding: 4px 12px;
+                    font-size: .78rem; font-weight: 600; color: #0d3b5e;
+                }
+
+                /* ── Tabs ── */
+                .vp-hc-tabs { border-bottom: 2px solid #e4eef5; padding: 0 18px; background: #fafcff; }
+                .vp-hc-tabs .nav-link {
+                    color: #546e7a; font-size: .85rem; font-weight: 600;
+                    padding: 10px 16px; border: none; border-bottom: 2px solid transparent;
+                    margin-bottom: -2px; background: none; border-radius: 0;
+                }
+                .vp-hc-tabs .nav-link:hover { color: #2E86AB; }
+                .vp-hc-tabs .nav-link.active { color: #2E86AB; border-bottom-color: #2E86AB; }
+                .vp-hc-tab-content { padding: 22px; }
+
+                /* ── Info tab fields ── */
+                .vp-hc-info-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+                    gap: 14px;
+                }
+                .vp-hc-info-field {
+                    background: #f7fbfe; border-radius: 10px;
+                    border: 1px solid #e4eef5; padding: 12px 14px;
+                }
+                .vp-hc-info-label {
+                    font-size: .72rem; font-weight: 700; color: #8e9fb0;
+                    text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px;
+                }
+                .vp-hc-info-val { font-size: .92rem; color: #0d3b5e; font-weight: 500; line-height: 1.4; }
+                .vp-hc-info-val.alert-text { color: #c0392b; }
+
+                /* ── Citas timeline ── */
+                .vp-hc-cita {
+                    display: flex; gap: 14px; align-items: flex-start;
+                    padding: 14px 0; border-bottom: 1px solid #f0f4f8;
+                }
+                .vp-hc-cita:last-child { border-bottom: none; }
+                .vp-hc-cita-date {
+                    flex-shrink: 0; text-align: center; width: 52px;
+                    background: #f0f7fc; border-radius: 10px; padding: 8px 4px;
+                }
+                .vp-hc-cita-day   { font-size: 1.3rem; font-weight: 700; color: #0d3b5e; line-height: 1; }
+                .vp-hc-cita-month { font-size: .68rem; text-transform: uppercase; color: #8e9fb0; font-weight: 600; }
+                .vp-hc-cita-year  { font-size: .68rem; color: #8e9fb0; }
+                .vp-hc-cita-body  { flex: 1; min-width: 0; }
+                .vp-hc-cita-top   { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+                .vp-hc-cita-vet   { font-size: .82rem; color: #546e7a; }
+                .vp-hc-cita-motivo { font-size: .9rem; color: #2c3e50; line-height: 1.4; margin-bottom: 4px; }
+                .vp-hc-cita-symptoms {
+                    font-size: .78rem; color: #8e9fb0; font-style: italic;
+                }
+                .vp-hc-obs-ro {
+                    font-size: .82rem; color: #546e7a; font-style: italic;
+                    border-left: 3px solid #cde4f0; padding-left: 8px; margin-top: 5px;
+                }
+                /* Status badges for cita */
+                .vp-hc-s { display: inline-block; border-radius: 20px; padding: 2px 9px; font-size: .71rem; font-weight: 700; }
+                .vp-hc-s-done   { background: #e8f9f0; color: #1e7e34; }
+                .vp-hc-s-prog   { background: #e8f4fb; color: #1a5c8a; }
+                .vp-hc-s-cancel { background: #fde8e8; color: #c0392b; }
+                .vp-hc-s-noshw  { background: #fef3e2; color: #b36a00; }
+
+                /* ── Recetas en historia ── */
+                .vp-hc-rx {
+                    background: #fff; border: 1px solid #e4eef5;
+                    border-left: 4px solid #2E86AB; border-radius: 10px;
+                    padding: 14px 16px; margin-bottom: 12px;
+                }
+                .vp-hc-rx-hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+                .vp-hc-rx-ref { font-size: .82rem; font-weight: 700; color: #0d3b5e; }
+                .vp-hc-rx-date { font-size: .78rem; color: #8e9fb0; }
+                .vp-hc-rx-state-f { background: #e8f9f0; color: #1e7e34; border-radius: 20px; padding: 2px 9px; font-size: .71rem; font-weight: 700; }
+                .vp-hc-rx-state-b { background: #fef3e2; color: #b36a00; border-radius: 20px; padding: 2px 9px; font-size: .71rem; font-weight: 700; }
+                .vp-hc-rx-diag {
+                    font-size: .83rem; color: #546e7a; font-style: italic;
+                    border-left: 3px solid #cde4f0; padding-left: 8px;
+                    margin-bottom: 10px;
+                }
+                .vp-hc-rx-meds { list-style: none; padding: 0; margin: 0; }
+                .vp-hc-rx-meds li {
+                    display: flex; align-items: center; gap: 8px;
+                    font-size: .83rem; color: #2c3e50; padding: 4px 0;
+                    border-bottom: 1px dashed #f0f4f8;
+                }
+                .vp-hc-rx-meds li:last-child { border-bottom: none; }
+                .vp-hc-rx-med-num {
+                    width: 20px; height: 20px; border-radius: 50%;
+                    background: #2E86AB; color: #fff;
+                    display: inline-flex; align-items: center; justify-content: center;
+                    font-size: .7rem; font-weight: 700; flex-shrink: 0;
+                }
+                .vp-hc-rx-med-pos {
+                    display: inline-flex; align-items: center; gap: 4px;
+                    background: #e8f4fb; color: #1a5c8a;
+                    border-radius: 20px; padding: 1px 8px; font-size: .72rem; font-weight: 600;
+                    margin-left: auto; flex-shrink: 0;
+                }
+
+                /* Empty state */
+                .vp-hc-empty {
+                    text-align: center; padding: 56px 24px;
+                    background: #f7fbfe; border-radius: 16px;
+                    border: 2px dashed #cde4f0;
+                }
+                .vp-hc-empty i { font-size: 44px; color: #cde4f0; display: block; margin-bottom: 14px; }
+                .vp-hc-empty p { color: #8e9fb0; font-size: .95rem; margin: 0; }
+                .vp-hc-tab-empty { text-align: center; padding: 28px; color: #8e9fb0; font-size: .88rem; }
+                .vp-hc-tab-empty i { display: block; font-size: 26px; margin-bottom: 8px; opacity: .35; }
+            </style>
+
+            <div class="vp-hc-wrap">
+                <!-- Page Header + Stats -->
+                <t t-if="historias">
+                    <t t-set="total_consultas" t-value="sum(h.cita_count for h in historias)"/>
+                    <t t-set="total_recetas" t-value="sum(len(h.receta_ids) for h in historias)"/>
+                    <div class="vp-hc-page-hdr">
+                        <div>
+                            <h3><i class="fa fa-heartbeat" style="margin-right:8px;"/>Historia Clínica</h3>
+                            <p>Expediente médico completo de tus mascotas</p>
+                        </div>
+                        <div class="vp-hc-stat-pills">
+                            <div class="vp-hc-stat-pill">
+                                <i class="fa fa-paw"/>
+                                <span t-out="len(historias)"/> mascotas
+                            </div>
+                            <div class="vp-hc-stat-pill">
+                                <i class="fa fa-stethoscope"/>
+                                <span t-out="total_consultas"/> consultas
+                            </div>
+                            <div class="vp-hc-stat-pill">
+                                <i class="fa fa-file-text-o"/>
+                                <span t-out="total_recetas"/> recetas
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            <t t-if="not historias">
+                    <div class="vp-hc-page-hdr">
+                        <div>
+                            <h3><i class="fa fa-heartbeat" style="margin-right:8px;"/>Historia Clínica</h3>
+                            <p>Expediente médico completo de tus mascotas</p>
+                        </div>
+                    </div>
+                    <div class="vp-hc-empty">
+                        <i class="fa fa-folder-open-o"/>
+                        <p>No hay registros de historia clínica aún.<br/>
+                           Se crean automáticamente cuando agendas tu primera cita.
+                        </p>
+                    </div>
+                </t>
+
+                <!-- ── Historia card per pet ── -->
+                    <t t-foreach="historias" t-as="h">
+                    <div class="vp-hc-card">
+                        <!-- Card Header -->
+                        <div class="vp-hc-card-hdr">
+                            <t t-if="h.paciente_id.foto">
+                                <img t-attf-src="/web/image/veterinaria.paciente/#{h.paciente_id.id}/foto"
+                                     class="vp-hc-pet-photo" alt="Foto"/>
+                            </t>
+                            <t t-else="">
+                                <div class="vp-hc-pet-ph">
+                                    <i class="fa fa-paw fa-lg" style="color:#2E86AB;"/>
+                                </div>
+                            </t>
+                            <div style="flex:1;min-width:0;">
+                                <p class="vp-hc-pet-name"><t t-out="h.paciente_id.name"/></p>
+                                <div class="vp-hc-chips">
+                                    <span class="vp-hc-chip">
+                                        <t t-out="dict(h.paciente_id._fields['especie'].selection).get(h.paciente_id.especie, '')"/>
+                                        <t t-if="h.paciente_id.raza"> · <t t-out="h.paciente_id.raza"/></t>
+                                    </span>
+                                    <t t-if="h.paciente_id.estado_vacunacion == 'al_dia'">
+                                        <span class="vp-hc-chip vp-hc-chip-vac-ok">
+                                            <i class="fa fa-check"/> Vacunas al día
+                                        </span>
+                                    </t>
+                                    <t t-elif="h.paciente_id.estado_vacunacion == 'atrasado'">
+                                        <span class="vp-hc-chip vp-hc-chip-vac-bad">
+                                            <i class="fa fa-exclamation"/> Vacunas atrasadas
+                                        </span>
+                                    </t>
+                                </div>
+                                <div class="vp-hc-meta-row">
+                                    <span class="vp-hc-meta-item">
+                                        <i class="fa fa-calendar-o"/>
+                                        Desde <t t-out="str(h.fecha_apertura)[:10]"/>
+                                    </span>
+                                    <t t-if="h.peso">
+                                        <span class="vp-hc-meta-item">
+                                            <i class="fa fa-balance-scale"/>
+                                            <t t-out="h.peso"/> kg
+                                        </span>
+                                    </t>
+                                    <t t-if="h.tipo_sangre and h.tipo_sangre != 'desconocido'">
+                                        <span class="vp-hc-meta-item">
+                                            <i class="fa fa-tint"/>
+                                            <t t-out="dict(h._fields['tipo_sangre'].selection).get(h.tipo_sangre, '')"/>
+                                        </span>
+                                    </t>
+                                </div>
+                            </div>
+                            <div class="vp-hc-counts">
+                                <span class="vp-hc-count-pill">
+                                    <i class="fa fa-stethoscope" style="color:#2E86AB;"/>
+                                    <t t-out="h.cita_count"/> consultas
+                                </span>
+                                <span class="vp-hc-count-pill">
+                                    <i class="fa fa-file-text-o" style="color:#7b5ea7;"/>
+                                    <t t-out="len(h.receta_ids)"/> recetas
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Tabs -->
+                        <ul t-attf-id="vp-hc-nav-#{h.id}"
+                            class="nav vp-hc-tabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" type="button"
+                                        data-bs-toggle="tab"
+                                        t-attf-data-bs-target="#vp-hc-info-#{h.id}"
+                                        role="tab">
+                                    <i class="fa fa-info-circle" style="margin-right:5px;"/>
+                                    Información Médica
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" type="button"
+                                        data-bs-toggle="tab"
+                                        t-attf-data-bs-target="#vp-hc-citas-#{h.id}"
+                                        role="tab">
+                                    <i class="fa fa-stethoscope" style="margin-right:5px;"/>
+                                    Consultas
+                                    <t t-if="h.cita_count">
+                                        <span style="background:#2E86AB;color:#fff;border-radius:10px;padding:1px 7px;font-size:.72rem;margin-left:4px;">
+                                            <t t-out="h.cita_count"/>
+                                        </span>
+                                    </t>
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" type="button"
+                                        data-bs-toggle="tab"
+                                        t-attf-data-bs-target="#vp-hc-rx-#{h.id}"
+                                        role="tab">
+                                    <i class="fa fa-file-text-o" style="margin-right:5px;"/>
+                                    Recetas
+                                    <t t-if="h.receta_ids">
+                                        <span style="background:#7b5ea7;color:#fff;border-radius:10px;padding:1px 7px;font-size:.72rem;margin-left:4px;">
+                                            <t t-out="len(h.receta_ids)"/>
+                                        </span>
+                                    </t>
+                                </button>
                                             </li>
                                         </ul>
-                                    </t>
 
+                        <!-- Tab Content -->
+                        <div class="tab-content vp-hc-tab-content">
+
+                            <!-- ── Información Médica ── -->
+                            <div t-attf-id="vp-hc-info-#{h.id}" class="tab-pane fade show active" role="tabpanel">
+                                <div class="vp-hc-info-grid">
+                                    <div class="vp-hc-info-field">
+                                        <div class="vp-hc-info-label">
+                                            <i class="fa fa-tint" style="margin-right:4px;color:#e74c3c;"/> Tipo de Sangre
+                                        </div>
+                                        <div class="vp-hc-info-val">
+                                            <t t-out="dict(h._fields['tipo_sangre'].selection).get(h.tipo_sangre, 'Desconocido')"/>
+                                        </div>
+                                    </div>
+                                    <div class="vp-hc-info-field">
+                                        <div class="vp-hc-info-label">
+                                            <i class="fa fa-balance-scale" style="margin-right:4px;color:#2E86AB;"/> Peso Registrado
+                                        </div>
+                                        <div class="vp-hc-info-val">
+                                            <t t-if="h.peso"><t t-out="h.peso"/> kg</t>
+                                            <t t-else="">No registrado</t>
+                                        </div>
+                                    </div>
+                                    <div class="vp-hc-info-field" style="grid-column: span 1;">
+                                        <div class="vp-hc-info-label">
+                                            <i class="fa fa-exclamation-triangle" style="margin-right:4px;color:#f4951e;"/> Alergias
+                                        </div>
+                                        <div t-attf-class="vp-hc-info-val #{' alert-text' if h.alergias else ''}">
+                                            <t t-out="h.alergias or 'Ninguna registrada'"/>
+                                        </div>
+                                    </div>
+                                    <t t-if="h.condiciones_cronicas">
+                                        <div class="vp-hc-info-field" style="grid-column: span 2;">
+                                            <div class="vp-hc-info-label">
+                                                <i class="fa fa-medkit" style="margin-right:4px;color:#7b5ea7;"/> Condiciones Crónicas
+                                            </div>
+                                            <div class="vp-hc-info-val"><t t-out="h.condiciones_cronicas"/></div>
+                                        </div>
+                                    </t>
+                                    <t t-if="h.observaciones">
+                                        <div class="vp-hc-info-field" style="grid-column: span 2;">
+                                            <div class="vp-hc-info-label">
+                                                <i class="fa fa-comment-o" style="margin-right:4px;color:#546e7a;"/> Observaciones Generales
+                                            </div>
+                                            <div class="vp-hc-info-val"><t t-out="h.observaciones"/></div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+
+                            <!-- ── Consultas ── -->
+                            <div t-attf-id="vp-hc-citas-#{h.id}" class="tab-pane fade" role="tabpanel">
+                                <t t-if="h.cita_ids">
+                                    <t t-foreach="h.cita_ids" t-as="c">
+                                        <div class="vp-hc-cita">
+                                            <div class="vp-hc-cita-date">
+                                                <div class="vp-hc-cita-day">
+                                                    <t t-out="str(c.fecha_hora)[:10].split('-')[2]"/>
+                                                </div>
+                                                <div class="vp-hc-cita-month">
+                                                    <t t-out="['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][int(str(c.fecha_hora)[:10].split('-')[1])]"/>
+                                                </div>
+                                                <div class="vp-hc-cita-year">
+                                                    <t t-out="str(c.fecha_hora)[:4]"/>
+                                                </div>
+                                            </div>
+                                            <div class="vp-hc-cita-body">
+                                                <div class="vp-hc-cita-top">
+                                                    <t t-if="c.estado == 'completada'">
+                                                        <span class="vp-hc-s vp-hc-s-done">Completada</span>
+                                                    </t>
+                                                    <t t-elif="c.estado == 'programada'">
+                                                        <span class="vp-hc-s vp-hc-s-prog">Programada</span>
+                                                    </t>
+                                                    <t t-elif="c.estado == 'cancelada'">
+                                                        <span class="vp-hc-s vp-hc-s-cancel">Cancelada</span>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span class="vp-hc-s vp-hc-s-noshw">No asistió</span>
+                                                    </t>
+                                                    <span class="vp-hc-cita-vet">
+                                                        <i class="fa fa-user-md" style="margin-right:3px;color:#2E86AB;"/>
+                                                        <t t-out="c.veterinario_id.name or 'Veterinario no asignado'"/>
+                                                    </span>
+                                                    <t t-if="c.servicio_id">
+                                                        <span style="font-size:.75rem;color:#8e9fb0;">
+                                                            · <t t-out="c.servicio_id.name"/>
+                                                        </span>
+                                                    </t>
+                                                </div>
+                                                <div class="vp-hc-cita-motivo"><t t-out="c.motivo"/></div>
+                                                <t t-if="c.sintomas_resumen">
+                                                    <div class="vp-hc-cita-symptoms">
+                                                        <i class="fa fa-thermometer-half" style="margin-right:3px;"/>
+                                                        Síntomas: <t t-out="c.sintomas_resumen"/>
+                                                    </div>
+                                                </t>
+                                                <t t-if="c.observaciones_cliente">
+                                                    <div class="vp-hc-obs-ro">
+                                                        <i class="fa fa-comment-o" style="margin-right:4px;"/>
+                                                        <t t-out="c.observaciones_cliente"/>
+                                                    </div>
+                                                </t>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </t>
+                                <t t-else="">
+                                    <div class="vp-hc-tab-empty">
+                                        <i class="fa fa-stethoscope"/>
+                                        Sin consultas registradas aún
+                                    </div>
+                                </t>
+                            </div>
+
+                            <!-- ── Recetas ── -->
+                            <div t-attf-id="vp-hc-rx-#{h.id}" class="tab-pane fade" role="tabpanel">
                                     <t t-if="h.receta_ids">
-                                        <h6 class="mt-3">Recetas emitidas</h6>
-                                        <ul>
                                             <t t-foreach="h.receta_ids" t-as="r">
-                                                <li>
-                                                    <strong t-out="r.name"/> -
-                                                    <span t-out="r.fecha_emision"/>
-                                                    <ul t-if="r.linea_ids">
-                                                        <li t-foreach="r.linea_ids" t-as="l">
-                                                            <t t-out="l.nombre_medicamento_display"/> —
-                                                            <t t-out="l.dosis"/> ud cada
-                                                            <t t-out="l.frecuencia_horas"/>h por
+                                        <div class="vp-hc-rx">
+                                            <div class="vp-hc-rx-hdr">
+                                                <span class="vp-hc-rx-ref">
+                                                    <i class="fa fa-file-text-o" style="margin-right:4px;color:#7b5ea7;"/>
+                                                    <t t-out="r.name"/>
+                                                </span>
+                                                <span class="vp-hc-rx-date">
+                                                    <i class="fa fa-calendar-o" style="margin-right:3px;"/>
+                                                    <t t-out="str(r.fecha_emision)[:10]"/>
+                                                </span>
+                                                <t t-if="r.state == 'finalizada'">
+                                                    <span class="vp-hc-rx-state-f">Finalizada</span>
+                                                </t>
+                                                <t t-else="">
+                                                    <span class="vp-hc-rx-state-b">Borrador</span>
+                                                </t>
+                                                <t t-if="r.veterinario_id">
+                                                    <span style="font-size:.78rem;color:#8e9fb0;margin-left:auto;">
+                                                        <i class="fa fa-user-md" style="margin-right:3px;"/>
+                                                        <t t-out="r.veterinario_id.name"/>
+                                                    </span>
+                                                </t>
+                                            </div>
+                                            <t t-if="r.diagnostico">
+                                                <div class="vp-hc-rx-diag">
+                                                    <i class="fa fa-stethoscope" style="margin-right:4px;"/>
+                                                    <t t-out="r.diagnostico"/>
+                                                </div>
+                                            </t>
+                                            <t t-if="r.linea_ids">
+                                                <ul class="vp-hc-rx-meds">
+                                                    <t t-foreach="r.linea_ids" t-as="l">
+                                                        <li>
+                                                            <span class="vp-hc-rx-med-num">
+                                                                <t t-out="l_index + 1"/>
+                                                            </span>
+                                                            <span style="flex:1;font-weight:600;">
+                                                                <t t-out="l.nombre_medicamento_display"/>
+                                                            </span>
+                                                            <span class="vp-hc-rx-med-pos">
+                                                                <t t-out="l.dosis"/> ud ·
+                                                                c/<t t-out="l.frecuencia_horas"/>h ·
                                                             <t t-out="l.duracion_dias"/> días
-                                                        </li>
-                                                    </ul>
+                                                            </span>
                                                 </li>
                                             </t>
                                         </ul>
                                     </t>
+                                            <t t-if="r.instrucciones_generales">
+                                                <div style="font-size:.8rem;color:#546e7a;margin-top:8px;border-left:3px solid #f4951e;padding-left:8px;">
+                                                    <i class="fa fa-info-circle" style="margin-right:3px;color:#f4951e;"/>
+                                                    <t t-out="r.instrucciones_generales"/>
                                 </div>
+                                            </t>
                             </div>
+                                    </t>
+                                </t>
+                                <t t-else="">
+                                    <div class="vp-hc-tab-empty">
+                                        <i class="fa fa-file-text-o"/>
+                                        Sin recetas emitidas aún
                         </div>
                     </t>
                 </div>
