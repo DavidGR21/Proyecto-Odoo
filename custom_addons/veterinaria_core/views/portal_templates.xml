@@ -2658,29 +2658,38 @@
                                     </div>
                                 </t>
 
-                                <!-- Indicaciones de cuidado -->
+                                    <!-- Indicaciones -->
                                 <t t-if="r.observaciones_adicionales or r.instrucciones_generales">
-                                    <div class="vet-instructions-box">
-                                        <h6 class="fw-bold text-warning-dark mb-2">
-                                            <i class="fa fa-info-circle me-1 text-warning"/> Indicaciones de Cuidado y Uso
-                                        </h6>
-                                        <t t-if="r.instrucciones_generales">
-                                            <p class="mb-2 text-dark">
-                                                <strong>Instrucciones generales:</strong> <t t-out="r.instrucciones_generales"/>
+                                        <div class="vp-script-notes">
+                                            <p class="vp-script-notes-lbl">
+                                                <i class="fa fa-info-circle me-1"/>Indicaciones de uso
                                             </p>
+                                        <t t-if="r.instrucciones_generales">
+                                                <p><strong>Instrucciones:</strong> <t t-out="r.instrucciones_generales"/></p>
                                         </t>
                                         <t t-if="r.observaciones_adicionales">
-                                            <p class="m-0 text-dark">
-                                                <strong>Observaciones adicionales:</strong> <t t-out="r.observaciones_adicionales"/>
-                                            </p>
+                                                <p><strong>Observaciones:</strong> <t t-out="r.observaciones_adicionales"/></p>
                                         </t>
                                     </div>
                                 </t>
+
+                                    <!-- Firma -->
+                                    <div class="vp-script-footer">
+                                        <div class="vp-script-sig">
+                                            <div class="vp-script-sig-line"/>
+                                            <div class="vp-script-sig-name"
+                                                 t-out="r.veterinario_id.name or 'Médico Veterinario'"/>
+                                            <div class="vp-script-sig-sub">Firma del veterinario</div>
                             </div>
+                                    </div>
+                                </div>
+                                <!-- Borde picado al pie -->
+                                <div class="vp-script-tear"/>
                         </div>
                     </t>
                 </div>
             </t>
+            </div>
         </t>
     </template>
 
@@ -2689,79 +2698,230 @@
          ===================================================== -->
     <template id="portal_my_vet_invoices" name="Mis Facturas Veterinarias">
         <t t-call="portal.portal_layout">
-            <div class="d-flex justify-content-between align-items-center mt-3 mb-4">
-                <h3 class="m-0">Mis Facturas Veterinarias</h3>
-                <span class="badge bg-primary"><t t-out="len(facturas)"/> en total</span>
+            <style>
+                /* === VitalPet · Facturas =================================== */
+                .vp-inv-wrap { font-family:'Inter','Segoe UI',sans-serif; }
+
+                /* Card de factura */
+                .vp-inv-card {
+                    background:#fff; border-radius:18px;
+                    border:1.5px solid #e4eef5; overflow:hidden;
+                    height:100%; display:flex; flex-direction:column;
+                    box-shadow:0 2px 10px rgba(0,0,0,.05);
+                    transition:transform .2s, box-shadow .2s, border-color .2s;
+                }
+                .vp-inv-card:hover {
+                    transform:translateY(-4px);
+                    box-shadow:0 14px 36px rgba(0,0,0,.1);
+                    border-color:#2E86AB;
+                }
+                /* Franja superior de color según estado */
+                .vp-inv-stripe { height:5px; width:100%; }
+                .vp-stripe-paid    { background:linear-gradient(90deg,#06A77D,#0abf91); }
+                .vp-stripe-pending { background:linear-gradient(90deg,#f4951e,#f5b041); }
+                .vp-stripe-cancel  { background:linear-gradient(90deg,#e74c3c,#ec7063); }
+                .vp-stripe-draft   { background:linear-gradient(90deg,#8e9fb0,#aab5bf); }
+
+                /* Cuerpo */
+                .vp-inv-body { padding:18px 20px; flex:1; display:flex; flex-direction:column; }
+                .vp-inv-head { display:flex; justify-content:space-between; align-items:start; gap:8px; margin-bottom:14px; }
+                .vp-inv-num  { font-size:15px; font-weight:800; color:#0d3b5e; margin:0; }
+                .vp-inv-date { font-size:11px; color:#8e9fb0; margin:4px 0 0 0; }
+
+                /* Badge de estado */
+                .vp-inv-badge {
+                    display:inline-flex; align-items:center; gap:5px;
+                    padding:4px 11px; border-radius:20px;
+                    font-size:11px; font-weight:700; flex-shrink:0;
+                }
+                .vp-inv-b-paid    { background:#e8f5e9; color:#1b5e20; }
+                .vp-inv-b-pending { background:#fff3e0; color:#b7560a; }
+                .vp-inv-b-cancel  { background:#fdeaea; color:#c0392b; }
+                .vp-inv-b-draft   { background:#f0f0f0; color:#546e7a; }
+
+                /* Info líneas */
+                .vp-inv-info { margin-bottom:auto; }
+                .vp-inv-info-row {
+                    display:flex; align-items:center; gap:7px;
+                    font-size:12.5px; color:#546e7a;
+                    padding:4px 0; border-bottom:1px solid #f5f5f5;
+                }
+                .vp-inv-info-row:last-child { border-bottom:none; }
+                .vp-inv-info-row i { width:14px; text-align:center; color:#8e9fb0; }
+
+                /* Importe destacado */
+                .vp-inv-amount-wrap {
+                    background:linear-gradient(135deg,#f0f8ff,#e3f0f8);
+                    border-radius:12px; padding:14px 16px;
+                    text-align:center; margin:14px 0;
+                }
+                .vp-inv-amount-lbl { font-size:10px; font-weight:700; text-transform:uppercase;
+                                     letter-spacing:.6px; color:#8e9fb0; margin:0 0 2px 0; }
+                .vp-inv-amount-val { font-size:28px; font-weight:800; color:#2E86AB; margin:0;
+                                     letter-spacing:-1px; }
+
+                /* Footer de botones */
+                .vp-inv-footer { padding:14px 20px 16px; border-top:1px solid #f0f0f0; }
+                .vp-inv-btns { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+                .vp-inv-btn {
+                    display:flex; align-items:center; justify-content:center; gap:6px;
+                    padding:9px; border-radius:10px; font-size:12px; font-weight:700;
+                    text-decoration:none !important; transition:background .15s;
+                }
+                .vp-inv-btn-solid   { background:#2E86AB; color:#fff !important; }
+                .vp-inv-btn-solid:hover { background:#1a5c8a; }
+                .vp-inv-btn-outline { border:1.5px solid #2E86AB; color:#2E86AB !important; }
+                .vp-inv-btn-outline:hover { background:#e3f0f8; }
+                .vp-inv-btn-pp {
+                    grid-column:1 / -1;
+                    background:#003087; color:#fff !important; border-radius:10px;
+                }
+                .vp-inv-btn-pp:hover { background:#002060; }
+
+                /* Empty */
+                .vp-inv-empty {
+                    text-align:center; padding:64px 24px;
+                    background:#f7fbfe; border-radius:20px;
+                    border:2px dashed #cde4f0;
+                }
+                .vp-inv-empty i { font-size:44px; opacity:.2; display:block; margin-bottom:12px; }
+            </style>
+
+            <div class="vp-inv-wrap">
+                <!-- Header -->
+                <div class="d-flex align-items-center justify-content-between mt-3 mb-4 flex-wrap gap-2">
+                    <h3 class="m-0 fw-bold" style="color:#0d3b5e;">
+                        <i class="fa fa-file-text-o me-2" style="color:#f4951e;"/>Mis Facturas
+                    </h3>
+                    <t t-if="facturas">
+                        <div class="d-flex gap-2 flex-wrap">
+                            <t t-set="n_pend" t-value="sum(1 for f in facturas if f.estado == 'validado' and not f.pagado)"/>
+                            <t t-if="n_pend > 0">
+                                <span class="badge rounded-pill px-3 py-2"
+                                      style="background:#f4951e; font-size:12px;">
+                                    <i class="fa fa-clock-o me-1"/>
+                                    <t t-out="n_pend"/> pendiente<t t-if="n_pend != 1">s</t>
+                                </span>
+                            </t>
+                            <span class="badge rounded-pill px-3 py-2"
+                                  style="background:#546e7a; font-size:12px;">
+                                <t t-out="len(facturas)"/> en total
+                            </span>
             </div>
+                    </t>
+                </div>
+
+                <!-- Empty -->
             <t t-if="not facturas">
-                <div class="alert alert-light text-center py-4">
-                    <i class="fa fa-file-text-o fa-2x text-muted mb-2 d-block"/>
-                    No tiene facturas registradas todavía.
+                    <div class="vp-inv-empty">
+                        <i class="fa fa-file-text-o"/>
+                        <h5 class="fw-bold mb-2" style="color:#0d3b5e;">
+                            No tienes facturas registradas
+                        </h5>
+                        <p class="text-muted small mb-0">
+                            Tus facturas veterinarias aparecerán aquí cuando sean emitidas.
+                        </p>
                 </div>
             </t>
+
+                <!-- Grid de cards -->
             <t t-if="facturas">
-                <div class="row g-3">
+                    <div class="row g-3 pb-5">
                     <t t-foreach="facturas" t-as="f">
-                        <div class="col-md-6 col-lg-4">
-                            <div class="card shadow-sm h-100 border-0"
-                                 style="border-radius:14px;">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-start mb-3">
-                                        <h5 class="m-0" t-out="f.name"/>
-                                        <div class="d-flex flex-column align-items-end gap-1">
-                                            <span t-attf-class="badge rounded-pill bg-#{ 'success' if f.estado=='validado' else ('danger' if f.estado=='cancelado' else 'warning text-dark') }"
-                                                  t-out="dict(f._fields['estado'].selection).get(f.estado, '')"/>
-                                            <!-- Badge Pagado -->
+                            <div class="col-md-6 col-xl-4">
+                                <div class="vp-inv-card">
+                                    <!-- Franja de color -->
                                             <t t-if="f.pagado">
-                                                <span class="badge rounded-pill" style="background:#06A77D;">
-                                                    <i class="fa fa-check-circle me-1"/>Pagado
+                                        <div class="vp-inv-stripe vp-stripe-paid"/>
+                                    </t>
+                                    <t t-elif="f.estado == 'validado' and not f.pagado">
+                                        <div class="vp-inv-stripe vp-stripe-pending"/>
+                                    </t>
+                                    <t t-elif="f.estado == 'cancelado'">
+                                        <div class="vp-inv-stripe vp-stripe-cancel"/>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="vp-inv-stripe vp-stripe-draft"/>
+                                    </t>
+
+                                    <!-- Cuerpo -->
+                                    <div class="vp-inv-body">
+                                        <div class="vp-inv-head">
+                                            <div>
+                                                <p class="vp-inv-num" t-out="f.name"/>
+                                                <p class="vp-inv-date">
+                                                    <i class="fa fa-calendar-o me-1"/>
+                                                    <t t-out="f.fecha_factura"/>
+                                                </p>
+                                            </div>
+                                            <!-- Badge estado pago -->
+                                            <t t-if="f.pagado">
+                                                <span class="vp-inv-badge vp-inv-b-paid">
+                                                    <i class="fa fa-check-circle"/>Pagada
                                                 </span>
                                             </t>
                                             <t t-elif="f.estado == 'validado' and not f.pagado">
-                                                <span class="badge rounded-pill bg-warning text-dark">
-                                                    <i class="fa fa-clock-o me-1"/>Pago pendiente
+                                                <span class="vp-inv-badge vp-inv-b-pending">
+                                                    <i class="fa fa-clock-o"/>Pendiente
+                                                </span>
+                                            </t>
+                                            <t t-elif="f.estado == 'cancelado'">
+                                                <span class="vp-inv-badge vp-inv-b-cancel">
+                                                    <i class="fa fa-times-circle"/>Cancelada
+                                                </span>
+                                            </t>
+                                            <t t-else="">
+                                                <span class="vp-inv-badge vp-inv-b-draft">
+                                                    <t t-out="dict(f._fields['estado'].selection).get(f.estado,'')"/>
                                                 </span>
                                             </t>
                                         </div>
-                                    </div>
-                                    <p class="text-muted small mb-2">
-                                        <i class="fa fa-calendar me-1"/>
-                                        <t t-out="f.fecha_factura"/>
-                                    </p>
-                                    <p class="small mb-2">
-                                        <i class="fa fa-paw me-1 text-primary"/>
+
+                                        <!-- Info -->
+                                        <div class="vp-inv-info mb-2">
                                         <t t-set="mascotas" t-value="f.linea_ids.mapped('cita_id.paciente_id.name')"/>
+                                            <div class="vp-inv-info-row">
+                                                <i class="fa fa-paw"/>
                                         <t t-if="mascotas">
                                             <t t-out="', '.join([m for m in mascotas if m])"/>
                                         </t>
                                         <t t-else="">Sin mascotas asociadas</t>
-                                    </p>
-                                    <p class="small mb-3 text-muted">
-                                        <t t-out="len(f.linea_ids)"/> línea(s) facturada(s)
-                                    </p>
-                                    <div class="text-end mb-3">
-                                        <div class="text-muted small">Total</div>
-                                        <div style="font-size:1.6rem;font-weight:600;color:#2E86AB;">
+                                            </div>
+                                            <div class="vp-inv-info-row">
+                                                <i class="fa fa-list-ol"/>
+                                                <t t-out="len(f.linea_ids)"/> línea<t t-if="len(f.linea_ids) != 1">s</t> facturada<t t-if="len(f.linea_ids) != 1">s</t>
+                                            </div>
+                                        </div>
+
+                                        <!-- Importe -->
+                                        <div class="vp-inv-amount-wrap">
+                                            <p class="vp-inv-amount-lbl">Total a pagar</p>
+                                            <p class="vp-inv-amount-val">
                                             $<t t-out="'%.2f' % (f.total or 0)"/>
+                                            </p>
                                         </div>
                                     </div>
-                                    <div class="d-grid gap-2">
+
+                                    <!-- Botones -->
+                                    <div class="vp-inv-footer">
+                                        <div class="vp-inv-btns">
                                         <a t-attf-href="/my/invoices_vet/#{f.id}"
-                                           class="btn btn-primary btn-sm">
-                                            <i class="fa fa-eye me-1"/> Ver detalle
+                                               class="vp-inv-btn vp-inv-btn-solid">
+                                                <i class="fa fa-eye"/>Ver detalle
                                         </a>
                                         <a t-attf-href="/my/invoices_vet/#{f.id}/pdf"
-                                           class="btn btn-outline-secondary btn-sm">
-                                            <i class="fa fa-file-pdf-o me-1"/> Descargar PDF
+                                               class="vp-inv-btn vp-inv-btn-outline">
+                                                <i class="fa fa-file-pdf-o"/>PDF
                                         </a>
-                                        <!-- Botón pago rápido desde listado -->
                                         <t t-if="f.estado == 'validado' and not f.pagado and f.total &gt; 0">
-                                            <form t-attf-action="/my/invoices_vet/#{f.id}/pay" method="post">
-                                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                                                <button type="submit" class="btn btn-sm w-100"
-                                                        style="background:#003087;color:#fff;border:none;">
+                                                <form t-attf-action="/my/invoices_vet/#{f.id}/pay" method="post"
+                                                      style="grid-column:1/-1;">
+                                                    <input type="hidden" name="csrf_token"
+                                                           t-att-value="request.csrf_token()"/>
+                                                    <button type="submit"
+                                                            class="vp-inv-btn vp-inv-btn-pp w-100">
                                                     <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg"
-                                                         alt="PayPal" style="height:16px;vertical-align:middle;margin-right:6px;"/>
+                                                             alt="PayPal" style="height:15px; vertical-align:middle;"/>
                                                     Pagar con PayPal
                                                 </button>
                                             </form>
@@ -2773,6 +2933,7 @@
                     </t>
                 </div>
             </t>
+            </div>
         </t>
     </template>
 
